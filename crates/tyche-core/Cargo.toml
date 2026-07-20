@@ -1,0 +1,27 @@
+[package]
+name = "tyche-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+description = "Core reproducible uncertainty-study laws for Tyche"
+repository.workspace = true
+license.workspace = true
+readme = "../../README.md"
+keywords = ["uncertainty", "sampling", "sensitivity", "no-std"]
+categories = ["no-std", "science"]
+publish.workspace = true
+
+[dependencies]
+eunomia.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+stats_alloc.workspace = true
+
+[features]
+default = ["std"]
+std = ["eunomia/std"]
+
+[lints]
+workspace = true

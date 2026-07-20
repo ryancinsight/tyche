@@ -1,0 +1,38 @@
+//! Consus Zarr store adapter.
+
+use consus_zarr::Store;
+
+use crate::{ArtifactKey, ArtifactRead, ArtifactWrite};
+
+/// Pointer-sized adapter borrowing a caller-owned Consus Zarr store.
+#[derive(Debug)]
+#[repr(transparent)]
+pub struct ConsusArchive<'store, S: Store> {
+    store: &'store mut S,
+}
+
+impl<'store, S: Store> ConsusArchive<'store, S> {
+    /// Borrow a Consus store without taking format or lifecycle ownership.
+    #[must_use]
+    pub const fn new(store: &'store mut S) -> Self {
+        Self { store }
+    }
+}
+
+impl<S: Store> ArtifactRead for ConsusArchive<'_, S> {
+    type Error = consus_core::Error;
+    type Bytes<'a>
+        = Vec<u8>
+    where
+        Self: 'a;
+
+    fn read<'a>(&'a self, key: &ArtifactKey<'_>) -> Result<Self::Bytes<'a>, Self::Error> {
+        self.store.get(key.as_str())
+    }
+}
+
+impl<S: Store> ArtifactWrite for ConsusArchive<'_, S> {
+    fn write(&mut self, key: &ArtifactKey<'_>, bytes: &[u8]) -> Result<(), Self::Error> {
+        self.store.set(key.as_str(), bytes)
+    }
+}

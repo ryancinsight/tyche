@@ -1,0 +1,27 @@
+[package]
+name = "tyche"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+description = "Atlas reproducible uncertainty-study foundation"
+repository.workspace = true
+license.workspace = true
+readme = "../../README.md"
+keywords = ["uncertainty", "sampling", "sensitivity", "simulation"]
+categories = ["science"]
+publish.workspace = true
+
+[dependencies]
+tyche-core = { workspace = true }
+tyche-moirai = { workspace = true, optional = true }
+tyche-consus = { workspace = true, optional = true }
+
+[features]
+default = ["std", "moirai", "consus"]
+std = ["tyche-core/std"]
+moirai = ["std", "dep:tyche-moirai"]
+consus = ["std", "dep:tyche-consus"]
+
+[lints]
+workspace = true

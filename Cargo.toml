@@ -1,0 +1,53 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/tyche-core",
+    "crates/tyche-moirai",
+    "crates/tyche-consus",
+    "crates/tyche",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+authors = ["Ryan Clanton <ryanclanton@outlook.com>"]
+repository = "https://github.com/ryancinsight/tyche"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+tyche-core = { path = "crates/tyche-core", version = "0.1.0", default-features = false }
+tyche-moirai = { path = "crates/tyche-moirai", version = "0.1.0" }
+tyche-consus = { path = "crates/tyche-consus", version = "0.1.0" }
+eunomia = { version = "0.6.0", git = "https://github.com/ryancinsight/eunomia.git", rev = "2a6cb2ce381d3ddffc8f6f5542c5f3383329012a", default-features = false }
+consus-core = { version = "0.1.0", git = "https://github.com/ryancinsight/consus.git", rev = "0106b709212033823a22782b0c491603e8ce1229", default-features = false, features = ["alloc"] }
+consus-zarr = { version = "0.1.0", git = "https://github.com/ryancinsight/consus.git", rev = "0106b709212033823a22782b0c491603e8ce1229", default-features = false, features = ["std"] }
+moirai-core = { version = "0.4.0", git = "https://github.com/ryancinsight/Moirai.git", rev = "8a51b2a7c5240bbeee6f1b766af2c54ac2898af6" }
+moirai-executor = { version = "0.4.0", git = "https://github.com/ryancinsight/Moirai.git", rev = "8a51b2a7c5240bbeee6f1b766af2c54ac2898af6" }
+proptest = "1.11.0"
+stats_alloc = "0.1.10"
+
+[workspace.lints.rust]
+missing_docs = "deny"
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+unwrap_used = "deny"
+
+[profile.dev]
+debug = "line-tables-only"
+overflow-checks = true
+
+[profile.dev.package."*"]
+debug = false
+
+[profile.test]
+debug = "line-tables-only"
+overflow-checks = true
+
+[profile.release]
+debug = false
+strip = "symbols"
+overflow-checks = true

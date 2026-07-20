@@ -1,0 +1,18 @@
+[package]
+name = "tyche-consus"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+description = "Consus artifact adapter for Tyche studies"
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+tyche-core = { workspace = true, features = ["std"] }
+consus-core.workspace = true
+consus-zarr.workspace = true
+
+[lints]
+workspace = true

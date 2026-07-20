@@ -1,0 +1,19 @@
+[package]
+name = "tyche-moirai"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+description = "Moirai execution adapter for Tyche studies"
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+tyche-core = { workspace = true, features = ["std"] }
+eunomia = { workspace = true, features = ["std"] }
+moirai-core.workspace = true
+moirai-executor.workspace = true
+
+[lints]
+workspace = true
