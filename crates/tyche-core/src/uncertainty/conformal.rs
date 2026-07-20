@@ -32,33 +32,81 @@ impl<T: RealField> ConformalCalibrator<T> {
     /// # Errors
     ///
     /// Rejects empty, negative, or non-finite scores.
-    #[expect(
-        clippy::cast_possible_truncation,
-        clippy::cast_precision_loss,
-        clippy::cast_sign_loss,
-        reason = "validated finite rank lies in the closed interval [1, scores.len()]"
-    )]
     pub fn calibrate_in_place(self, scores: &mut [T]) -> Result<T, ConformalError<T>> {
-        if scores.is_empty() {
-            return Err(ConformalError::EmptyScores);
-        }
-        for (index, &score) in scores.iter().enumerate() {
-            if !score.is_finite() || score < T::ZERO {
+        validate_scores(scores)?;
+        scores.sort_unstable_by(|left, right| {
+            if left < right {
+                Ordering::Less
+            } else if left > right {
+                Ordering::Greater
+            } else {
+                Ordering::Equal
+            }
+        });
+        Ok(self.select_sorted(scores))
+    }
+    /// Return the corrected quantile from an already nondecreasing score slice.
+    ///
+    /// This borrowed form performs no allocation or mutation. The selected
+    /// position is the first integer rank not less than
+    /// `ceil((n+1)(1-alpha))`; therefore it equals the finite-sample corrected
+    /// order statistic and is capped by the final score.
+    ///
+    /// # Errors
+    ///
+    /// Rejects empty, negative, non-finite, or decreasing scores.
+    pub fn calibrate_sorted(self, scores: &[T]) -> Result<T, ConformalError<T>> {
+        validate_scores(scores)?;
+        for (index, pair) in scores.windows(2).enumerate() {
+            if pair[1] < pair[0] {
                 return Err(ConformalError::InvalidScore {
-                    index,
-                    value: score,
+                    index: index + 1,
+                    value: pair[1],
                 });
             }
         }
-        scores.sort_unstable_by(|left, right| left.partial_cmp(right).unwrap_or(Ordering::Equal));
-        let count = scores.len();
-        let rank = (count + 1) as f64 * (1.0 - self.miscoverage.to_f64());
-        let raw = <f64 as eunomia::FloatElement>::ceil(rank) as usize;
-        Ok(scores[raw.clamp(1, count) - 1])
+        Ok(self.select_sorted(scores))
     }
     /// Form a symmetric interval.
     #[must_use]
     pub fn interval(self, prediction: T, radius: T) -> PredictionInterval<T> {
         PredictionInterval::new(prediction - radius, prediction + radius)
     }
+
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "structural ranks are embedded into T before native-precision arithmetic"
+    )]
+    fn select_sorted(self, scores: &[T]) -> T {
+        let corrected_rank =
+            (T::from_f64((scores.len() + 1) as f64) * (T::ONE - self.miscoverage)).ceil();
+        scores
+            .iter()
+            .enumerate()
+            .find(|(index, _)| T::from_f64((index + 1) as f64) >= corrected_rank)
+            .map_or_else(
+                || {
+                    scores
+                        .last()
+                        .copied()
+                        .expect("invariant: score validation rejects empty slices")
+                },
+                |(_, &score)| score,
+            )
+    }
+}
+
+fn validate_scores<T: RealField>(scores: &[T]) -> Result<(), ConformalError<T>> {
+    if scores.is_empty() {
+        return Err(ConformalError::EmptyScores);
+    }
+    for (index, &score) in scores.iter().enumerate() {
+        if !score.is_finite() || score < T::ZERO {
+            return Err(ConformalError::InvalidScore {
+                index,
+                value: score,
+            });
+        }
+    }
+    Ok(())
 }
