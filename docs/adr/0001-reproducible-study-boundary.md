@@ -12,9 +12,11 @@ counter-addressed streams, random-access LHS, GAT model responses, ordered
 moments, explicit variance policies, honest correlation screening, and
 corrected conformal calibration. It owns no runtime, store, array, or physics.
 
-Moirai dispatch writes caller-owned disjoint chunks. Models errors remain
-indexed values; scheduler errors are separate. Consus adaptation validates
-relative keys before delegation and persists only after dispatch.
+`Study::sample` preserves `SampleIndexError`; public `Design` implementations
+can construct that typed failure. Moirai dispatch writes caller-owned disjoint
+chunks. Model errors remain indexed values, while scheduler and malformed
+design-contract failures are separate. Consus adaptation validates relative
+keys before delegation and persists only after dispatch.
 
 ## Proof obligations
 
@@ -94,8 +96,9 @@ has no flush or transaction contract, so Tyche makes no crash-durability claim.
 
 Stratification, bounds, bitwise replay, stream domains, Welford/Chan oracles,
 variance denominators, correlation, conformal rank, GAT/Cow identity, ZST and
-allocation checks, Moirai index preservation, Consus byte roundtrip, safe keys,
-no-std, Clippy, tests, rustdoc, example, and supply-chain gates.
+allocation checks, Moirai index preservation and malformed-design rejection,
+Consus byte roundtrip, safe keys, no-std, Clippy, tests, rustdoc, example, and
+supply-chain gates.
 
 ## References
 

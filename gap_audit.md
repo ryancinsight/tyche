@@ -34,6 +34,7 @@ allocator, or physics ownership.
 Tyche main `c6b69addabf89cec73aa9feab2010e06b0c0a4a6` is hosted-CI green. Main
 `90e466388a936e0f9fff56e33baae69b467144ed` failed only its formatting gate;
 this delivery formats that scalar-generic expression and passes the full local
-locked gate: no-std check, warning-denied Clippy, 17/17 Nextest, 9/9 doctests,
-Rustdoc, the reproducible-study example, supply-chain policy, and SemVer checks.
+locked gate: no-std check, warning-denied Clippy, 18/18 Nextest, 9/9 doctests,
+Rustdoc, the reproducible-study example, and supply-chain policy.
+`cargo-semver-checks` completes but has no published Tyche baseline to compare.
 The remaining hosted evidence limits are explicit.

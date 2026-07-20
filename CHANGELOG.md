@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking
+
+- `Study::sample` now preserves its typed `SampleIndexError`, and the Moirai
+  adapter reports a malformed public `Design` implementation as
+  `DispatchError::DesignContract` instead of entering a contained panic path.
+
 ### Fixed
 
 - Conformal ranks now compute in the caller's scalar precision, and sorted
