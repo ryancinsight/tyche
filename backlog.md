@@ -20,7 +20,7 @@
   tests. Hosted verification and merge remain.
 - Moirai merge `91c802e` repairs the final-completion lifetime race exposed by
   Tyche's 257-item, seven-item-chunk adapter contract. The pinned Tyche
-  workspace passes 16/16 tests, including the exact former access-violation
+  workspace passes 17/17 tests, including the exact former access-violation
   case.
 
 ## TYCHE-003 — Sampling breadth — planned
