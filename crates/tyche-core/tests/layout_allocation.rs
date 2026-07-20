@@ -14,7 +14,7 @@ static ALLOCATOR: &StatsAlloc<std::alloc::System> = &INSTRUMENTED_SYSTEM;
 #[test]
 fn static_policies_and_counter_samplers_are_zero_sized() {
     assert_eq!(size_of::<SplitMix64>(), 0);
-    assert_eq!(size_of::<StandardNormal>(), 0);
+    assert_eq!(size_of::<StandardNormal<f64>>(), 0);
     assert_eq!(size_of::<PopulationVariance>(), 0);
 }
 

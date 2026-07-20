@@ -1,5 +1,7 @@
 //! Stateless counter-addressed pseudorandom words.
 
+use core::marker::PhantomData;
+
 /// Reproducibility seed for an uncertainty study.
 #[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -70,23 +72,31 @@ impl SplitMix64 {
     }
 }
 
-/// Zero-sized standard-normal counter sampler.
+/// Zero-sized standard-normal counter sampler over scalar type `T`.
+///
+/// Box-Muller consumes two independent counter streams. No mutable RNG
+/// state or cache is shared between trials.
 #[must_use]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct StandardNormal;
+pub struct StandardNormal<T> {
+    _marker: PhantomData<T>,
+}
 
-impl StandardNormal {
+impl<T: eunomia::RealField> StandardNormal<T> {
     /// Return one standard-normal variate addressed by `(seed, sample, stream)`.
     ///
-    /// Box-Muller consumes two independent counter streams. No mutable RNG
-    /// state or cache is shared between trials.
+    /// The Box-Muller transform derives two independent uniform variates from
+    /// the counter streams, converts them to `T`, and applies the closed-form
+    /// polar transformation at the precision of `T`.
     #[must_use]
-    pub fn at(seed: Seed, sample: u64, stream: u64) -> f64 {
-        use eunomia::{FloatElement, NumericElement, RealField};
+    pub fn at(seed: Seed, sample: u64, stream: u64) -> T {
+        use eunomia::{FloatElement, NumericElement};
 
         let first = SplitMix64::open_unit(seed, sample, stream.wrapping_mul(2));
         let second = SplitMix64::unit(seed, sample, stream.wrapping_mul(2).wrapping_add(1));
-        let radius = <f64 as NumericElement>::sqrt(-2.0 * <f64 as FloatElement>::ln(first));
-        radius * <f64 as FloatElement>::cos(<f64 as RealField>::TAU * second)
+        let first = T::from_f64(first);
+        let second = T::from_f64(second);
+        let radius = <T as NumericElement>::sqrt(<T as FloatElement>::from_f64(-2.0) * <T as FloatElement>::ln(first));
+        radius * <T as FloatElement>::cos(<T as eunomia::RealField>::TAU * second)
     }
 }

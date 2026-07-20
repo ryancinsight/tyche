@@ -44,7 +44,7 @@ fn streams_respect_domains() {
         assert!((0.0..1.0).contains(&SplitMix64::unit(seed, index, 0)));
         let open = SplitMix64::open_unit(seed, index, 1);
         assert!(open > 0.0 && open < 1.0);
-        assert!(StandardNormal::at(seed, index, 2).is_finite());
+        assert!(StandardNormal::<f64>::at(seed, index, 2).is_finite());
     }
 }
 

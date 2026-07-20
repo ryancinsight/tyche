@@ -49,7 +49,7 @@ fn borrowing_and_allocation_contracts_hold() {
         source.as_ptr()
     ));
     assert_eq!(size_of::<SplitMix64>(), 0);
-    assert_eq!(size_of::<StandardNormal>(), 0);
+    assert_eq!(size_of::<StandardNormal<f64>>(), 0);
     assert_eq!(size_of::<PopulationVariance>(), 0);
 
     let mut point = [0.0; 2];
