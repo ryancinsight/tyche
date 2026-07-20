@@ -3,6 +3,7 @@
 use core::fmt;
 
 /// Reproducible-study construction failure.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StudyError {
     /// A study needs a stable non-empty name.

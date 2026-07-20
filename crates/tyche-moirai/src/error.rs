@@ -4,6 +4,7 @@ use core::fmt;
 use moirai_core::error::ExecutorError;
 
 /// Failure before or during dispatch.
+#[must_use]
 #[derive(Debug)]
 pub enum DispatchError {
     /// Compile-time chunk width is zero.

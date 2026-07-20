@@ -10,6 +10,7 @@ use super::{Design, SampleIndexError, Seed, SplitMix64};
 /// coprime with `n`. The complete design therefore places exactly one point in
 /// every stratum of every dimension without storing an `n × PARAMETERS`
 /// design matrix.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LatinHypercube<const PARAMETERS: usize> {
     seed: Seed,
@@ -24,7 +25,17 @@ impl<const PARAMETERS: usize> LatinHypercube<PARAMETERS> {
     /// A non-zero sample count is carried by [`NonZeroU32`]. Bounding the
     /// count to 32 bits keeps every stratum exactly representable in `f64`. A
     /// zero-dimensional design is rejected by [`crate::ParameterSpace`].
-    #[must_use]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::num::NonZeroU32;
+    /// use tyche_core::sampling::{LatinHypercube, Seed, Design};
+    ///
+    /// let seed = Seed::new(42);
+    /// let lh = LatinHypercube::<3>::new(seed, NonZeroU32::new(10).unwrap());
+    /// assert_eq!(lh.sample_count(), 10);
+    /// ```
     pub fn new(seed: Seed, sample_count: NonZeroU32) -> Self {
         let count = sample_count.get();
         let mut strides = [1; PARAMETERS];
@@ -44,7 +55,6 @@ impl<const PARAMETERS: usize> LatinHypercube<PARAMETERS> {
     }
 
     /// Stable study seed.
-    #[must_use]
     pub const fn seed(&self) -> Seed {
         self.seed
     }

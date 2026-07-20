@@ -16,6 +16,7 @@ pub trait VariancePolicy<T: RealField> {
 }
 
 /// Zero-sized population variance (`n` denominator).
+#[must_use]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct PopulationVariance;
 
@@ -37,6 +38,7 @@ impl<T: RealField> VariancePolicy<T> for PopulationVariance {
 }
 
 /// Zero-sized sample variance (`n-1` denominator).
+#[must_use]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct SampleVariance;
 

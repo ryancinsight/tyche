@@ -1,6 +1,7 @@
 //! Symmetric scalar prediction interval.
 
 /// Closed scalar interval.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PredictionInterval<T> {
     lower: T,

@@ -20,6 +20,7 @@ pub trait Design<const PARAMETERS: usize> {
 }
 
 /// A requested sample index lies outside its design.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SampleIndexError {
     index: usize,

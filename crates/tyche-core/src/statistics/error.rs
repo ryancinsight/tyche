@@ -3,6 +3,7 @@
 use core::fmt;
 
 /// A statistic received too few observations.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InsufficientSamples {
     required: u64,
@@ -11,7 +12,6 @@ pub struct InsufficientSamples {
 
 impl InsufficientSamples {
     /// Construct the failure.
-    #[must_use]
     pub const fn new(required: u64, actual: u64) -> Self {
         Self { required, actual }
     }

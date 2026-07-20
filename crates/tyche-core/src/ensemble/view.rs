@@ -4,6 +4,7 @@ use crate::statistics::{InsufficientSamples, Moments};
 use eunomia::RealField;
 
 /// Borrowed scalar responses in logical-index order.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(transparent)]
 pub struct Ensemble<'a, T> {
@@ -12,7 +13,6 @@ pub struct Ensemble<'a, T> {
 
 impl<'a, T: RealField> Ensemble<'a, T> {
     /// Borrow a response slice.
-    #[must_use]
     pub const fn new(responses: &'a [T]) -> Self {
         Self { responses }
     }

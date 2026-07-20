@@ -4,6 +4,7 @@ use super::{InsufficientSamples, VariancePolicy};
 use eunomia::RealField;
 
 /// Online scalar mean and centered sum of squares.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Moments<T> {
     count: u64,
@@ -19,7 +20,18 @@ impl<T: RealField> Default for Moments<T> {
 
 impl<T: RealField> Moments<T> {
     /// Construct empty.
-    #[must_use]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tyche_core::statistics::Moments;
+    ///
+    /// let mut m = Moments::<f64>::new();
+    /// m.update(1.0);
+    /// m.update(2.0);
+    /// m.update(3.0);
+    /// assert_eq!(m.mean().unwrap(), 2.0);
+    /// ```
     pub fn new() -> Self {
         Self {
             count: 0,

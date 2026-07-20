@@ -3,6 +3,7 @@
 use core::fmt;
 
 /// Invalid level or score set.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConformalError<T> {
     /// Miscoverage is outside `(0,1)`.

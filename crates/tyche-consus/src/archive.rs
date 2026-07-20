@@ -4,6 +4,7 @@ use crate::{ArtifactKey, ArtifactRead, ArtifactWrite};
 use consus_zarr::Store;
 
 /// Pointer-sized borrowed Consus store adapter.
+#[must_use]
 #[repr(transparent)]
 pub struct ConsusArchive<'store, S> {
     store: &'store mut S,
@@ -11,7 +12,6 @@ pub struct ConsusArchive<'store, S> {
 
 impl<'store, S: Store> ConsusArchive<'store, S> {
     /// Borrow the store.
-    #[must_use]
     pub const fn new(store: &'store mut S) -> Self {
         Self { store }
     }

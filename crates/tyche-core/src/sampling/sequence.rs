@@ -1,13 +1,13 @@
 //! Stateless counter-addressed pseudorandom words.
 
 /// Reproducibility seed for an uncertainty study.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct Seed(u64);
 
 impl Seed {
     /// Construct a seed from its stable bit representation.
-    #[must_use]
     pub const fn new(bits: u64) -> Self {
         Self(bits)
     }
@@ -23,6 +23,7 @@ impl Seed {
 ///
 /// Tyche uses `SplitMix64` as a deterministic hash of a study seed and logical
 /// coordinates, not as shared mutable RNG state.
+#[must_use]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct SplitMix64;
 
@@ -70,6 +71,7 @@ impl SplitMix64 {
 }
 
 /// Zero-sized standard-normal counter sampler.
+#[must_use]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct StandardNormal;
 

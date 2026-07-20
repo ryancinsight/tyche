@@ -6,6 +6,7 @@ use core::fmt;
 use eunomia::RealField;
 
 /// A named finite parameter interval.
+#[must_use]
 #[derive(Debug, Clone, PartialEq)]
 pub struct Parameter<'a, T> {
     name: Cow<'a, str>,
@@ -16,6 +17,15 @@ pub struct Parameter<'a, T> {
 impl<'a, T: RealField> Parameter<'a, T> {
     /// Construct a borrowed-name parameter.
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tyche_core::design::Parameter;
+    ///
+    /// let p = Parameter::borrowed("x", 0.0_f64, 1.0).unwrap();
+    /// assert_eq!(p.name(), "x");
+    /// ```
+    ///
     /// # Errors
     ///
     /// Returns [`InvalidParameter`] unless both bounds are finite and
@@ -25,6 +35,15 @@ impl<'a, T: RealField> Parameter<'a, T> {
     }
 
     /// Construct an owned-name parameter.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tyche_core::design::Parameter;
+    ///
+    /// let p = Parameter::owned("y".to_string(), 0.0_f64, 1.0).unwrap();
+    /// assert_eq!(p.name(), "y");
+    /// ```
     ///
     /// # Errors
     ///
@@ -84,6 +103,7 @@ impl<'a, T: RealField> Parameter<'a, T> {
 }
 
 /// Parameter construction failure.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum InvalidParameter<T> {
     /// The parameter has no stable identity.

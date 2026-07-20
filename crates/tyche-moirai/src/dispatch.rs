@@ -6,6 +6,7 @@ use moirai_executor::{HybridExecutor, SyncTask};
 use tyche_core::{Design, ResponseReducer, Study, StudyModel};
 
 /// Pointer-sized adapter borrowing a caller-owned Moirai executor.
+#[must_use]
 #[repr(transparent)]
 pub struct MoiraiDispatch<'executor, const CHUNK: usize> {
     executor: &'executor HybridExecutor,
@@ -13,7 +14,6 @@ pub struct MoiraiDispatch<'executor, const CHUNK: usize> {
 
 impl<'executor, const CHUNK: usize> MoiraiDispatch<'executor, CHUNK> {
     /// Borrow an executor without lifecycle ownership.
-    #[must_use]
     pub const fn new(executor: &'executor HybridExecutor) -> Self {
         Self { executor }
     }

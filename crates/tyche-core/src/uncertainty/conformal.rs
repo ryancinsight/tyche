@@ -5,6 +5,7 @@ use core::cmp::Ordering;
 use eunomia::RealField;
 
 /// Validated split-conformal miscoverage policy.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ConformalCalibrator<T> {
     miscoverage: T,
@@ -12,6 +13,15 @@ pub struct ConformalCalibrator<T> {
 
 impl<T: RealField> ConformalCalibrator<T> {
     /// Construct with `0 < alpha < 1`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tyche_core::uncertainty::ConformalCalibrator;
+    ///
+    /// let cal = ConformalCalibrator::new(0.1_f64).unwrap();
+    /// assert!((cal.miscoverage() - 0.1).abs() < f64::EPSILON);
+    /// ```
     ///
     /// # Errors
     ///
@@ -68,7 +78,6 @@ impl<T: RealField> ConformalCalibrator<T> {
         Ok(self.select_sorted(scores))
     }
     /// Form a symmetric interval.
-    #[must_use]
     pub fn interval(self, prediction: T, radius: T) -> PredictionInterval<T> {
         PredictionInterval::new(prediction - radius, prediction + radius)
     }

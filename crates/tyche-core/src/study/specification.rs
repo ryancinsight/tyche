@@ -7,6 +7,7 @@ use alloc::borrow::Cow;
 use eunomia::RealField;
 
 /// A named reproducible study over a statically dispatched design.
+#[must_use]
 #[derive(Debug, Clone, PartialEq)]
 pub struct Study<'a, T, D, const PARAMETERS: usize> {
     name: Cow<'a, str>,
@@ -20,6 +21,21 @@ where
     D: Design<PARAMETERS>,
 {
     /// Construct a borrowed-name study.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tyche_core::design::{Parameter, ParameterSpace};
+    /// use tyche_core::sampling::{Seed, LatinHypercube};
+    /// use tyche_core::study::Study;
+    /// use std::num::NonZeroU32;
+    ///
+    /// let x = Parameter::borrowed("x", 0.0_f64, 1.0).unwrap();
+    /// let space = ParameterSpace::new([x]).unwrap();
+    /// let design = LatinHypercube::<1>::new(Seed::new(0), NonZeroU32::new(5).unwrap());
+    /// let study = Study::borrowed("my-study", space, design).unwrap();
+    /// assert_eq!(study.name(), "my-study");
+    /// ```
     ///
     /// # Errors
     ///
@@ -73,7 +89,6 @@ where
     }
 
     /// Parameter space.
-    #[must_use]
     pub const fn space(&self) -> &ParameterSpace<'a, T, PARAMETERS> {
         &self.space
     }

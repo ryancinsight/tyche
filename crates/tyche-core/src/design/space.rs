@@ -7,6 +7,7 @@ use eunomia::RealField;
 use super::Parameter;
 
 /// A fixed-dimensional parameter space.
+#[must_use]
 #[derive(Debug, Clone, PartialEq)]
 pub struct ParameterSpace<'a, T, const PARAMETERS: usize> {
     parameters: [Parameter<'a, T>; PARAMETERS],
@@ -14,6 +15,16 @@ pub struct ParameterSpace<'a, T, const PARAMETERS: usize> {
 
 impl<'a, T: RealField, const PARAMETERS: usize> ParameterSpace<'a, T, PARAMETERS> {
     /// Construct a parameter space.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tyche_core::design::{Parameter, ParameterSpace};
+    ///
+    /// let x = Parameter::borrowed("x", 0.0_f64, 1.0).unwrap();
+    /// let space = ParameterSpace::new([x]).unwrap();
+    /// assert_eq!(space.parameters().len(), 1);
+    /// ```
     ///
     /// # Errors
     ///
@@ -37,7 +48,6 @@ impl<'a, T: RealField, const PARAMETERS: usize> ParameterSpace<'a, T, PARAMETERS
     }
 
     /// Borrow the parameter definitions without copying them.
-    #[must_use]
     pub const fn parameters(&self) -> &[Parameter<'a, T>; PARAMETERS] {
         &self.parameters
     }
@@ -51,6 +61,7 @@ impl<'a, T: RealField, const PARAMETERS: usize> ParameterSpace<'a, T, PARAMETERS
 }
 
 /// Parameter-space construction failure.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpaceError {
     /// A zero-dimensional study has no sampleable parameter.

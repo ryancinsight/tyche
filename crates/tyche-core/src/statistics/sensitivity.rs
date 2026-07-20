@@ -4,6 +4,7 @@ use super::InsufficientSamples;
 use eunomia::RealField;
 
 /// Online parameter-response correlation screening.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CorrelationScreening<T, const PARAMETERS: usize> {
     count: u64,
@@ -22,7 +23,6 @@ impl<T: RealField, const PARAMETERS: usize> Default for CorrelationScreening<T, 
 
 impl<T: RealField, const PARAMETERS: usize> CorrelationScreening<T, PARAMETERS> {
     /// Construct empty.
-    #[must_use]
     pub fn new() -> Self {
         Self {
             count: 0,
@@ -78,6 +78,7 @@ impl<T: RealField, const PARAMETERS: usize> CorrelationScreening<T, PARAMETERS> 
 }
 
 /// Correlation-based screening report.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SensitivityReport<T, const PARAMETERS: usize> {
     sample_count: u64,

@@ -1,6 +1,7 @@
 //! One indexed parameter-space sample.
 
 /// An index-addressed study sample.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(C)]
 pub struct Sample<T, const PARAMETERS: usize> {

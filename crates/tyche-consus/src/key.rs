@@ -4,12 +4,22 @@ use std::borrow::Cow;
 use std::fmt;
 
 /// Validated relative key.
+#[must_use]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct ArtifactKey<'a>(Cow<'a, str>);
 
 impl<'a> ArtifactKey<'a> {
     /// Validate borrowed storage.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tyche_consus::ArtifactKey;
+    ///
+    /// let key = ArtifactKey::borrowed("results/metrics.json").unwrap();
+    /// assert_eq!(key.as_str(), "results/metrics.json");
+    /// ```
     ///
     /// # Errors
     ///
@@ -56,6 +66,7 @@ impl<'a> ArtifactKey<'a> {
 }
 
 /// Invalid key syntax.
+#[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ArtifactKeyError {
     /// Empty.
