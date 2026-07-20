@@ -1,8 +1,7 @@
 //! Welford-Chan online moments.
 
-use eunomia::RealField;
-
 use super::{InsufficientSamples, VariancePolicy};
+use eunomia::RealField;
 
 /// Online scalar mean and centered sum of squares.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -19,7 +18,7 @@ impl<T: RealField> Default for Moments<T> {
 }
 
 impl<T: RealField> Moments<T> {
-    /// Construct an empty accumulator.
+    /// Construct empty.
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -28,30 +27,25 @@ impl<T: RealField> Moments<T> {
             centered_sum: T::ZERO,
         }
     }
-
-    /// Number of observations.
+    /// Observation count.
     #[must_use]
     pub const fn count(self) -> u64 {
         self.count
     }
-
-    /// Whether no observation has been accumulated.
+    /// Whether empty.
     #[must_use]
     pub const fn is_empty(self) -> bool {
         self.count == 0
     }
-
-    /// Add one observation using Welford's recurrence.
+    /// Add an observation.
     pub fn update(&mut self, value: T) {
         self.count += 1;
         let count = T::from_f64(self.count as f64);
         let delta = value - self.mean;
         self.mean += delta / count;
-        let delta_after = value - self.mean;
-        self.centered_sum += delta * delta_after;
+        self.centered_sum += delta * (value - self.mean);
     }
-
-    /// Merge another accumulator using Chan's pairwise recurrence.
+    /// Merge another accumulator using Chan's recurrence.
     pub fn merge(&mut self, other: Self) {
         if other.count == 0 {
             return;
@@ -61,21 +55,19 @@ impl<T: RealField> Moments<T> {
             return;
         }
         let combined = self.count + other.count;
-        let left_count = T::from_f64(self.count as f64);
-        let right_count = T::from_f64(other.count as f64);
-        let combined_count = T::from_f64(combined as f64);
+        let left = T::from_f64(self.count as f64);
+        let right = T::from_f64(other.count as f64);
+        let total = T::from_f64(combined as f64);
         let delta = other.mean - self.mean;
-        self.mean += delta * (right_count / combined_count);
-        self.centered_sum +=
-            other.centered_sum + delta * delta * (left_count * right_count / combined_count);
+        self.mean += delta * (right / total);
+        self.centered_sum += other.centered_sum + delta * delta * (left * right / total);
         self.count = combined;
     }
-
     /// Arithmetic mean.
     ///
     /// # Errors
     ///
-    /// Returns [`InsufficientSamples`] when empty.
+    /// Rejects empty input.
     pub fn mean(self) -> Result<T, InsufficientSamples> {
         if self.count == 0 {
             Err(InsufficientSamples::new(1, 0))
@@ -83,19 +75,16 @@ impl<T: RealField> Moments<T> {
             Ok(self.mean)
         }
     }
-
-    /// Centered sum of squares `Σ(xᵢ - mean)²`.
+    /// Centered sum of squares.
     #[must_use]
     pub const fn centered_sum(self) -> T {
         self.centered_sum
     }
-
-    /// Variance under an explicit zero-sized denominator policy.
+    /// Variance under an explicit policy.
     ///
     /// # Errors
     ///
-    /// Returns [`InsufficientSamples`] when the selected convention is
-    /// undefined.
+    /// Rejects an undefined denominator.
     pub fn variance<P: VariancePolicy<T>>(self) -> Result<T, InsufficientSamples> {
         P::variance(self.count, self.centered_sum)
     }

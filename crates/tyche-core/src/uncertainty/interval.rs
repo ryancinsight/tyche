@@ -1,32 +1,24 @@
 //! Symmetric scalar prediction interval.
 
-/// A closed scalar prediction interval.
+/// Closed scalar interval.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PredictionInterval<T> {
     lower: T,
     upper: T,
 }
 
-impl<T> PredictionInterval<T> {
+impl<T: Copy> PredictionInterval<T> {
     pub(crate) const fn new(lower: T, upper: T) -> Self {
         Self { lower, upper }
     }
-
     /// Lower endpoint.
     #[must_use]
-    pub const fn lower(self) -> T
-    where
-        T: Copy,
-    {
+    pub const fn lower(self) -> T {
         self.lower
     }
-
     /// Upper endpoint.
     #[must_use]
-    pub const fn upper(self) -> T
-    where
-        T: Copy,
-    {
+    pub const fn upper(self) -> T {
         self.upper
     }
 }

@@ -2,18 +2,18 @@
 
 use core::fmt;
 
-/// Invalid calibration level or score set.
+/// Invalid level or score set.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConformalError<T> {
-    /// Miscoverage must lie strictly between zero and one.
+    /// Miscoverage is outside `(0,1)`.
     InvalidMiscoverage(T),
-    /// Calibration requires at least one score.
+    /// No scores.
     EmptyScores,
-    /// Every nonconformity score must be finite and non-negative.
+    /// A score is negative or non-finite.
     InvalidScore {
-        /// Index of the invalid score.
+        /// Score index.
         index: usize,
-        /// Invalid score.
+        /// Invalid value.
         value: T,
     },
 }
@@ -23,14 +23,11 @@ impl<T: fmt::Debug> fmt::Display for ConformalError<T> {
         match self {
             Self::InvalidMiscoverage(value) => write!(
                 formatter,
-                "conformal miscoverage must satisfy 0 < alpha < 1, got {value:?}"
+                "miscoverage must satisfy 0 < alpha < 1, got {value:?}"
             ),
             Self::EmptyScores => formatter.write_str("conformal calibration needs scores"),
             Self::InvalidScore { index, value } => {
-                write!(
-                    formatter,
-                    "score {index} is not finite and non-negative: {value:?}"
-                )
+                write!(formatter, "score {index} is invalid: {value:?}")
             }
         }
     }

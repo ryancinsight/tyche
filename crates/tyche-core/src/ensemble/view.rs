@@ -3,7 +3,7 @@
 use crate::statistics::{InsufficientSamples, Moments};
 use eunomia::RealField;
 
-/// Borrowed scalar responses from an index-ordered ensemble.
+/// Borrowed scalar responses in logical-index order.
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(transparent)]
 pub struct Ensemble<'a, T> {
@@ -11,23 +11,23 @@ pub struct Ensemble<'a, T> {
 }
 
 impl<'a, T: RealField> Ensemble<'a, T> {
-    /// Borrow an ordered response slice.
+    /// Borrow a response slice.
     #[must_use]
     pub const fn new(responses: &'a [T]) -> Self {
         Self { responses }
     }
 
-    /// Borrow the underlying responses without copying.
+    /// Borrow responses.
     #[must_use]
     pub const fn responses(self) -> &'a [T] {
         self.responses
     }
 
-    /// Summarize responses in logical index order.
+    /// Summarize in logical order.
     ///
     /// # Errors
     ///
-    /// Returns [`InsufficientSamples`] for an empty ensemble.
+    /// Rejects an empty ensemble.
     pub fn moments(self) -> Result<Moments<T>, InsufficientSamples> {
         let mut moments = Moments::new();
         for &response in self.responses {

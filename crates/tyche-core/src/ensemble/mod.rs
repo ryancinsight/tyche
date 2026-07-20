@@ -1,4 +1,4 @@
-//! Borrowed ensemble response views and model evaluation contracts.
+//! Borrowed ensemble views and model contracts.
 
 mod model;
 mod view;

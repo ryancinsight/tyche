@@ -1,22 +1,21 @@
 //! Moirai study-dispatch failures.
 
 use core::fmt;
-
 use moirai_core::error::ExecutorError;
 
-/// Failure before or during Moirai trial dispatch.
+/// Failure before or during dispatch.
 #[derive(Debug)]
 pub enum DispatchError {
-    /// The compile-time chunk width is zero.
+    /// Compile-time chunk width is zero.
     ZeroChunkWidth,
-    /// Caller-owned output storage does not match the study.
+    /// Output storage does not match the study.
     OutputLength {
-        /// Study sample count.
+        /// Required slots.
         expected: usize,
-        /// Supplied slot count.
+        /// Supplied slots.
         actual: usize,
     },
-    /// The borrowed Moirai executor rejected or failed scoped work.
+    /// Moirai scheduler failure.
     Executor(ExecutorError),
 }
 

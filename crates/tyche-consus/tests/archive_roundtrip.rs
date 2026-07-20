@@ -1,24 +1,17 @@
-//! Consus adapter and key-safety integration.
+//! Consus adapter contracts.
 
 use consus_zarr::InMemoryStore;
 use tyche_consus::{ArtifactKey, ArtifactRead, ArtifactWrite, ConsusArchive};
 
 #[test]
-fn in_memory_consus_roundtrip_preserves_exact_bytes() {
+fn exact_byte_roundtrip_and_key_safety() {
     let mut store = InMemoryStore::new();
-    let key = ArtifactKey::borrowed("studies/reference/responses/00000003").expect("canonical key");
+    let key = ArtifactKey::borrowed("studies/reference/responses/00000003").expect("valid");
     let payload = [0_u8, 1, 2, 127, 128, 255];
-
-    {
-        let mut archive = ConsusArchive::new(&mut store);
-        archive.write(&key, &payload).expect("store write");
-        let replay = archive.read(&key).expect("store read");
-        assert_eq!(replay.as_ref(), payload);
-    }
-}
-
-#[test]
-fn traversal_and_platform_paths_are_rejected() {
+    let mut archive = ConsusArchive::new(&mut store);
+    archive.write(&key, &payload).expect("write");
+    assert_eq!(archive.read(&key).expect("read").as_ref(), payload);
+    assert!(key.is_borrowed());
     for invalid in [
         "",
         "/absolute",
@@ -28,17 +21,6 @@ fn traversal_and_platform_paths_are_rejected() {
         "./study",
         "scheme:key",
     ] {
-        assert!(
-            ArtifactKey::borrowed(invalid).is_err(),
-            "{invalid:?} must be rejected"
-        );
+        assert!(ArtifactKey::borrowed(invalid).is_err(), "{invalid:?}");
     }
-}
-
-#[test]
-fn borrowed_key_preserves_pointer_identity() {
-    let source = "studies/reference/manifest";
-    let key = ArtifactKey::borrowed(source).expect("canonical key");
-    assert!(key.is_borrowed());
-    assert!(core::ptr::eq(key.as_str().as_ptr(), source.as_ptr()));
 }

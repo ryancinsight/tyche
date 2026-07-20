@@ -1,13 +1,10 @@
 //! Study identity, parameter space, and design composition.
 
-use alloc::borrow::Cow;
-
-use eunomia::RealField;
-
+use super::{Sample, StudyError};
 use crate::design::ParameterSpace;
 use crate::sampling::Design;
-
-use super::{Sample, StudyError};
+use alloc::borrow::Cow;
+use eunomia::RealField;
 
 /// A named reproducible study over a statically dispatched design.
 #[derive(Debug, Clone, PartialEq)]
@@ -26,7 +23,7 @@ where
     ///
     /// # Errors
     ///
-    /// Returns [`StudyError::EmptyName`] when the name is empty.
+    /// Rejects an empty name.
     pub fn borrowed(
         name: &'a str,
         space: ParameterSpace<'a, T, PARAMETERS>,
@@ -39,7 +36,7 @@ where
     ///
     /// # Errors
     ///
-    /// Returns [`StudyError::EmptyName`] when the name is empty.
+    /// Rejects an empty name.
     pub fn owned(
         name: alloc::string::String,
         space: ParameterSpace<'a, T, PARAMETERS>,
@@ -63,39 +60,37 @@ where
         })
     }
 
-    /// Stable study name.
+    /// Stable name.
     #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    /// Whether the study name is borrowed.
+    /// Whether the name is borrowed.
     #[must_use]
     pub const fn is_name_borrowed(&self) -> bool {
         matches!(self.name, Cow::Borrowed(_))
     }
 
-    /// Parameter-space definition.
+    /// Parameter space.
     #[must_use]
     pub const fn space(&self) -> &ParameterSpace<'a, T, PARAMETERS> {
         &self.space
     }
 
-    /// Experimental design.
+    /// Design.
     #[must_use]
     pub const fn design(&self) -> &D {
         &self.design
     }
 
-    /// Number of trials.
+    /// Trial count.
     #[must_use]
     pub fn sample_count(&self) -> usize {
         self.design.sample_count()
     }
 
-    /// Generate one sample directly into a fixed array.
-    ///
-    /// Returns `None` when `index` is outside the design.
+    /// Generate one fixed-array sample, or `None` outside the design.
     #[must_use]
     pub fn sample(&self, index: usize) -> Option<Sample<T, PARAMETERS>> {
         let mut unit = [0.0; PARAMETERS];

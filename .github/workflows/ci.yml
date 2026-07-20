@@ -8,10 +8,6 @@ on:
 permissions:
   contents: read
 
-env:
-  CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: "0"
-
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -21,22 +17,15 @@ jobs:
         with:
           components: clippy, rustfmt
       - uses: taiki-e/install-action@nextest
-      - name: Format
-        run: cargo fmt --all -- --check
-      - name: Core no-std check
-        run: cargo check -p tyche-core --no-default-features
-      - name: Clippy
-        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
-      - name: Native tests
-        run: cargo nextest run --workspace --all-features
-      - name: Documentation tests
-        run: cargo test --doc --workspace --all-features
-      - name: Documentation
+      - run: cargo fmt --all -- --check
+      - run: cargo check -p tyche-core --no-default-features
+      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - run: cargo nextest run --workspace --all-features
+      - run: cargo test --doc --workspace --all-features
+      - run: cargo doc --workspace --no-deps --all-features
         env:
           RUSTDOCFLAGS: -D warnings
-        run: cargo doc --workspace --no-deps --all-features
-      - name: Example
-        run: cargo run -p tyche --example reproducible_study
+      - run: cargo run -p tyche --example reproducible_study
 
   supply-chain:
     runs-on: ubuntu-latest

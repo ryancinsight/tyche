@@ -1,30 +1,26 @@
 //! Explicit variance denominator policies.
 
-use eunomia::RealField;
-
 use super::InsufficientSamples;
+use eunomia::RealField;
 
 /// A statically selected variance convention.
 pub trait VariancePolicy<T: RealField> {
     /// Minimum observation count.
     const MINIMUM_SAMPLES: u64;
-
-    /// Convert centered sum of squares into variance.
+    /// Convert centered sum into variance.
     ///
     /// # Errors
     ///
-    /// Returns [`InsufficientSamples`] when the policy's denominator is
-    /// undefined.
+    /// Rejects an undefined denominator.
     fn variance(count: u64, centered_sum: T) -> Result<T, InsufficientSamples>;
 }
 
-/// Zero-sized population-variance policy, dividing by `n`.
+/// Zero-sized population variance (`n` denominator).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct PopulationVariance;
 
 impl<T: RealField> VariancePolicy<T> for PopulationVariance {
     const MINIMUM_SAMPLES: u64 = 1;
-
     fn variance(count: u64, centered_sum: T) -> Result<T, InsufficientSamples> {
         if count == 0 {
             return Err(InsufficientSamples::new(
@@ -36,13 +32,12 @@ impl<T: RealField> VariancePolicy<T> for PopulationVariance {
     }
 }
 
-/// Zero-sized unbiased sample-variance policy, dividing by `n-1`.
+/// Zero-sized sample variance (`n-1` denominator).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct SampleVariance;
 
 impl<T: RealField> VariancePolicy<T> for SampleVariance {
     const MINIMUM_SAMPLES: u64 = 2;
-
     fn variance(count: u64, centered_sum: T) -> Result<T, InsufficientSamples> {
         if count < <Self as VariancePolicy<T>>::MINIMUM_SAMPLES {
             return Err(InsufficientSamples::new(

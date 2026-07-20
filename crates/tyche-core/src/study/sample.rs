@@ -13,19 +13,19 @@ impl<T, const PARAMETERS: usize> Sample<T, PARAMETERS> {
         Self { index, values }
     }
 
-    /// Logical index within the study.
+    /// Logical index.
     #[must_use]
     pub const fn index(&self) -> usize {
         self.index
     }
 
-    /// Borrow the fixed-width parameter values without copying.
+    /// Borrow fixed-width values without copying.
     #[must_use]
     pub const fn values(&self) -> &[T; PARAMETERS] {
         &self.values
     }
 
-    /// Consume the record and return its fixed-width values.
+    /// Consume the record into its values.
     #[must_use]
     pub fn into_values(self) -> [T; PARAMETERS] {
         self.values

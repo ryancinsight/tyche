@@ -1,28 +1,27 @@
-//! Validated relative Consus artifact keys.
+//! Traversal-safe relative artifact keys.
 
 use std::borrow::Cow;
 use std::fmt;
 
-/// A traversal-safe relative study-artifact key.
+/// Validated relative key.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct ArtifactKey<'a>(Cow<'a, str>);
 
 impl<'a> ArtifactKey<'a> {
-    /// Validate a borrowed key.
+    /// Validate borrowed storage.
     ///
     /// # Errors
     ///
-    /// Rejects absolute paths, backslashes, empty segments, and `.` or `..`.
+    /// Rejects absolute, platform, empty, dot, and traversal paths.
     pub fn borrowed(key: &'a str) -> Result<Self, ArtifactKeyError> {
         Self::new(Cow::Borrowed(key))
     }
-
-    /// Validate an owned key.
+    /// Validate owned storage.
     ///
     /// # Errors
     ///
-    /// Rejects absolute paths, backslashes, empty segments, and `.` or `..`.
+    /// Rejects absolute, platform, empty, dot, and traversal paths.
     pub fn owned(key: String) -> Result<Self, ArtifactKeyError> {
         Self::new(Cow::Owned(key))
     }
@@ -44,13 +43,11 @@ impl<'a> ArtifactKey<'a> {
         }
         Ok(Self(key))
     }
-
-    /// Relative key string.
+    /// Key string.
     #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
     }
-
     /// Whether storage is borrowed.
     #[must_use]
     pub const fn is_borrowed(&self) -> bool {
@@ -58,19 +55,19 @@ impl<'a> ArtifactKey<'a> {
     }
 }
 
-/// Invalid artifact-key syntax.
+/// Invalid key syntax.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ArtifactKeyError {
-    /// Key is empty.
+    /// Empty.
     Empty,
-    /// Key is absolute or uses a platform separator.
+    /// Absolute or platform-separated.
     AbsoluteOrPlatformPath,
-    /// A path segment is empty, `.` or `..`.
+    /// Empty, dot, or traversal segment.
     InvalidSegment {
         /// Segment index.
         index: usize,
     },
-    /// A segment resembles a Windows drive or URI prefix.
+    /// Drive or URI-like prefix.
     PlatformPrefix {
         /// Segment index.
         index: usize,
@@ -84,18 +81,14 @@ impl fmt::Display for ArtifactKeyError {
             Self::AbsoluteOrPlatformPath => {
                 formatter.write_str("artifact key must be a slash-separated relative path")
             }
-            Self::InvalidSegment { index } => {
-                write!(
-                    formatter,
-                    "artifact key segment {index} is empty or traversing"
-                )
-            }
-            Self::PlatformPrefix { index } => {
-                write!(
-                    formatter,
-                    "artifact key segment {index} has a platform prefix"
-                )
-            }
+            Self::InvalidSegment { index } => write!(
+                formatter,
+                "artifact key segment {index} is empty or traversing"
+            ),
+            Self::PlatformPrefix { index } => write!(
+                formatter,
+                "artifact key segment {index} has a platform prefix"
+            ),
         }
     }
 }

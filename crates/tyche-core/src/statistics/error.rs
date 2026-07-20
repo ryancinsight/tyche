@@ -2,7 +2,7 @@
 
 use core::fmt;
 
-/// A statistic received fewer observations than its mathematical definition.
+/// A statistic received too few observations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InsufficientSamples {
     required: u64,
@@ -10,19 +10,17 @@ pub struct InsufficientSamples {
 }
 
 impl InsufficientSamples {
-    /// Construct a sample-count failure.
+    /// Construct the failure.
     #[must_use]
     pub const fn new(required: u64, actual: u64) -> Self {
         Self { required, actual }
     }
-
-    /// Minimum number of observations.
+    /// Minimum count.
     #[must_use]
     pub const fn required(self) -> u64 {
         self.required
     }
-
-    /// Supplied number of observations.
+    /// Actual count.
     #[must_use]
     pub const fn actual(self) -> u64 {
         self.actual
