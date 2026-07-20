@@ -1,6 +1,6 @@
 //! Allocation-free random-access affine-permutation Latin hypercube.
 
-use core::num::NonZeroUsize;
+use core::num::NonZeroU32;
 
 use super::{Design, SampleIndexError, Seed, SplitMix64};
 
@@ -13,26 +13,27 @@ use super::{Design, SampleIndexError, Seed, SplitMix64};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LatinHypercube<const PARAMETERS: usize> {
     seed: Seed,
-    sample_count: NonZeroUsize,
-    strides: [usize; PARAMETERS],
-    offsets: [usize; PARAMETERS],
+    sample_count: NonZeroU32,
+    strides: [u32; PARAMETERS],
+    offsets: [u32; PARAMETERS],
 }
 
 impl<const PARAMETERS: usize> LatinHypercube<PARAMETERS> {
     /// Construct a random-access design.
     ///
-    /// A non-zero sample count is carried by [`NonZeroUsize`]. A
+    /// A non-zero sample count is carried by [`NonZeroU32`]. Bounding the
+    /// count to 32 bits keeps every stratum exactly representable in `f64`. A
     /// zero-dimensional design is rejected by [`crate::ParameterSpace`].
     #[must_use]
-    pub fn new(seed: Seed, sample_count: NonZeroUsize) -> Self {
+    pub fn new(seed: Seed, sample_count: NonZeroU32) -> Self {
         let count = sample_count.get();
         let mut strides = [1; PARAMETERS];
         let mut offsets = [0; PARAMETERS];
         for dimension in 0..PARAMETERS {
-            let stream = dimension as u64;
-            let candidate = (SplitMix64::word(seed, 0, stream) as usize) % count;
+            let stream = u64_from_usize(dimension);
+            let candidate = u32_from_u64(SplitMix64::word(seed, 0, stream) % u64::from(count));
             strides[dimension] = coprime_stride(candidate, count);
-            offsets[dimension] = (SplitMix64::word(seed, 1, stream) as usize) % count;
+            offsets[dimension] = u32_from_u64(SplitMix64::word(seed, 1, stream) % u64::from(count));
         }
         Self {
             seed,
@@ -54,18 +55,23 @@ impl<const PARAMETERS: usize> LatinHypercube<PARAMETERS> {
     ///
     /// Returns [`SampleIndexError`] for an out-of-range sample or dimension.
     pub fn stratum(&self, sample: usize, dimension: usize) -> Result<usize, SampleIndexError> {
-        if sample >= self.sample_count.get() || dimension >= PARAMETERS {
-            return Err(SampleIndexError::new(sample, self.sample_count.get()));
+        let sample_count = usize_from_u32(self.sample_count.get());
+        if sample >= sample_count || dimension >= PARAMETERS {
+            return Err(SampleIndexError::new(sample, sample_count));
         }
-        let count = self.sample_count.get() as u128;
-        let product = (self.strides[dimension] as u128) * (sample as u128);
-        Ok(((product + self.offsets[dimension] as u128) % count) as usize)
+        let Ok(sample) = u32::try_from(sample) else {
+            unreachable!("invariant: validated sample index is bounded by u32 count");
+        };
+        let count = u64::from(self.sample_count.get());
+        let product = u64::from(self.strides[dimension]) * u64::from(sample);
+        let stratum = u32_from_u64((product + u64::from(self.offsets[dimension])) % count);
+        Ok(usize_from_u32(stratum))
     }
 }
 
 impl<const PARAMETERS: usize> Design<PARAMETERS> for LatinHypercube<PARAMETERS> {
     fn sample_count(&self) -> usize {
-        self.sample_count.get()
+        usize_from_u32(self.sample_count.get())
     }
 
     fn sample_unit_into(
@@ -73,20 +79,28 @@ impl<const PARAMETERS: usize> Design<PARAMETERS> for LatinHypercube<PARAMETERS> 
         index: usize,
         output: &mut [f64; PARAMETERS],
     ) -> Result<(), SampleIndexError> {
-        if index >= self.sample_count.get() {
-            return Err(SampleIndexError::new(index, self.sample_count.get()));
+        let sample_count = usize_from_u32(self.sample_count.get());
+        if index >= sample_count {
+            return Err(SampleIndexError::new(index, sample_count));
         }
-        let inverse_count = 1.0 / self.sample_count.get() as f64;
+        let inverse_count = 1.0 / f64::from(self.sample_count.get());
         for (dimension, coordinate) in output.iter_mut().enumerate() {
             let stratum = self.stratum(index, dimension)?;
-            let jitter = SplitMix64::unit(self.seed, index as u64, dimension as u64 + 2);
-            *coordinate = (stratum as f64 + jitter) * inverse_count;
+            let Ok(stratum) = u32::try_from(stratum) else {
+                unreachable!("invariant: stratum is bounded by u32 count");
+            };
+            let jitter = SplitMix64::unit(
+                self.seed,
+                u64_from_usize(index),
+                u64_from_usize(dimension).wrapping_add(2),
+            );
+            *coordinate = (f64::from(stratum) + jitter) * inverse_count;
         }
         Ok(())
     }
 }
 
-fn coprime_stride(candidate: usize, modulus: usize) -> usize {
+fn coprime_stride(candidate: u32, modulus: u32) -> u32 {
     if modulus == 1 {
         return 1;
     }
@@ -99,11 +113,32 @@ fn coprime_stride(candidate: usize, modulus: usize) -> usize {
     }
 }
 
-const fn greatest_common_divisor(mut left: usize, mut right: usize) -> usize {
+const fn greatest_common_divisor(mut left: u32, mut right: u32) -> u32 {
     while right != 0 {
         let remainder = left % right;
         left = right;
         right = remainder;
     }
     left
+}
+
+fn u32_from_u64(value: u64) -> u32 {
+    match u32::try_from(value) {
+        Ok(value) => value,
+        Err(_) => unreachable!("invariant: value is reduced modulo a u32 count"),
+    }
+}
+
+fn usize_from_u32(value: u32) -> usize {
+    match usize::try_from(value) {
+        Ok(value) => value,
+        Err(_) => unreachable!("invariant: Tyche requires a target with at least 32-bit usize"),
+    }
+}
+
+fn u64_from_usize(value: usize) -> u64 {
+    match u64::try_from(value) {
+        Ok(value) => value,
+        Err(_) => unreachable!("invariant: Tyche supports targets with at most 64-bit usize"),
+    }
 }

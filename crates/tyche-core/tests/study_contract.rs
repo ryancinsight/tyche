@@ -1,7 +1,7 @@
 //! Study, GAT, Cow, layout, and allocation contracts.
 
 use core::mem::size_of;
-use core::num::NonZeroUsize;
+use core::num::NonZeroU32;
 use stats_alloc::{INSTRUMENTED_SYSTEM, Region, StatsAlloc};
 use tyche_core::{
     Design, LatinHypercube, Moments, Parameter, ParameterSpace, PopulationVariance,
@@ -22,7 +22,14 @@ impl StudyModel<f64, 2> for BorrowingModel {
 struct CopyResponse;
 impl ResponseReducer<BorrowingModel, f64, 2> for CopyResponse {
     type Output = f64;
-    fn reduce<'a>(&self, response: &'a f64) -> Self::Output {
+    fn reduce<'a>(
+        &self,
+        response: <BorrowingModel as StudyModel<f64, 2>>::Response<'a>,
+    ) -> Self::Output
+    where
+        BorrowingModel: 'a,
+        f64: 'a,
+    {
         *response
     }
 }
@@ -35,7 +42,7 @@ fn borrowing_and_allocation_contracts_hold() {
         Parameter::borrowed("pressure", 10.0, 20.0).expect("valid"),
     ])
     .expect("unique");
-    let design = LatinHypercube::new(Seed::new(9), NonZeroUsize::new(128).expect("positive"));
+    let design = LatinHypercube::new(Seed::new(9), NonZeroU32::new(128).expect("positive"));
     let study = Study::borrowed("pump", space, design).expect("named");
     assert!(core::ptr::eq(
         study.space().parameters()[0].name().as_ptr(),

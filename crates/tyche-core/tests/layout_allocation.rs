@@ -1,7 +1,7 @@
 //! Representation and allocation invariants.
 
 use core::mem::size_of;
-use core::num::NonZeroUsize;
+use core::num::NonZeroU32;
 
 use stats_alloc::{INSTRUMENTED_SYSTEM, Region, StatsAlloc};
 use tyche_core::{
@@ -22,7 +22,7 @@ fn static_policies_and_counter_samplers_are_zero_sized() {
 fn repeated_sampling_and_statistics_allocate_nothing() {
     let design = LatinHypercube::<4>::new(
         Seed::new(21),
-        NonZeroUsize::new(128).expect("constant is positive"),
+        NonZeroU32::new(128).expect("constant is positive"),
     );
     let mut point = [0.0; 4];
     let mut moments = Moments::new();

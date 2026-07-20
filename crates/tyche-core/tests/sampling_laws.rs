@@ -1,6 +1,6 @@
 //! Sampling-law evidence.
 
-use core::num::NonZeroUsize;
+use core::num::NonZeroU32;
 use tyche_core::{Design, LatinHypercube, Seed, SplitMix64, StandardNormal};
 
 #[test]
@@ -9,7 +9,7 @@ fn every_dimension_contains_every_stratum_once() {
     const SAMPLES: usize = 97;
     let design = LatinHypercube::<PARAMETERS>::new(
         Seed::new(0x5459_4348_455F_4C48),
-        NonZeroUsize::new(SAMPLES).expect("positive"),
+        NonZeroU32::new(97).expect("positive"),
     );
     for dimension in 0..PARAMETERS {
         let mut seen = [false; SAMPLES];
@@ -25,8 +25,7 @@ fn every_dimension_contains_every_stratum_once() {
 #[test]
 fn replay_is_bitwise_and_order_independent() {
     const SAMPLES: usize = 31;
-    let design =
-        LatinHypercube::<3>::new(Seed::new(42), NonZeroUsize::new(SAMPLES).expect("positive"));
+    let design = LatinHypercube::<3>::new(Seed::new(42), NonZeroU32::new(31).expect("positive"));
     let mut forward = [[0.0_f64; 3]; SAMPLES];
     for (index, point) in forward.iter_mut().enumerate() {
         design.sample_unit_into(index, point).expect("valid");
@@ -51,9 +50,12 @@ fn streams_respect_domains() {
 
 proptest::proptest! {
     #[test]
-    fn points_stay_in_unit_hypercube(seed in proptest::prelude::any::<u64>(), count in 1_usize..256) {
-        let design = LatinHypercube::<4>::new(Seed::new(seed), NonZeroUsize::new(count).expect("positive"));
-        for index in 0..count {
+    fn points_stay_in_unit_hypercube(seed in proptest::prelude::any::<u64>(), count in 1_u16..256) {
+        let design = LatinHypercube::<4>::new(
+            Seed::new(seed),
+            NonZeroU32::new(u32::from(count)).expect("positive"),
+        );
+        for index in 0..usize::from(count) {
             let mut point = [0.0; 4];
             design.sample_unit_into(index, &mut point).expect("valid");
             proptest::prop_assert!(point.into_iter().all(|value| (0.0..1.0).contains(&value)));

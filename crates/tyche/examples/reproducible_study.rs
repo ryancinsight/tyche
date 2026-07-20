@@ -1,6 +1,6 @@
 //! Reproducible study example.
 
-use core::num::NonZeroUsize;
+use core::num::NonZeroU32;
 use tyche::{Ensemble, LatinHypercube, Parameter, ParameterSpace, PopulationVariance, Seed, Study};
 
 fn main() {
@@ -11,7 +11,7 @@ fn main() {
     .expect("unique");
     let design = LatinHypercube::new(
         Seed::new(0x5459_4348_455F_3031),
-        NonZeroUsize::new(256).expect("positive"),
+        NonZeroU32::new(256).expect("positive"),
     );
     let study = Study::borrowed("diffusivity proxy", space, design).expect("named");
     let responses: Vec<_> = (0..study.sample_count())

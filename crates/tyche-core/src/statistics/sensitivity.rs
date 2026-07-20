@@ -34,6 +34,10 @@ impl<T: RealField, const PARAMETERS: usize> CorrelationScreening<T, PARAMETERS> 
         }
     }
     /// Add a pair.
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "the generic numeric contract represents observation counts in T"
+    )]
     pub fn update(&mut self, parameters: &[T; PARAMETERS], response: T) {
         self.count += 1;
         let count = T::from_f64(self.count as f64);
@@ -41,10 +45,10 @@ impl<T: RealField, const PARAMETERS: usize> CorrelationScreening<T, PARAMETERS> 
         self.mean_response += response_delta / count;
         let response_after = response - self.mean_response;
         self.response_sum += response_delta * response_after;
-        for dimension in 0..PARAMETERS {
-            let delta = parameters[dimension] - self.mean_parameters[dimension];
+        for (dimension, &parameter) in parameters.iter().enumerate() {
+            let delta = parameter - self.mean_parameters[dimension];
             self.mean_parameters[dimension] += delta / count;
-            let after = parameters[dimension] - self.mean_parameters[dimension];
+            let after = parameter - self.mean_parameters[dimension];
             self.parameter_sums[dimension] += delta * after;
             self.co_moments[dimension] += delta * response_after;
         }

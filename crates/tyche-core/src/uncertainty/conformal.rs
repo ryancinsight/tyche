@@ -2,7 +2,7 @@
 
 use super::{ConformalError, PredictionInterval};
 use core::cmp::Ordering;
-use eunomia::{FloatElement, RealField};
+use eunomia::RealField;
 
 /// Validated split-conformal miscoverage policy.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -32,6 +32,12 @@ impl<T: RealField> ConformalCalibrator<T> {
     /// # Errors
     ///
     /// Rejects empty, negative, or non-finite scores.
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::cast_precision_loss,
+        clippy::cast_sign_loss,
+        reason = "validated finite rank lies in the closed interval [1, scores.len()]"
+    )]
     pub fn calibrate_in_place(self, scores: &mut [T]) -> Result<T, ConformalError<T>> {
         if scores.is_empty() {
             return Err(ConformalError::EmptyScores);
@@ -46,7 +52,8 @@ impl<T: RealField> ConformalCalibrator<T> {
         }
         scores.sort_unstable_by(|left, right| left.partial_cmp(right).unwrap_or(Ordering::Equal));
         let count = scores.len();
-        let raw = ((count + 1) as f64 * (1.0 - self.miscoverage.to_f64())).ceil() as usize;
+        let rank = (count + 1) as f64 * (1.0 - self.miscoverage.to_f64());
+        let raw = <f64 as eunomia::FloatElement>::ceil(rank) as usize;
         Ok(scores[raw.clamp(1, count) - 1])
     }
     /// Form a symmetric interval.

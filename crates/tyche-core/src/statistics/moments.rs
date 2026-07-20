@@ -38,6 +38,10 @@ impl<T: RealField> Moments<T> {
         self.count == 0
     }
     /// Add an observation.
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "the generic numeric contract represents observation counts in T"
+    )]
     pub fn update(&mut self, value: T) {
         self.count += 1;
         let count = T::from_f64(self.count as f64);
@@ -46,6 +50,10 @@ impl<T: RealField> Moments<T> {
         self.centered_sum += delta * (value - self.mean);
     }
     /// Merge another accumulator using Chan's recurrence.
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "the generic numeric contract represents observation counts in T"
+    )]
     pub fn merge(&mut self, other: Self) {
         if other.count == 0 {
             return;

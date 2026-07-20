@@ -19,9 +19,9 @@ impl Seed {
     }
 }
 
-/// Zero-sized SplitMix64 counter mixer.
+/// Zero-sized `SplitMix64` counter mixer.
 ///
-/// Tyche uses SplitMix64 as a deterministic hash of a study seed and logical
+/// Tyche uses `SplitMix64` as a deterministic hash of a study seed and logical
 /// coordinates, not as shared mutable RNG state.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct SplitMix64;
@@ -39,6 +39,10 @@ impl SplitMix64 {
 
     /// Map a counter key into `[0, 1)` using the high 53 bits.
     #[must_use]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "every 53-bit mantissa value is exactly representable by f64"
+    )]
     pub fn unit(seed: Seed, sample: u64, stream: u64) -> f64 {
         const SCALE: f64 = 1.0 / 9_007_199_254_740_992.0;
         ((Self::word(seed, sample, stream) >> 11) as f64) * SCALE
@@ -49,6 +53,10 @@ impl SplitMix64 {
     /// The half-unit offset prevents either logarithm endpoint from appearing
     /// in inverse-transform samplers.
     #[must_use]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "every 53-bit mantissa value is exactly representable by f64"
+    )]
     pub fn open_unit(seed: Seed, sample: u64, stream: u64) -> f64 {
         const SCALE: f64 = 1.0 / 9_007_199_254_740_992.0;
         (((Self::word(seed, sample, stream) >> 11) as f64) + 0.5) * SCALE

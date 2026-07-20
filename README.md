@@ -17,7 +17,7 @@ model semantics.
 ## Example
 
 ```rust
-use core::num::NonZeroUsize;
+use core::num::NonZeroU32;
 use tyche::{
     Ensemble, LatinHypercube, Parameter, ParameterSpace, PopulationVariance,
     Seed, Study,
@@ -30,7 +30,7 @@ let space = ParameterSpace::new([
 .expect("unique");
 let design = LatinHypercube::new(
     Seed::new(0x5459_4348_45),
-    NonZeroUsize::new(64).expect("positive"),
+    NonZeroU32::new(64).expect("positive"),
 );
 let study = Study::borrowed("pump sweep", space, design).expect("named");
 let responses: Vec<_> = (0..study.sample_count())
@@ -108,7 +108,7 @@ cargo deny check
 
 1. Add random-access Sobol, runtime-dimension views, categorical and weighted
    sampling, and versioned distribution vectors.
-2. After public promotion, replace Helios's normal generator, CFDrs's LHS, and
+2. After public promotion, replace Helios's normal generator, `CFDrs`'s LHS, and
    Kwavers's conformal/moment duplication.
 3. Add deterministic bootstrap, Morris, and true Saltelli Sobol estimators.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
