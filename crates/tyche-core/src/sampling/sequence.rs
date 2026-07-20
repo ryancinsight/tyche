@@ -96,7 +96,9 @@ impl<T: eunomia::RealField> StandardNormal<T> {
         let second = SplitMix64::unit(seed, sample, stream.wrapping_mul(2).wrapping_add(1));
         let first = T::from_f64(first);
         let second = T::from_f64(second);
-        let radius = <T as NumericElement>::sqrt(<T as FloatElement>::from_f64(-2.0) * <T as FloatElement>::ln(first));
+        let radius = <T as NumericElement>::sqrt(
+            <T as FloatElement>::from_f64(-2.0) * <T as FloatElement>::ln(first),
+        );
         radius * <T as FloatElement>::cos(<T as eunomia::RealField>::TAU * second)
     }
 }

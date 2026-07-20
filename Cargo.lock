@@ -426,7 +426,7 @@ dependencies = [
 [[package]]
 name = "moirai-core"
 version = "0.4.0"
-source = "git+https://github.com/ryancinsight/Moirai.git?rev=8a51b2a7c5240bbeee6f1b766af2c54ac2898af6#8a51b2a7c5240bbeee6f1b766af2c54ac2898af6"
+source = "git+https://github.com/ryancinsight/Moirai.git?rev=91c802e23e3711760c260dcfb529f5d41ea55964#91c802e23e3711760c260dcfb529f5d41ea55964"
 dependencies = [
  "bytemuck",
  "libc",
@@ -437,7 +437,7 @@ dependencies = [
 [[package]]
 name = "moirai-executor"
 version = "0.4.0"
-source = "git+https://github.com/ryancinsight/Moirai.git?rev=8a51b2a7c5240bbeee6f1b766af2c54ac2898af6#8a51b2a7c5240bbeee6f1b766af2c54ac2898af6"
+source = "git+https://github.com/ryancinsight/Moirai.git?rev=91c802e23e3711760c260dcfb529f5d41ea55964#91c802e23e3711760c260dcfb529f5d41ea55964"
 dependencies = [
  "melinoe",
  "mnemosyne",
@@ -450,7 +450,7 @@ dependencies = [
 [[package]]
 name = "moirai-pal"
 version = "0.4.0"
-source = "git+https://github.com/ryancinsight/Moirai.git?rev=8a51b2a7c5240bbeee6f1b766af2c54ac2898af6#8a51b2a7c5240bbeee6f1b766af2c54ac2898af6"
+source = "git+https://github.com/ryancinsight/Moirai.git?rev=91c802e23e3711760c260dcfb529f5d41ea55964#91c802e23e3711760c260dcfb529f5d41ea55964"
 dependencies = [
  "js-sys",
  "libc",
@@ -465,7 +465,7 @@ dependencies = [
 [[package]]
 name = "moirai-scheduler"
 version = "0.4.0"
-source = "git+https://github.com/ryancinsight/Moirai.git?rev=8a51b2a7c5240bbeee6f1b766af2c54ac2898af6#8a51b2a7c5240bbeee6f1b766af2c54ac2898af6"
+source = "git+https://github.com/ryancinsight/Moirai.git?rev=91c802e23e3711760c260dcfb529f5d41ea55964#91c802e23e3711760c260dcfb529f5d41ea55964"
 dependencies = [
  "mnemosyne",
  "moirai-core",
@@ -477,7 +477,7 @@ dependencies = [
 [[package]]
 name = "moirai-utils"
 version = "0.4.0"
-source = "git+https://github.com/ryancinsight/Moirai.git?rev=8a51b2a7c5240bbeee6f1b766af2c54ac2898af6#8a51b2a7c5240bbeee6f1b766af2c54ac2898af6"
+source = "git+https://github.com/ryancinsight/Moirai.git?rev=91c802e23e3711760c260dcfb529f5d41ea55964#91c802e23e3711760c260dcfb529f5d41ea55964"
 
 [[package]]
 name = "num-traits"

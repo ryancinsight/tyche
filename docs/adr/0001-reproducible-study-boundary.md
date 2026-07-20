@@ -96,3 +96,16 @@ Stratification, bounds, bitwise replay, stream domains, Welford/Chan oracles,
 variance denominators, correlation, conformal rank, GAT/Cow identity, ZST and
 allocation checks, Moirai index preservation, Consus byte roundtrip, safe keys,
 no-std, Clippy, tests, rustdoc, example, and supply-chain gates.
+
+## References
+
+- McKay, Beckman, and Conover, “A Comparison of Three Methods for Selecting
+  Values of Input Variables in the Analysis of Output from a Computer Code,”
+  *Technometrics* 21(2), 239–245 (1979),
+  <https://doi.org/10.1080/00401706.1979.10489755>.
+- Welford, “Note on a Method for Calculating Corrected Sums of Squares and
+  Products,” *Technometrics* 4(3), 419–420 (1962),
+  <https://doi.org/10.1080/00401706.1962.10490022>.
+- Angelopoulos and Bates, “A Gentle Introduction to Conformal Prediction and
+  Distribution-Free Uncertainty Quantification,” Section 1.1 and Appendix D,
+  arXiv:2107.07511v6 (2022), <https://arxiv.org/abs/2107.07511>.

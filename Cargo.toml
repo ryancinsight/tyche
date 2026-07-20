@@ -23,8 +23,8 @@ tyche-consus = { path = "crates/tyche-consus", version = "0.1.0" }
 eunomia = { version = "0.6.0", git = "https://github.com/ryancinsight/eunomia.git", rev = "2a6cb2ce381d3ddffc8f6f5542c5f3383329012a", default-features = false }
 consus-core = { version = "0.1.0", git = "https://github.com/ryancinsight/consus.git", rev = "0106b709212033823a22782b0c491603e8ce1229", default-features = false, features = ["alloc"] }
 consus-zarr = { version = "0.1.0", git = "https://github.com/ryancinsight/consus.git", rev = "0106b709212033823a22782b0c491603e8ce1229", default-features = false, features = ["std"] }
-moirai-core = { version = "0.4.0", git = "https://github.com/ryancinsight/Moirai.git", rev = "8a51b2a7c5240bbeee6f1b766af2c54ac2898af6" }
-moirai-executor = { version = "0.4.0", git = "https://github.com/ryancinsight/Moirai.git", rev = "8a51b2a7c5240bbeee6f1b766af2c54ac2898af6" }
+moirai-core = { version = "0.4.0", git = "https://github.com/ryancinsight/Moirai.git", rev = "91c802e23e3711760c260dcfb529f5d41ea55964" }
+moirai-executor = { version = "0.4.0", git = "https://github.com/ryancinsight/Moirai.git", rev = "91c802e23e3711760c260dcfb529f5d41ea55964" }
 proptest = "1.11.0"
 stats_alloc = "0.1.10"
 
