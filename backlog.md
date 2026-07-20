@@ -22,6 +22,8 @@
   Tyche's 257-item, seven-item-chunk adapter contract. The pinned Tyche
   workspace passes 18/18 tests, including the exact former access-violation
   case.
+- ADR 0002 closes the public `Design` error-construction gap and replaces the
+  adapter's contained panic path with a typed `DesignContract` failure.
 
 ## TYCHE-003 — Sampling breadth — planned
 

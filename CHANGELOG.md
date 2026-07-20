@@ -7,6 +7,7 @@
 - `Study::sample` now preserves its typed `SampleIndexError`, and the Moirai
   adapter reports a malformed public `Design` implementation as
   `DispatchError::DesignContract` instead of entering a contained panic path.
+  See ADR 0002 for migration details.
 
 ### Fixed
 

@@ -70,7 +70,9 @@ monomorphize without algorithm-path vtables.
 `SplitMix64`, `StandardNormal`, `PopulationVariance`, and `SampleVariance` are
 zero-sized. The Latin hypercube stores `O(PARAMETERS)` coefficients instead of
 an `O(SAMPLES × PARAMETERS)` matrix. Repeated core sampling and statistics
-allocate nothing.
+allocate nothing. Public design failures remain typed across `Study` and the
+Moirai adapter; see
+[ADR 0002](docs/adr/0002-typed-design-errors.md).
 
 ## Mathematical evidence
 
