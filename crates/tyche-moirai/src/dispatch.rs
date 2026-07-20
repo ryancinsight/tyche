@@ -22,13 +22,9 @@ impl<'executor, const CHUNK: usize> MoiraiDispatch<'executor, CHUNK> {
     ///
     /// # Errors
     ///
-    /// Rejects zero chunk width, mismatched storage, or scheduler failure.
-    /// Model errors remain values in their corresponding slots.
-    ///
-    /// # Panics
-    ///
-    /// Panics if a third-party [`Design`] implementation violates its contract
-    /// by rejecting an index below its declared sample count.
+    /// Rejects zero chunk width, mismatched storage, a [`Design`] contract
+    /// violation, or scheduler failure. Model errors remain values in their
+    /// corresponding slots.
     pub fn evaluate_into<T, D, M, R, const PARAMETERS: usize>(
         &self,
         study: &Study<'_, T, D, PARAMETERS>,
@@ -59,9 +55,9 @@ impl<'executor, const CHUNK: usize> MoiraiDispatch<'executor, CHUNK> {
                 let first = chunk_index * CHUNK;
                 scope.spawn(move |_| {
                     for (offset, slot) in slots.iter_mut().enumerate() {
-                        let sample = study.sample(first + offset).expect(
-                            "invariant: Design rejects only indices at or beyond sample_count",
-                        );
+                        let Ok(sample) = study.sample(first + offset) else {
+                            return;
+                        };
                         *slot = Some(
                             model
                                 .evaluate(sample.values())
@@ -72,6 +68,12 @@ impl<'executor, const CHUNK: usize> MoiraiDispatch<'executor, CHUNK> {
             }
             Ok(())
         })?;
+        if let Some(index) = output.iter().position(Option::is_none) {
+            return Err(DispatchError::DesignContract {
+                index,
+                sample_count: study.sample_count(),
+            });
+        }
         Ok(())
     }
 }

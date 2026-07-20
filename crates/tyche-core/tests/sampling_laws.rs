@@ -44,8 +44,23 @@ fn streams_respect_domains() {
         assert!((0.0..1.0).contains(&SplitMix64::unit(seed, index, 0)));
         let open = SplitMix64::open_unit(seed, index, 1);
         assert!(open > 0.0 && open < 1.0);
-        assert!(StandardNormal::<f64>::at(seed, index, 2).is_finite());
     }
+}
+
+#[test]
+fn standard_normal_contract_holds_for_every_supported_primitive_field() {
+    fn assert_contract<T: eunomia::RealField>() {
+        let seed = Seed::new(7);
+        for index in 0..10_000_u64 {
+            let value = StandardNormal::<T>::at(seed, index, 2);
+            let replay = StandardNormal::<T>::at(seed, index, 2);
+            assert!(<T as eunomia::NumericElement>::is_finite(value));
+            assert!(value == replay);
+        }
+    }
+
+    assert_contract::<f32>();
+    assert_contract::<f64>();
 }
 
 proptest::proptest! {

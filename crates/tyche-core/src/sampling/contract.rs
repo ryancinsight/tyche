@@ -28,7 +28,11 @@ pub struct SampleIndexError {
 }
 
 impl SampleIndexError {
-    pub(crate) const fn new(index: usize, sample_count: usize) -> Self {
+    /// Construct an out-of-range sample failure.
+    ///
+    /// Public [`Design`] implementations use this constructor when
+    /// `index >= sample_count`.
+    pub const fn new(index: usize, sample_count: usize) -> Self {
         Self {
             index,
             sample_count,

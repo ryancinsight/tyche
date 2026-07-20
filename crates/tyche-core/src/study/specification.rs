@@ -2,7 +2,7 @@
 
 use super::{Sample, StudyError};
 use crate::design::ParameterSpace;
-use crate::sampling::Design;
+use crate::sampling::{Design, SampleIndexError};
 use alloc::borrow::Cow;
 use eunomia::RealField;
 
@@ -105,13 +105,16 @@ where
         self.design.sample_count()
     }
 
-    /// Generate one fixed-array sample, or `None` outside the design.
-    #[must_use]
-    pub fn sample(&self, index: usize) -> Option<Sample<T, PARAMETERS>> {
+    /// Generate one fixed-array sample.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SampleIndexError`] when `index` lies outside the design.
+    pub fn sample(&self, index: usize) -> Result<Sample<T, PARAMETERS>, SampleIndexError> {
         let mut unit = [0.0; PARAMETERS];
-        self.design.sample_unit_into(index, &mut unit).ok()?;
+        self.design.sample_unit_into(index, &mut unit)?;
         let mut values = [T::ZERO; PARAMETERS];
         self.space.map_unit_into(&unit, &mut values);
-        Some(Sample::new(index, values))
+        Ok(Sample::new(index, values))
     }
 }

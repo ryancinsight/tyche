@@ -70,7 +70,9 @@ monomorphize without algorithm-path vtables.
 `SplitMix64`, `StandardNormal`, `PopulationVariance`, and `SampleVariance` are
 zero-sized. The Latin hypercube stores `O(PARAMETERS)` coefficients instead of
 an `O(SAMPLES × PARAMETERS)` matrix. Repeated core sampling and statistics
-allocate nothing.
+allocate nothing. Public design failures remain typed across `Study` and the
+Moirai adapter; see
+[ADR 0002](docs/adr/0002-typed-design-errors.md).
 
 ## Mathematical evidence
 
@@ -110,10 +112,15 @@ cargo deny check
 
 1. Add random-access Sobol, runtime-dimension views, categorical and weighted
    sampling, and versioned distribution vectors.
-2. After public promotion, replace Helios's normal generator, `CFDrs`'s LHS, and
-   Kwavers's conformal/moment duplication.
+2. Consumer integration is in delivery: [Helios PR 10] replaces its normal
+   generator, [CFDrs PR 299] replaces its LHS, and [Kwavers PR 298] replaces
+   its conformal, moment, and mislabeled sensitivity implementations.
 3. Add deterministic bootstrap, Morris, and true Saltelli Sobol estimators.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
 
 See [`gap_audit.md`](gap_audit.md) and [`backlog.md`](backlog.md).
+
+[Helios PR 10]: https://github.com/ryancinsight/helios/pull/10
+[CFDrs PR 299]: https://github.com/ryancinsight/CFDrs/pull/299
+[Kwavers PR 298]: https://github.com/ryancinsight/kwavers/pull/298
