@@ -1,0 +1,5 @@
+[profile.default]
+slow-timeout = { period = "30s", terminate-after = 2 }
+failure-output = "immediate-final"
+status-level = "pass"
+final-status-level = "slow"

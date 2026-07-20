@@ -4,7 +4,6 @@
 //! designs, ensemble summaries, sensitivity screening, and conformal
 //! calibration. Moirai owns execution and Consus owns persistence.
 
-#![doc = include_str!("../../../README.md")]
 #![no_std]
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]

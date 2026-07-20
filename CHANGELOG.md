@@ -10,3 +10,4 @@
   explicit variance policies, honest correlation screening, and corrected
   conformal rank.
 - Borrowed Moirai and Consus adapters, proofs, tests, and documentation.
+- Exact-width Latin-hypercube counts and committed nextest time budgets.

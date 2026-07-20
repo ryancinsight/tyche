@@ -24,9 +24,14 @@ impl<'executor, const CHUNK: usize> MoiraiDispatch<'executor, CHUNK> {
     ///
     /// Rejects zero chunk width, mismatched storage, or scheduler failure.
     /// Model errors remain values in their corresponding slots.
-    pub fn evaluate_into<'study, T, D, M, R, const PARAMETERS: usize>(
+    ///
+    /// # Panics
+    ///
+    /// Panics if a third-party [`Design`] implementation violates its contract
+    /// by rejecting an index below its declared sample count.
+    pub fn evaluate_into<T, D, M, R, const PARAMETERS: usize>(
         &self,
-        study: &Study<'study, T, D, PARAMETERS>,
+        study: &Study<'_, T, D, PARAMETERS>,
         model: &M,
         reducer: &R,
         output: &mut [Option<Result<R::Output, M::Error>>],
@@ -48,14 +53,15 @@ impl<'executor, const CHUNK: usize> MoiraiDispatch<'executor, CHUNK> {
                 actual: output.len(),
             });
         }
+        output.fill_with(|| None);
         self.executor.scope::<SyncTask, _>(|scope| {
             for (chunk_index, slots) in output.chunks_mut(CHUNK).enumerate() {
                 let first = chunk_index * CHUNK;
                 scope.spawn(move |_| {
                     for (offset, slot) in slots.iter_mut().enumerate() {
-                        let sample = study
-                            .sample(first + offset)
-                            .expect("validated index domain");
+                        let sample = study.sample(first + offset).expect(
+                            "invariant: Design rejects only indices at or beyond sample_count",
+                        );
                         *slot = Some(
                             model
                                 .evaluate(sample.values())

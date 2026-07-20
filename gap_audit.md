@@ -23,5 +23,5 @@ allocator, or physics ownership.
 - Consus Store has no durability contract, and filesystem path validation is
   weaker than its documentation. Tyche validates keys before delegation.
 
-Hosted CI, public identity, Atlas gitlink, and migrated-consumer behavior are
-not yet evidence.
+Hosted CI and migrated-consumer behavior are not yet evidence. Public identity
+and the Atlas gitlink are present.

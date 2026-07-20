@@ -5,24 +5,30 @@ use tyche_core::{CorrelationScreening, Moments, PopulationVariance, SampleVarian
 #[test]
 fn welford_matches_two_pass_oracle() {
     let values = [1.0_f64, 2.0, 4.0, 8.0, 16.0, 32.0];
-    let mean = values.iter().sum::<f64>() / values.len() as f64;
+    let mean = values.iter().sum::<f64>() / 6.0;
     let population = values
         .iter()
         .map(|value| (value - mean).powi(2))
         .sum::<f64>()
-        / values.len() as f64;
+        / 6.0;
     let mut moments = Moments::new();
     for value in values {
         moments.update(value);
     }
-    assert_eq!(moments.mean().expect("defined"), mean);
+    assert_eq!(moments.mean().expect("defined").to_bits(), mean.to_bits());
     assert_eq!(
-        moments.variance::<PopulationVariance>().expect("defined"),
-        population
+        moments
+            .variance::<PopulationVariance>()
+            .expect("defined")
+            .to_bits(),
+        population.to_bits()
     );
     assert_eq!(
-        moments.variance::<SampleVariance>().expect("defined"),
-        population * 6.0 / 5.0
+        moments
+            .variance::<SampleVariance>()
+            .expect("defined")
+            .to_bits(),
+        (population * 6.0 / 5.0).to_bits()
     );
 }
 
@@ -37,13 +43,16 @@ fn chan_merge_and_singleton_policy_are_explicit() {
         right.update(value);
     }
     left.merge(right);
-    assert_eq!(left.mean().expect("defined"), 3.5);
-    assert_eq!(left.centered_sum(), 17.5);
-    let mut singleton = Moments::new();
+    assert_eq!(left.mean().expect("defined").to_bits(), 3.5_f64.to_bits());
+    assert_eq!(left.centered_sum().to_bits(), 17.5_f64.to_bits());
+    let mut singleton = Moments::<f64>::new();
     singleton.update(3.0);
     assert_eq!(
-        singleton.variance::<PopulationVariance>().expect("defined"),
-        0.0
+        singleton
+            .variance::<PopulationVariance>()
+            .expect("defined")
+            .to_bits(),
+        0.0_f64.to_bits()
     );
     assert_eq!(
         singleton
