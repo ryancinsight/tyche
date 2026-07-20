@@ -5,7 +5,7 @@ use consus_zarr::Store;
 
 /// Pointer-sized borrowed Consus store adapter.
 #[repr(transparent)]
-pub struct ConsusArchive<'store, S: Store> {
+pub struct ConsusArchive<'store, S> {
     store: &'store mut S,
 }
 

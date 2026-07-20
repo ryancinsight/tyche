@@ -5,10 +5,14 @@
 - Reproducible design, study, ensemble, statistics, calibration, execution, and
   artifact-access vertical slice.
 
-## TYCHE-002 — Public promotion and consumers — blocked externally
+## TYCHE-002 — Public promotion — implemented
 
-- Create/push public `ryancinsight/tyche`, register the fetched Atlas gitlink,
-  then migrate Helios normal noise, CFDrs LHS, and Kwavers conformal/moments.
+- Public `ryancinsight/tyche` origin and the Atlas gitlink are registered.
+
+## TYCHE-006 — Consumer migrations — ready
+
+- Replace Helios normal noise, `CFDrs` LHS, and Kwavers conformal/moment
+  duplication after pinning this verified public revision.
 
 ## TYCHE-003 — Sampling breadth — planned
 

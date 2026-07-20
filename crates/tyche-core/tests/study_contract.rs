@@ -71,6 +71,12 @@ fn borrowing_and_allocation_contracts_hold() {
     let response = BorrowingModel
         .evaluate(sample.values())
         .expect("infallible");
-    assert!(core::ptr::eq(response, &sample.values()[0]));
-    assert_eq!(CopyResponse.reduce(response), sample.values()[0]);
+    assert!(core::ptr::eq(
+        core::ptr::from_ref(response),
+        core::ptr::from_ref(&sample.values()[0])
+    ));
+    assert_eq!(
+        CopyResponse.reduce(response).to_bits(),
+        sample.values()[0].to_bits()
+    );
 }
