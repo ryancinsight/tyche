@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Fixed
+
+- Conformal ranks now compute in the caller's scalar precision, and sorted
+  calibration scores support allocation-free borrowed quantile selection.
+
 ### Added
 
 - Four-crate dependency-inverted Tyche workspace.

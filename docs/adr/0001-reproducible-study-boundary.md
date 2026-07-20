@@ -58,7 +58,13 @@ For centered vectors, `r²=<x,y>²/(||x||²||y||²)`. Cauchy-Schwarz gives
 For `n` exchangeable calibration scores and one future score, the rank among
 `n+1` values is uniform under random tie breaking. Choosing
 `ceil((n+1)(1-alpha))`, capped at `n`, excludes at most an alpha fraction of
-ranks, establishing marginal coverage subject to exchangeability.
+ranks, establishing marginal coverage subject to exchangeability. Tyche embeds
+the structural count into `T` before multiplying by `(1-alpha)` and applying
+`ceil`, so each monomorphization performs the rank arithmetic in its native
+scalar precision. For a validated nondecreasing score slice, scanning integer
+positions selects the first position not less than that rank; if scalar
+rounding places it above `n`, selecting the final score implements the stated
+cap. The borrowed sorted path therefore performs no allocation or mutation.
 
 ### Persistence boundary
 
