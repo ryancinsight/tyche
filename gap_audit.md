@@ -58,14 +58,25 @@ The remaining hosted evidence limits are explicit.
 - Hoisting Gray-bit discovery from the dimension loop reduces Criterion's
   width-3 fixed estimate by 14.03%, runtime estimate by 27.78%, and 4,096-row
   fill estimate by 54.43%. The allocation gate covers every Sobol path and
-  remains at zero post-construction allocations. The current branch passes
-  warning-denied all-target Clippy, 33/33 workspace Nextest cases, and 14/14
-  doctests.
+  remains at zero post-construction allocations.
 - `cargo-semver-checks` reports five major API changes against `origin/main`,
   matching ADR 0003's classification; a major-release check passes under a
   temporary metadata-only version projection. The delivered manifests remain
   at 0.1.0 because no release or version bump is authorized in this increment.
-- Categorical, weighted, and discrete importance sampling remain TYCHE-003
-  work. Moirai and Consus
-  adapters require no change until runtime-dimensional studies or versioned
-  persistence enter their respective scopes.
+- ADR 0005 adds exact uniform categorical reduction, borrowed-or-owned
+  validated mass tables, native-precision weighted inverse-CDF sampling, and
+  support-checked discrete importance ratios. One generic contract suite
+  covers `f32` and `f64`; exact replay, six-standard-error distribution laws,
+  algebraic importance equality, invalid mass/support cases, `Cow` storage
+  identity, and allocation/layout invariants are executable gates.
+- The current branch passes warning-denied all-target/all-feature Clippy,
+  40/40 workspace Nextest cases, 18/18 doctests, warning-denied Rustdoc, the
+  end-to-end example, and supply-chain policy. On this Windows x86-64 machine,
+  Criterion measures width-16 categorical, weighted, and importance medians of
+  2.389 ns, 14.594 ns, and 15.872 ns respectively; these are raw instrument
+  readings without an earlier discrete baseline, not speedup claims. Existing
+  row-major Sobol throughput has no statistically significant change.
+- `cargo-semver-checks` classifies the public discrete surface as additive:
+  all 196 applicable minor-release checks pass against `origin/main`.
+- Moirai and Consus adapters require no change until runtime-dimensional
+  studies or versioned persistence enter their respective scopes.

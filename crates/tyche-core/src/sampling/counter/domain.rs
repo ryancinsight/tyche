@@ -93,6 +93,24 @@ impl StreamDomain for SobolDigitalShift {
     const TAG: u64 = u64::from_le_bytes(*b"sobolshf");
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(in crate::sampling) struct CategoricalSelection;
+
+impl private::Sealed for CategoricalSelection {}
+
+impl StreamDomain for CategoricalSelection {
+    const TAG: u64 = u64::from_le_bytes(*b"category");
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(in crate::sampling) struct WeightedSelection;
+
+impl private::Sealed for WeightedSelection {}
+
+impl StreamDomain for WeightedSelection {
+    const TAG: u64 = u64::from_le_bytes(*b"weighted");
+}
+
 const _: () = {
     let tags = [
         LatinHypercubeStride::TAG,
@@ -101,6 +119,8 @@ const _: () = {
         StandardNormalRadius::TAG,
         StandardNormalAngle::TAG,
         SobolDigitalShift::TAG,
+        CategoricalSelection::TAG,
+        WeightedSelection::TAG,
     ];
     let mut left = 0;
     while left < tags.len() {

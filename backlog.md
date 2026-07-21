@@ -29,7 +29,7 @@
 - ADR 0002 closes the public `Design` error-construction gap and replaces the
   adapter's contained panic path with a typed `DesignContract` failure.
 
-## TYCHE-003 — Sampling breadth — in progress
+## TYCHE-003 — Sampling breadth — implemented
 
 - Owner: `/root`; scope: `tyche-core` sampling/design modules, their tests,
   performance evidence, ADRs, README, changelog, and facade exports.
@@ -40,7 +40,14 @@
   explicit sequence ranges, static scrambling policies, typed failures, and an
   allocation-free row-major fill. Exact vectors, sequential differential
   checks, dyadic projection laws, and controlled performance evidence pass.
-- Remaining: categorical, weighted, and discrete importance sampling.
+- ADR 0005 delivers categorical, weighted, and discrete importance sampling
+  with typed validation, exact categorical reduction, `Cow` mass storage,
+  native-precision arithmetic, and allocation-free repeated draws.
+- Exact replay, generic `f32`/`f64` contracts, analytical importance identity,
+  empirical laws with derived bounds, support failures, and allocation/layout
+  invariants pass in the 40/40 workspace suite. All 18 doctests, warning-denied
+  Clippy/Rustdoc, the end-to-end example, supply-chain policy, Criterion, and
+  all 196 applicable additive SemVer checks pass.
 
 ## TYCHE-004 — UQ breadth — planned
 

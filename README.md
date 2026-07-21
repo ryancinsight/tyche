@@ -3,9 +3,10 @@
 Tyche is the Atlas owner for reproducible uncertainty studies. Phase 0
 provides validated parameter spaces, deterministic random-access Latin
 hypercube and Sobol designs, fixed and runtime dimension selection,
-index-addressed ensemble execution, online moments, correlation screening,
-finite-sample split-conformal calibration, and provider adapters for Moirai
-and Consus.
+uniform and weighted finite-distribution sampling, support-checked discrete
+importance ratios, index-addressed ensemble execution, online moments,
+correlation screening, finite-sample split-conformal calibration, and provider
+adapters for Moirai and Consus.
 
 ## Boundary
 
@@ -63,7 +64,9 @@ crates/
 
 `tyche-core` is `no_std + alloc` and has no runtime or persistence dependency.
 `Parameter`, `Study`, and `ArtifactKey` use `Cow<str>` for one borrowed/owned
-API. Numeric widths are const generics. `StudyModel::Response<'a>` is a GAT;
+API. Discrete mass tables use `Cow<[T]>`, retaining borrowed inputs without
+normalization copies while accepting owned storage through the same contract.
+Numeric widths are const generics. `StudyModel::Response<'a>` is a GAT;
 the statically dispatched reducer consumes it before its borrow ends. Designs,
 models, reducers, scalar precision, variance policy, and Moirai chunk width
 monomorphize without algorithm-path vtables.
@@ -100,6 +103,21 @@ power-of-two prefixes stratify every one-dimensional dyadic projection; a
 fixed digital shift permutes those strata. ADR 0004 states the proof limits,
 exact vectors, differential oracle, memory contract, and controlled benchmark.
 
+For a nonzero category count `s`, categorical sampling multiplies a uniform
+`u64` word `x` by `s`, rejects when the product's low half lies below
+`2^64 mod s`, and returns the high half. The accepted source-space cardinality
+is divisible by `s`, so every category has the same number of preimages. The
+counter retry coordinate is a permutation of all `u64` words, so rejection
+terminates for each address.
+
+Weighted sampling returns the first category whose cumulative mass exceeds
+the native-precision uniform threshold. In ideal real arithmetic the interval
+length is exactly the category mass; the implementation states the finite
+`f32`/`f64` unit-grid quantization rather than widening silently. For target
+`p`, proposal `q`, and response `f`, the enforced support law gives
+`E_q[f(I) p_I/q_I] = sum_i p_i f_i`. [ADR 0005] records the reference theorems,
+proof obligations, finite-precision limit, and executable evidence.
+
 Welford's recurrence stores the mean and centered sum. Population variance
 divides by `n`; sample variance divides by `n-1`. The required zero-sized policy
 makes singleton sample variance a typed error instead of `NaN`.
@@ -116,6 +134,7 @@ beginning with [ADR 0001](docs/adr/0001-reproducible-study-boundary.md).
 [ADR 0002]: docs/adr/0002-typed-design-errors.md
 [ADR 0003]: docs/adr/0003-domain-separated-counter-schedule.md
 [ADR 0004]: docs/adr/0004-random-access-sobol.md
+[ADR 0005]: docs/adr/0005-discrete-importance-sampling.md
 
 ## Verification
 
@@ -133,9 +152,9 @@ cargo deny check
 
 ## Roadmap
 
-1. Add categorical, weighted, and discrete importance sampling on the
-   delivered versioned stream and fixed/runtime design substrate.
-2. Consumer integration is delivered: merged [Helios PR 10] replaces its
+1. Extend consumer integration to remaining local experimental-design
+   surfaces, beginning with Kwavers Latin-hypercube and Sobol generation.
+2. Existing consumer integration is delivered: merged [Helios PR 10] replaces its
    normal generator, merged [CFDrs PR 299] replaces its LHS, and merged
    [Kwavers PR 298] replaces its conformal, moment, and mislabeled sensitivity
    implementations.

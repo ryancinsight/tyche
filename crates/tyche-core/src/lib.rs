@@ -26,10 +26,12 @@ pub mod uncertainty;
 pub use design::{InvalidParameter, Parameter, ParameterSpace, SpaceError};
 pub use ensemble::{Ensemble, ResponseReducer, StudyModel};
 pub use sampling::{
-    Counter, Design, DigitalShift, LatinHypercube, RuntimeSampleError, RuntimeSobol,
-    SampleIndexError, SampleScalar, Seed, Sobol, SobolDimensionError, SobolDimensions, SobolRange,
-    SobolRangeError, SobolScramble, SplitMix64, StandardNormal, StreamAlgorithm, StreamDomain,
-    StreamVersion, Unscrambled, UserDomain,
+    Categorical, CategoryCount, CategoryIndex, Counter, Design, DigitalShift, DiscreteImportance,
+    DiscreteWeights, ImportanceError, ImportanceSample, LatinHypercube, RuntimeSampleError,
+    RuntimeSobol, SampleIndexError, SampleScalar, Seed, Sobol, SobolDimensionError,
+    SobolDimensions, SobolRange, SobolRangeError, SobolScramble, SplitMix64, StandardNormal,
+    StreamAlgorithm, StreamDomain, StreamVersion, Unscrambled, UserDomain, WeightError,
+    WeightedCategorical,
 };
 pub use statistics::{
     CorrelationScreening, InsufficientSamples, Moments, PopulationVariance, SampleVariance,
