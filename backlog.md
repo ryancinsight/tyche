@@ -68,9 +68,10 @@
   multiply-high bounded-integer kernel under bootstrap-specific typed stream
   domains and writes to caller-owned storage.
 - Consumer closure: replace Kwavers' private SplitMix/modulo percentile
-  bootstrap and entropy-seeded ensemble bagging, deleting the direct `rand 0.8`
-  edge when its final use disappears. Percentile interpolation and model
-  training remain consumer policy.
+  bootstrap. Percentile interpolation remains consumer policy. Its nominal
+  ensemble bagging is not a valid migration target until it owns a real
+  trainable-model seam: the current model stores only an error-derived score
+  and prediction perturbs an external predictor without retained training.
 - Following increments: genuine Morris and Saltelli Sobol estimators plus
   multi-output reports.
 

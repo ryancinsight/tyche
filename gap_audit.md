@@ -91,14 +91,16 @@ The remaining hosted evidence limits are explicit.
 
 ## UQ breadth
 
-- Kwavers still owns two bootstrap index mechanisms: a private stateful
-  SplitMix/modulo reducer for percentile confidence intervals and an
-  entropy-seeded `rand 0.8` generator for ensemble bagging. The shared provider
-  gap is deterministic resampling with replacement, not percentile selection
-  or model training.
+- Kwavers' percentile confidence interval owns a private stateful
+  SplitMix/modulo bootstrap reducer. Its nominal entropy-seeded ensemble
+  bagging is not a valid second implementation: `EnsembleModel::train` retains
+  no trained model and prediction only perturbs an external predictor. That
+  placeholder must gain a real trainable-model seam or be removed before it can
+  consume provider resampling.
 - The next Tyche increment shares the existing exact multiply-high bounded
   reduction through one private kernel, adds bootstrap-specific stream domains,
   validates population and resample sizes, and exposes random-access and
-  caller-owned fill forms. This removes modulo bias, entropy dependence, and
-  the duplicate generator without adding consumer-specific statistics to
-  Tyche.
+  caller-owned fill forms. The first consumer deletion removes modulo bias and
+  the duplicate percentile generator without adding consumer-specific
+  statistics to Tyche. Ensemble entropy and `rand` ownership remain a separate
+  correctness item, not a bootstrap-API acceptance shortcut.

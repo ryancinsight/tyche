@@ -158,7 +158,9 @@ cargo deny check
    implementations, and merged [Kwavers PR 304] replaces fixed collocation LHS
    and Sobol generation. Geometry mappings remain Kwavers-owned.
 2. Add deterministic bootstrap resampling and migrate Kwavers percentile-mean
-   and ensemble-bagging index generation to that provider contract.
+   index generation to that provider contract. Ensemble bagging adopts it only
+   with a real trainable-model seam; the current score-only placeholder is not
+   a valid consumer contract.
 3. Add genuine Morris and Saltelli Sobol estimators plus multi-output reports.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
