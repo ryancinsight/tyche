@@ -32,8 +32,8 @@
   fixed Latin-hypercube and Sobol collocation designs to Tyche while retaining
   rectangle, disk, ball, interface, and physics mappings in Kwavers. Local
   value-semantic suites pass 46/46 grid tests and 21/21 PINN geometry/config
-  tests; the exact source head has 22 successful hosted checks while code
-  coverage and four full benchmark pairs remain in progress.
+  tests; the exact source head has 23 successful hosted checks, including code
+  coverage, while four full benchmark pairs remain in progress.
 - Moirai merge `91c802e` repairs the final-completion lifetime race exposed by
   Tyche's 257-item, seven-item-chunk adapter contract. The pinned Tyche
   workspace passes 18/18 tests, including the exact former access-violation

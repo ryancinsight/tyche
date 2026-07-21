@@ -28,9 +28,9 @@ allocator, or physics ownership.
   local fixed collocation LHS and pseudo-Sobol generators and consumes Tyche's
   const-generic random-access designs. Kwavers retains measure-correct
   rectangle, disk, ball, boundary, and interface mapping. Local evidence is
-  46/46 grid and 21/21 PINN geometry/config tests; 22 hosted checks have
-  succeeded while code coverage and four full benchmark pairs continue on the
-  exact source head.
+  46/46 grid and 21/21 PINN geometry/config tests; 23 hosted checks, including
+  code coverage, have succeeded while four full benchmark pairs continue on
+  the exact source head.
 
 ## Provider residuals
 
