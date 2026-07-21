@@ -29,7 +29,10 @@
 - ADR 0002 closes the public `Design` error-construction gap and replaces the
   adapter's contained panic path with a typed `DesignContract` failure.
 
-## TYCHE-003 — Sampling breadth — planned
+## TYCHE-003 — Sampling breadth — in progress
+
+- Owner: `/root`; scope: `tyche-core` sampling/design modules, their tests,
+  performance evidence, ADRs, README, changelog, and facade exports.
 
 - Runtime dimensions, Sobol, categorical, weighted, importance sampling, and
   versioned stream vectors.
