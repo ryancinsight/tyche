@@ -108,13 +108,14 @@ cargo run -p tyche --example reproducible_study
 cargo deny check
 ```
 
-## Planned vertical increments
+## Roadmap
 
 1. Add random-access Sobol, runtime-dimension views, categorical and weighted
    sampling, and versioned distribution vectors.
-2. Consumer integration is in delivery: [Helios PR 10] replaces its normal
-   generator, [CFDrs PR 299] replaces its LHS, and [Kwavers PR 298] replaces
-   its conformal, moment, and mislabeled sensitivity implementations.
+2. Consumer integration is delivered: merged [Helios PR 10] replaces its
+   normal generator, merged [CFDrs PR 299] replaces its LHS, and merged
+   [Kwavers PR 298] replaces its conformal, moment, and mislabeled sensitivity
+   implementations.
 3. Add deterministic bootstrap, Morris, and true Saltelli Sobol estimators.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
