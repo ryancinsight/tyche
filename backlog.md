@@ -9,7 +9,12 @@
 
 - Public `ryancinsight/tyche` origin and the Atlas gitlink are registered.
 
-## TYCHE-006 — Consumer migrations — implemented
+## TYCHE-006 — Consumer migrations — in progress
+
+- Owner: Codex `/root`; scope: document merged Kwavers PR 304's direct Tyche
+  collocation-design adoption in `README.md`, `backlog.md`, `gap_audit.md`, and
+  `CHANGELOG.md`. Provider code, unrelated consumer surfaces, and release
+  metadata are non-goals.
 
 - Helios PR 10 delegates reproducible normal noise to `StandardNormal`; its
   package-local suite passes 27/27 tests.
