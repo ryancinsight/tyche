@@ -34,9 +34,38 @@ allocator, or physics ownership.
 - Consus Store has no durability contract, and filesystem path validation is
   weaker than its documentation. Tyche validates keys before delegation.
 
-Tyche main `2b8fb14267a710e1438102666211494a3d6f179e` is hosted-CI green for both
-verification and supply-chain policy. Its full local locked gate passes the
-no-std check, warning-denied Clippy, 18/18 Nextest, 9/9 doctests, Rustdoc, the
-reproducible-study example, and supply-chain policy.
+Tyche baseline main `94d3c342b48045bda2364b1bc8d1d62d5e2ca99e` is hosted-CI green for both
+verification and supply-chain policy. Its prior full local locked gate passes
+the no-std check, warning-denied Clippy, 18/18 Nextest, 9/9 doctests, Rustdoc,
+the reproducible-study example, and supply-chain policy.
 `cargo-semver-checks` completes but has no published Tyche baseline to compare.
 The remaining hosted evidence limits are explicit.
+
+## Sampling breadth
+
+- ADR 0003 closes the untyped counter namespace that aliased LHS coefficient,
+  jitter, and normal coordinates. Public stream/design/distribution types now
+  require an explicit algorithm ZST and exact versioned vectors.
+- A controlled `origin/main` Criterion comparison detects no raw-word or
+  normal-throughput regression and measures a 7.87% lower median for width-8
+  LHS sampling. Repeated sampling remains allocation-free.
+- ADR 0004 adds fixed and runtime Sobol over one const-generic kernel for the
+  verified one-through-three-dimensional consumer boundary. Explicit ranges
+  replace seed-derived skipping; `Unscrambled` and versioned `DigitalShift`
+  are static policies. Exact vectors, 1,024-point sequential differential
+  equivalence, projection stratification before and after shifting, fixed and
+  runtime equality, failure atomicity, and row-major equivalence pass.
+- Hoisting Gray-bit discovery from the dimension loop reduces Criterion's
+  width-3 fixed estimate by 14.03%, runtime estimate by 27.78%, and 4,096-row
+  fill estimate by 54.43%. The allocation gate covers every Sobol path and
+  remains at zero post-construction allocations. The current branch passes
+  warning-denied all-target Clippy, 33/33 workspace Nextest cases, and 14/14
+  doctests.
+- `cargo-semver-checks` reports five major API changes against `origin/main`,
+  matching ADR 0003's classification; a major-release check passes under a
+  temporary metadata-only version projection. The delivered manifests remain
+  at 0.1.0 because no release or version bump is authorized in this increment.
+- Categorical, weighted, and discrete importance sampling remain TYCHE-003
+  work. Moirai and Consus
+  adapters require no change until runtime-dimensional studies or versioned
+  persistence enter their respective scopes.

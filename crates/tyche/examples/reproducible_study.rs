@@ -1,7 +1,10 @@
 //! Reproducible study example.
 
 use core::num::NonZeroU32;
-use tyche::{Ensemble, LatinHypercube, Parameter, ParameterSpace, PopulationVariance, Seed, Study};
+use tyche::{
+    Ensemble, LatinHypercube, Parameter, ParameterSpace, PopulationVariance, Seed, SplitMix64,
+    Study,
+};
 
 fn main() {
     let space = ParameterSpace::new([
@@ -9,7 +12,7 @@ fn main() {
         Parameter::borrowed("density", 900.0, 1_100.0).expect("valid"),
     ])
     .expect("unique");
-    let design = LatinHypercube::new(
+    let design = LatinHypercube::<2, SplitMix64>::new(
         Seed::new(0x5459_4348_455F_3031),
         NonZeroU32::new(256).expect("positive"),
     );

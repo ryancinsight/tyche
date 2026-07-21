@@ -29,10 +29,18 @@
 - ADR 0002 closes the public `Design` error-construction gap and replaces the
   adapter's contained panic path with a typed `DesignContract` failure.
 
-## TYCHE-003 — Sampling breadth — planned
+## TYCHE-003 — Sampling breadth — in progress
 
-- Runtime dimensions, Sobol, categorical, weighted, importance sampling, and
-  versioned stream vectors.
+- Owner: `/root`; scope: `tyche-core` sampling/design modules, their tests,
+  performance evidence, ADRs, README, changelog, and facade exports.
+
+- Domain-separated, explicitly versioned stream vectors are implemented with
+  native-precision unit conversion and controlled performance evidence.
+- Fixed and runtime random-access Sobol designs share one const-generic kernel,
+  explicit sequence ranges, static scrambling policies, typed failures, and an
+  allocation-free row-major fill. Exact vectors, sequential differential
+  checks, dyadic projection laws, and controlled performance evidence pass.
+- Remaining: categorical, weighted, and discrete importance sampling.
 
 ## TYCHE-004 — UQ breadth — planned
 
