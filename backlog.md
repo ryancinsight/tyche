@@ -9,15 +9,19 @@
 
 - Public `ryancinsight/tyche` origin and the Atlas gitlink are registered.
 
-## TYCHE-006 — Consumer migrations — ready-review
+## TYCHE-006 — Consumer migrations — implemented
 
 - Helios PR 10 delegates reproducible normal noise to `StandardNormal`; its
   package-local suite passes 27/27 tests.
 - CFDrs PR 299 delegates const-width Latin-hypercube designs to Tyche; its
   package-local suite passes 128/128 tests.
-- Kwavers PR 298 delegates conformal calibration, moments, and correlation
-  screening to Tyche; local suites pass 718/718 analysis and 1,251/1,251 solver
-  tests. Hosted verification and merge remain.
+- Kwavers merge `a8d797cc8bc4b3f032be3f12f586e5e1269837a1`
+  delegates conformal calibration, moments, and correlation screening to
+  Tyche. The local all-feature Analysis suite passes 764/764 tests, and the
+  solver suite passes 1,251/1,251 tests. Final head `be5bd37f1` passes the
+  complete hosted migration, architecture, feature, stable/beta/nightly,
+  Miri, CUDA, solver, PINN, coverage, benchmark, documentation, and
+  security matrix.
 - Moirai merge `91c802e` repairs the final-completion lifetime race exposed by
   Tyche's 257-item, seven-item-chunk adapter contract. The pinned Tyche
   workspace passes 18/18 tests, including the exact former access-violation

@@ -16,10 +16,13 @@ allocator, or physics ownership.
   LHS and direct `rand` dependency while keeping CFD candidate mapping local.
   The package-local suite passes 128/128 tests; isolated semver reconstruction
   is blocked by Gaia's published relative Leto path.
-- Kwavers PR 298 removes local conformal ranks and moment accumulation, routes
-  f32 and f64 calibration through Tyche, and names squared Pearson correlation
-  as screening rather than Sobol. Local suites pass 718/718 analysis and
-  1,251/1,251 solver tests. Hosted verification and merge remain.
+- Kwavers merge `a8d797cc8bc4b3f032be3f12f586e5e1269837a1`
+  removes local conformal ranks and moment accumulation, routes `f32` and
+  `f64` calibration through Tyche, and names squared Pearson correlation as
+  screening rather than Sobol. Local suites pass 764/764 Analysis and
+  1,251/1,251 solver tests. Final head `be5bd37f1` passes the complete hosted
+  migration, architecture, feature, stable/beta/nightly, Miri, CUDA, solver,
+  PINN, coverage, benchmark, documentation, and security matrix.
 
 ## Provider residuals
 
@@ -31,10 +34,9 @@ allocator, or physics ownership.
 - Consus Store has no durability contract, and filesystem path validation is
   weaker than its documentation. Tyche validates keys before delegation.
 
-Tyche main `c6b69addabf89cec73aa9feab2010e06b0c0a4a6` is hosted-CI green. Main
-`90e466388a936e0f9fff56e33baae69b467144ed` failed only its formatting gate;
-this delivery formats that scalar-generic expression and passes the full local
-locked gate: no-std check, warning-denied Clippy, 18/18 Nextest, 9/9 doctests,
-Rustdoc, the reproducible-study example, and supply-chain policy.
+Tyche main `2b8fb14267a710e1438102666211494a3d6f179e` is hosted-CI green for both
+verification and supply-chain policy. Its full local locked gate passes the
+no-std check, warning-denied Clippy, 18/18 Nextest, 9/9 doctests, Rustdoc, the
+reproducible-study example, and supply-chain policy.
 `cargo-semver-checks` completes but has no published Tyche baseline to compare.
 The remaining hosted evidence limits are explicit.
