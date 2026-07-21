@@ -40,7 +40,11 @@
   explicit sequence ranges, static scrambling policies, typed failures, and an
   allocation-free row-major fill. Exact vectors, sequential differential
   checks, dyadic projection laws, and controlled performance evidence pass.
-- Remaining: categorical, weighted, and discrete importance sampling.
+- Active increment: implement categorical, weighted, and discrete importance
+  sampling under ADR 0005. Acceptance requires typed validation, exact replay,
+  generic `f32`/`f64` laws, analytical importance identities, allocation-free
+  repeated draws, controlled throughput evidence, facade/Rustdoc coverage,
+  and the complete repository gate.
 
 ## TYCHE-004 — UQ breadth — planned
 
