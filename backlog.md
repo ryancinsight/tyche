@@ -36,8 +36,11 @@
 
 - Domain-separated, explicitly versioned stream vectors are implemented with
   native-precision unit conversion and controlled performance evidence.
-- Remaining: runtime dimensions, Sobol, categorical, weighted, and importance
-  sampling.
+- Fixed and runtime random-access Sobol designs share one const-generic kernel,
+  explicit sequence ranges, static scrambling policies, typed failures, and an
+  allocation-free row-major fill. Exact vectors, sequential differential
+  checks, dyadic projection laws, and controlled performance evidence pass.
+- Remaining: categorical, weighted, and discrete importance sampling.
 
 ## TYCHE-004 — UQ breadth — planned
 

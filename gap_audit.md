@@ -48,12 +48,24 @@ The remaining hosted evidence limits are explicit.
   require an explicit algorithm ZST and exact versioned vectors.
 - A controlled `origin/main` Criterion comparison detects no raw-word or
   normal-throughput regression and measures a 7.87% lower median for width-8
-  LHS sampling. Repeated sampling remains allocation-free. The current branch
-  passes warning-denied all-target Clippy and 24/24 workspace Nextest cases.
+  LHS sampling. Repeated sampling remains allocation-free.
+- ADR 0004 adds fixed and runtime Sobol over one const-generic kernel for the
+  verified one-through-three-dimensional consumer boundary. Explicit ranges
+  replace seed-derived skipping; `Unscrambled` and versioned `DigitalShift`
+  are static policies. Exact vectors, 1,024-point sequential differential
+  equivalence, projection stratification before and after shifting, fixed and
+  runtime equality, failure atomicity, and row-major equivalence pass.
+- Hoisting Gray-bit discovery from the dimension loop reduces Criterion's
+  width-3 fixed estimate by 14.03%, runtime estimate by 27.78%, and 4,096-row
+  fill estimate by 54.43%. The allocation gate covers every Sobol path and
+  remains at zero post-construction allocations. The current branch passes
+  warning-denied all-target Clippy, 33/33 workspace Nextest cases, and 14/14
+  doctests.
 - `cargo-semver-checks` reports five major API changes against `origin/main`,
-  matching ADR 0003's classification; a major-release check passes. No release
-  or version bump is authorized in this increment.
-- Runtime-dimensional views, random-access Sobol, categorical, weighted, and
-  discrete importance sampling remain TYCHE-003 work. Moirai and Consus
+  matching ADR 0003's classification; a major-release check passes under a
+  temporary metadata-only version projection. The delivered manifests remain
+  at 0.1.0 because no release or version bump is authorized in this increment.
+- Categorical, weighted, and discrete importance sampling remain TYCHE-003
+  work. Moirai and Consus
   adapters require no change until runtime-dimensional studies or versioned
   persistence enter their respective scopes.

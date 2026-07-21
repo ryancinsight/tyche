@@ -2,9 +2,10 @@
 
 Tyche is the Atlas owner for reproducible uncertainty studies. Phase 0
 provides validated parameter spaces, deterministic random-access Latin
-hypercube designs, index-addressed ensemble execution, online moments,
-correlation screening, finite-sample split-conformal calibration, and provider
-adapters for Moirai and Consus.
+hypercube and Sobol designs, fixed and runtime dimension selection,
+index-addressed ensemble execution, online moments, correlation screening,
+finite-sample split-conformal calibration, and provider adapters for Moirai
+and Consus.
 
 ## Boundary
 
@@ -50,7 +51,7 @@ crates/
 ├── tyche-core/
 │   └── src/
 │       ├── design/       # Cow metadata and const-width spaces
-│       ├── sampling/     # counter streams and random-access LHS
+│       ├── sampling/     # typed streams and fixed/runtime designs
 │       ├── study/        # named specifications and fixed arrays
 │       ├── ensemble/     # GAT model seam and borrowed views
 │       ├── statistics/   # Welford/Chan and screening
@@ -73,8 +74,11 @@ selection has no default: the type and nonzero version identify the bitwise
 replay contract. Native `f32` and `f64` unit conversion avoids hidden
 widen/narrow arithmetic. The Latin hypercube stores `O(PARAMETERS)`
 coefficients instead of an `O(SAMPLES × PARAMETERS)` matrix. Repeated core
-sampling and statistics allocate nothing. Public design failures remain typed
-across `Study` and the Moirai adapter; see [ADR 0002] and [ADR 0003].
+sampling and statistics allocate nothing. Fixed and runtime Sobol designs
+share one const-generic kernel; a row-major runtime fill validates and
+dispatches once without nested point storage. Public design failures remain
+typed across `Study` and the Moirai adapter; see [ADR 0002], [ADR 0003], and
+[ADR 0004].
 
 ## Mathematical evidence
 
@@ -89,6 +93,13 @@ The explicit Mix13 schedule is pinned by raw-word, native-unit, normal, and LHS
 known-answer vectors. ADR 0003 proves equal-coordinate domain separation and
 records the controlled Criterion comparison against the untyped schedule.
 
+Sobol point `n` is the XOR of direction numbers selected by the set bits of
+its Gray code. Consecutive Gray codes toggle the same direction selected by the
+sequential recurrence, proving random-access equivalence. Origin-aligned
+power-of-two prefixes stratify every one-dimensional dyadic projection; a
+fixed digital shift permutes those strata. ADR 0004 states the proof limits,
+exact vectors, differential oracle, memory contract, and controlled benchmark.
+
 Welford's recurrence stores the mean and centered sum. Population variance
 divides by `n`; sample variance divides by `n-1`. The required zero-sized policy
 makes singleton sample variance a typed error instead of `NaN`.
@@ -99,11 +110,12 @@ not called Sobol. Split-conformal calibration uses corrected rank
 scalar's native precision; already sorted scores use an allocation-free
 borrowed calibration path.
 
-Proofs and consequences are the SSOT in
-[ADR 0001](docs/adr/0001-reproducible-study-boundary.md).
+Proofs and consequences are owned by the boundary and algorithm ADRs,
+beginning with [ADR 0001](docs/adr/0001-reproducible-study-boundary.md).
 
 [ADR 0002]: docs/adr/0002-typed-design-errors.md
 [ADR 0003]: docs/adr/0003-domain-separated-counter-schedule.md
+[ADR 0004]: docs/adr/0004-random-access-sobol.md
 
 ## Verification
 
@@ -121,9 +133,8 @@ cargo deny check
 
 ## Roadmap
 
-1. Add random-access Sobol, runtime-dimension views, categorical, weighted,
-   and discrete importance sampling on the delivered versioned stream
-   substrate.
+1. Add categorical, weighted, and discrete importance sampling on the
+   delivered versioned stream and fixed/runtime design substrate.
 2. Consumer integration is delivered: merged [Helios PR 10] replaces its
    normal generator, merged [CFDrs PR 299] replaces its LHS, and merged
    [Kwavers PR 298] replaces its conformal, moment, and mislabeled sensitivity

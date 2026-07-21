@@ -84,6 +84,15 @@ impl StreamDomain for StandardNormalAngle {
     const TAG: u64 = u64::from_le_bytes(*b"normangl");
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(in crate::sampling) struct SobolDigitalShift;
+
+impl private::Sealed for SobolDigitalShift {}
+
+impl StreamDomain for SobolDigitalShift {
+    const TAG: u64 = u64::from_le_bytes(*b"sobolshf");
+}
+
 const _: () = {
     let tags = [
         LatinHypercubeStride::TAG,
@@ -91,6 +100,7 @@ const _: () = {
         LatinHypercubeJitter::TAG,
         StandardNormalRadius::TAG,
         StandardNormalAngle::TAG,
+        SobolDigitalShift::TAG,
     ];
     let mut left = 0;
     while left < tags.len() {

@@ -3,7 +3,10 @@
 use core::num::NonZeroU32;
 
 use criterion::{Criterion, Throughput, criterion_group, criterion_main};
-use tyche_core::{Counter, Design, LatinHypercube, Seed, SplitMix64, StandardNormal, UserDomain};
+use tyche_core::{
+    Counter, Design, DigitalShift, LatinHypercube, RuntimeSobol, Seed, Sobol, SobolDimensions,
+    SobolRange, SplitMix64, StandardNormal, UserDomain,
+};
 
 type BenchmarkDomain = UserDomain<{ u64::from_le_bytes(*b"benchstr") }>;
 
@@ -12,6 +15,18 @@ fn counter_sampling(criterion: &mut Criterion) {
     let design =
         LatinHypercube::<8, SplitMix64>::new(seed, NonZeroU32::new(4_096).expect("positive"));
     let mut point = [0.0; 8];
+    let sobol_range =
+        SobolRange::new(1, NonZeroU32::new(4_096).expect("positive")).expect("bounded range");
+    let shift = DigitalShift::<SplitMix64>::new(seed);
+    let sobol = Sobol::<3, DigitalShift<SplitMix64>>::new(sobol_range, shift)
+        .expect("three dimensions are supported");
+    let runtime_sobol = RuntimeSobol::new(
+        SobolDimensions::new(3).expect("three dimensions are supported"),
+        sobol_range,
+        shift,
+    );
+    let mut sobol_point = [0.0; 3];
+    let mut sobol_rows = vec![0.0; 4_096 * 3].into_boxed_slice();
     let mut index = 0_u64;
 
     let mut group = criterion.benchmark_group("counter_sampling");
@@ -47,6 +62,41 @@ fn counter_sampling(criterion: &mut Criterion) {
                 )
                 .expect("bounded index");
             point
+        });
+    });
+    group.throughput(Throughput::Elements(3));
+    group.bench_function("sobol_fixed_width_3", |bencher| {
+        bencher.iter(|| {
+            index = index.wrapping_add(1) % 4_096;
+            sobol
+                .sample_unit_into(
+                    usize::try_from(std::hint::black_box(index)).expect("bounded index"),
+                    std::hint::black_box(&mut sobol_point),
+                )
+                .expect("bounded index");
+            sobol_point
+        });
+    });
+    group.bench_function("sobol_runtime_width_3", |bencher| {
+        bencher.iter(|| {
+            index = index.wrapping_add(1) % 4_096;
+            runtime_sobol
+                .sample_unit_slice_into(
+                    usize::try_from(std::hint::black_box(index)).expect("bounded index"),
+                    std::hint::black_box(&mut sobol_point),
+                )
+                .expect("bounded index and output width");
+            sobol_point
+        });
+    });
+    group.throughput(Throughput::Elements(4_096 * 3));
+    group.bench_function("sobol_runtime_rows_width_3", |bencher| {
+        bencher.iter(|| {
+            runtime_sobol
+                .sample_unit_rows_into(std::hint::black_box(&mut sobol_rows))
+                .expect("exact row-major output length");
+            let index = usize::try_from(index).expect("bounded index") % sobol_rows.len();
+            sobol_rows[std::hint::black_box(index)]
         });
     });
     group.finish();

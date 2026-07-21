@@ -2,7 +2,7 @@
 
 use core::{marker::PhantomData, num::NonZeroU32};
 
-use super::{Design, SampleIndexError};
+use super::super::{Design, SampleIndexError};
 use crate::sampling::counter::{
     Counter, LatinHypercubeJitter, LatinHypercubeOffset, LatinHypercubeStride, Seed,
     StreamAlgorithm,

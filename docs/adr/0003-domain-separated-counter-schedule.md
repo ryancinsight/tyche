@@ -20,9 +20,9 @@ Every counter is `Counter<D, A>`, where `D: StreamDomain` is a sealed ZST and
 `A: StreamAlgorithm` is an explicitly selected sealed algorithm ZST. Tyche's
 first schedule is `SplitMix64`, carrying nonzero `StreamVersion(1)`. Public
 downstream domains use `UserDomain<TAG>`; the const tag is part of persisted
-replay identity. Latin-hypercube stride, offset, and jitter plus normal radius
-and angle own distinct internal tags. Compile-time assertions reject duplicate
-internal tags.
+replay identity. Latin-hypercube stride, offset, and jitter, normal radius and
+angle, and Sobol digital shift own distinct internal tags. Compile-time
+assertions reject duplicate internal tags.
 
 For seed `s`, domain tag `t`, logical index `i`, and draw `r`, the schedule is
 
@@ -87,7 +87,8 @@ word latency by 233% and normal latency by 26.3%, so the measurement falsified
 that design. One finalizer over odd-stepped typed coordinates provides the
 required separation without the regression. All algorithm/domain policies
 remain ZSTs, and the allocation regression test covers counter, normal, LHS,
-and moments in one post-construction region.
+fixed/runtime Sobol point and row fills, and moments in one post-construction
+region.
 
 `cargo llvm-lines -p tyche-core --lib` increases emitted development IR from
 469 lines/46 copies to 505 lines/56 copies for the additional public scalar and
