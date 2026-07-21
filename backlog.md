@@ -27,6 +27,13 @@
   complete hosted migration, architecture, feature, stable/beta/nightly,
   Miri, CUDA, solver, PINN, coverage, benchmark, documentation, and
   security matrix.
+- Kwavers PR 304 merges as `9ad18523d0a936f3d32c2921dc3ff6fce2e35de9`
+  from source `cc382dbc2243678fef55101aa106e9f8d7ad7bbf`. It delegates
+  fixed Latin-hypercube and Sobol collocation designs to Tyche while retaining
+  rectangle, disk, ball, interface, and physics mappings in Kwavers. Local
+  value-semantic suites pass 46/46 grid tests and 21/21 PINN geometry/config
+  tests; the exact source head has 22 successful hosted checks while code
+  coverage and four full benchmark pairs remain in progress.
 - Moirai merge `91c802e` repairs the final-completion lifetime race exposed by
   Tyche's 257-item, seven-item-chunk adapter contract. The pinned Tyche
   workspace passes 18/18 tests, including the exact former access-violation
@@ -56,7 +63,16 @@
 
 ## TYCHE-004 — UQ breadth — planned
 
-- Reproducible bootstrap, Morris, true Saltelli Sobol, and multi-output reports.
+- First increment: a deterministic, allocation-free bootstrap index design over
+  validated runtime population and resample sizes. It reuses the canonical
+  multiply-high bounded-integer kernel under bootstrap-specific typed stream
+  domains and writes to caller-owned storage.
+- Consumer closure: replace Kwavers' private SplitMix/modulo percentile
+  bootstrap and entropy-seeded ensemble bagging, deleting the direct `rand 0.8`
+  edge when its final use disappears. Percentile interpolation and model
+  training remain consumer policy.
+- Following increments: genuine Morris and Saltelli Sobol estimators plus
+  multi-output reports.
 
 ## TYCHE-005 — Study schema — planned
 

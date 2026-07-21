@@ -152,13 +152,14 @@ cargo deny check
 
 ## Roadmap
 
-1. Extend consumer integration to remaining local experimental-design
-   surfaces, beginning with Kwavers Latin-hypercube and Sobol generation.
-2. Existing consumer integration is delivered: merged [Helios PR 10] replaces its
-   normal generator, merged [CFDrs PR 299] replaces its LHS, and merged
+1. Existing consumer integration is delivered: merged [Helios PR 10] replaces
+   its normal generator, merged [CFDrs PR 299] replaces its LHS, merged
    [Kwavers PR 298] replaces its conformal, moment, and mislabeled sensitivity
-   implementations.
-3. Add deterministic bootstrap, Morris, and true Saltelli Sobol estimators.
+   implementations, and merged [Kwavers PR 304] replaces fixed collocation LHS
+   and Sobol generation. Geometry mappings remain Kwavers-owned.
+2. Add deterministic bootstrap resampling and migrate Kwavers percentile-mean
+   and ensemble-bagging index generation to that provider contract.
+3. Add genuine Morris and Saltelli Sobol estimators plus multi-output reports.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
 
@@ -167,3 +168,4 @@ See [`gap_audit.md`](gap_audit.md) and [`backlog.md`](backlog.md).
 [Helios PR 10]: https://github.com/ryancinsight/helios/pull/10
 [CFDrs PR 299]: https://github.com/ryancinsight/CFDrs/pull/299
 [Kwavers PR 298]: https://github.com/ryancinsight/kwavers/pull/298
+[Kwavers PR 304]: https://github.com/ryancinsight/kwavers/pull/304

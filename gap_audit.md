@@ -23,6 +23,14 @@ allocator, or physics ownership.
   1,251/1,251 solver tests. Final head `be5bd37f1` passes the complete hosted
   migration, architecture, feature, stable/beta/nightly, Miri, CUDA, solver,
   PINN, coverage, benchmark, documentation, and security matrix.
+- Kwavers PR 304 merges as `9ad18523d0a936f3d32c2921dc3ff6fce2e35de9`
+  from source `cc382dbc2243678fef55101aa106e9f8d7ad7bbf`. It deletes its
+  local fixed collocation LHS and pseudo-Sobol generators and consumes Tyche's
+  const-generic random-access designs. Kwavers retains measure-correct
+  rectangle, disk, ball, boundary, and interface mapping. Local evidence is
+  46/46 grid and 21/21 PINN geometry/config tests; 22 hosted checks have
+  succeeded while code coverage and four full benchmark pairs continue on the
+  exact source head.
 
 ## Provider residuals
 
@@ -80,3 +88,17 @@ The remaining hosted evidence limits are explicit.
   all 196 applicable minor-release checks pass against `origin/main`.
 - Moirai and Consus adapters require no change until runtime-dimensional
   studies or versioned persistence enter their respective scopes.
+
+## UQ breadth
+
+- Kwavers still owns two bootstrap index mechanisms: a private stateful
+  SplitMix/modulo reducer for percentile confidence intervals and an
+  entropy-seeded `rand 0.8` generator for ensemble bagging. The shared provider
+  gap is deterministic resampling with replacement, not percentile selection
+  or model training.
+- The next Tyche increment shares the existing exact multiply-high bounded
+  reduction through one private kernel, adds bootstrap-specific stream domains,
+  validates population and resample sizes, and exposes random-access and
+  caller-owned fill forms. This removes modulo bias, entropy dependence, and
+  the duplicate generator without adding consumer-specific statistics to
+  Tyche.
