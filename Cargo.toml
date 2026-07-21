@@ -27,6 +27,7 @@ moirai-core = { version = "0.4.0", git = "https://github.com/ryancinsight/Moirai
 moirai-executor = { version = "0.4.0", git = "https://github.com/ryancinsight/Moirai.git", rev = "91c802e23e3711760c260dcfb529f5d41ea55964" }
 proptest = "1.11.0"
 stats_alloc = "0.1.10"
+criterion = "0.8.2"
 
 [workspace.lints.rust]
 missing_docs = "deny"

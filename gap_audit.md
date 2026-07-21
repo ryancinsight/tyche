@@ -34,9 +34,26 @@ allocator, or physics ownership.
 - Consus Store has no durability contract, and filesystem path validation is
   weaker than its documentation. Tyche validates keys before delegation.
 
-Tyche main `2b8fb14267a710e1438102666211494a3d6f179e` is hosted-CI green for both
-verification and supply-chain policy. Its full local locked gate passes the
-no-std check, warning-denied Clippy, 18/18 Nextest, 9/9 doctests, Rustdoc, the
-reproducible-study example, and supply-chain policy.
+Tyche baseline main `94d3c342b48045bda2364b1bc8d1d62d5e2ca99e` is hosted-CI green for both
+verification and supply-chain policy. Its prior full local locked gate passes
+the no-std check, warning-denied Clippy, 18/18 Nextest, 9/9 doctests, Rustdoc,
+the reproducible-study example, and supply-chain policy.
 `cargo-semver-checks` completes but has no published Tyche baseline to compare.
 The remaining hosted evidence limits are explicit.
+
+## Sampling breadth
+
+- ADR 0003 closes the untyped counter namespace that aliased LHS coefficient,
+  jitter, and normal coordinates. Public stream/design/distribution types now
+  require an explicit algorithm ZST and exact versioned vectors.
+- A controlled `origin/main` Criterion comparison detects no raw-word or
+  normal-throughput regression and measures a 7.87% lower median for width-8
+  LHS sampling. Repeated sampling remains allocation-free. The current branch
+  passes warning-denied all-target Clippy and 24/24 workspace Nextest cases.
+- `cargo-semver-checks` reports five major API changes against `origin/main`,
+  matching ADR 0003's classification; a major-release check passes. No release
+  or version bump is authorized in this increment.
+- Runtime-dimensional views, random-access Sobol, categorical, weighted, and
+  discrete importance sampling remain TYCHE-003 work. Moirai and Consus
+  adapters require no change until runtime-dimensional studies or versioned
+  persistence enter their respective scopes.

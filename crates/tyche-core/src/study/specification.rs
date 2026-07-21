@@ -26,13 +26,16 @@ where
     ///
     /// ```
     /// use tyche_core::design::{Parameter, ParameterSpace};
-    /// use tyche_core::sampling::{Seed, LatinHypercube};
+    /// use tyche_core::sampling::{Seed, LatinHypercube, SplitMix64};
     /// use tyche_core::study::Study;
     /// use std::num::NonZeroU32;
     ///
     /// let x = Parameter::borrowed("x", 0.0_f64, 1.0).unwrap();
     /// let space = ParameterSpace::new([x]).unwrap();
-    /// let design = LatinHypercube::<1>::new(Seed::new(0), NonZeroU32::new(5).unwrap());
+    /// let design = LatinHypercube::<1, SplitMix64>::new(
+    ///     Seed::new(0),
+    ///     NonZeroU32::new(5).unwrap(),
+    /// );
     /// let study = Study::borrowed("my-study", space, design).unwrap();
     /// assert_eq!(study.name(), "my-study");
     /// ```

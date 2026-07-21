@@ -5,7 +5,7 @@ use moirai_core::executor::ExecutorConfig;
 use moirai_executor::HybridExecutor;
 use tyche_core::{
     Design, LatinHypercube, Parameter, ParameterSpace, ResponseReducer, SampleIndexError, Seed,
-    Study, StudyModel,
+    SplitMix64, Study, StudyModel,
 };
 use tyche_moirai::{DispatchError, MoiraiDispatch};
 
@@ -59,7 +59,10 @@ fn dispatch_preserves_logical_indices() {
         Parameter::borrowed("y", 10.0, 20.0).expect("valid"),
     ])
     .expect("unique");
-    let design = LatinHypercube::new(Seed::new(44), NonZeroU32::new(257).expect("positive"));
+    let design = LatinHypercube::<2, SplitMix64>::new(
+        Seed::new(44),
+        NonZeroU32::new(257).expect("positive"),
+    );
     let study = Study::borrowed("parallel", space, design).expect("named");
     let mut executor = HybridExecutor::new(ExecutorConfig {
         worker_threads: 2,

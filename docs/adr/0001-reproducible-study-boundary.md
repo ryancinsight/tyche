@@ -39,7 +39,8 @@ Coordinates depend only on algorithm version, seed, logical index, and
 dimension. Each trial writes the same logical slot. Scheduling appears in
 neither input nor destination, so a scheduling permutation changes only
 evaluation time. Ordered serial summaries keep floating association invariant
-across worker counts.
+across worker counts. ADR 0003 defines the typed stream domains, explicit
+algorithm selection, bitwise vectors, and coordinate-separation proof.
 
 ### Welford invariant
 
@@ -79,7 +80,8 @@ has no flush or transaction contract, so Tyche makes no crash-durability claim.
 - GAT responses can borrow and are consumed by static reducers.
 - Designs, models, reducers, scalar precision, const widths, and policies
   monomorphize.
-- Counter/distribution and variance markers are ZSTs.
+- Counter algorithms, stream domains, distributions, and variance policies are
+  ZSTs; stream algorithm selection is explicit in the public type.
 - Core sampling and statistics allocate nothing.
 
 ## Rejected alternatives

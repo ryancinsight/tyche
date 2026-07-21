@@ -25,7 +25,10 @@ pub mod uncertainty;
 
 pub use design::{InvalidParameter, Parameter, ParameterSpace, SpaceError};
 pub use ensemble::{Ensemble, ResponseReducer, StudyModel};
-pub use sampling::{Design, LatinHypercube, SampleIndexError, Seed, SplitMix64, StandardNormal};
+pub use sampling::{
+    Counter, Design, LatinHypercube, SampleIndexError, SampleScalar, Seed, SplitMix64,
+    StandardNormal, StreamAlgorithm, StreamDomain, StreamVersion, UserDomain,
+};
 pub use statistics::{
     CorrelationScreening, InsufficientSamples, Moments, PopulationVariance, SampleVariance,
     SensitivityReport, VariancePolicy,

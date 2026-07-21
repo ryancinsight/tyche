@@ -20,7 +20,7 @@ model semantics.
 use core::num::NonZeroU32;
 use tyche::{
     Ensemble, LatinHypercube, Parameter, ParameterSpace, PopulationVariance,
-    Seed, Study,
+    Seed, SplitMix64, Study,
 };
 
 let space = ParameterSpace::new([
@@ -28,7 +28,7 @@ let space = ParameterSpace::new([
     Parameter::borrowed("pressure", 10.0, 20.0).expect("valid"),
 ])
 .expect("unique");
-let design = LatinHypercube::new(
+let design = LatinHypercube::<2, SplitMix64>::new(
     Seed::new(0x5459_4348_45),
     NonZeroU32::new(64).expect("positive"),
 );
@@ -67,12 +67,14 @@ the statically dispatched reducer consumes it before its borrow ends. Designs,
 models, reducers, scalar precision, variance policy, and Moirai chunk width
 monomorphize without algorithm-path vtables.
 
-`SplitMix64`, `StandardNormal`, `PopulationVariance`, and `SampleVariance` are
-zero-sized. The Latin hypercube stores `O(PARAMETERS)` coefficients instead of
-an `O(SAMPLES × PARAMETERS)` matrix. Repeated core sampling and statistics
-allocate nothing. Public design failures remain typed across `Study` and the
-Moirai adapter; see
-[ADR 0002](docs/adr/0002-typed-design-errors.md).
+`SplitMix64`, typed `Counter` domains, `StandardNormal`,
+`PopulationVariance`, and `SampleVariance` are zero-sized. Stream algorithm
+selection has no default: the type and nonzero version identify the bitwise
+replay contract. Native `f32` and `f64` unit conversion avoids hidden
+widen/narrow arithmetic. The Latin hypercube stores `O(PARAMETERS)`
+coefficients instead of an `O(SAMPLES × PARAMETERS)` matrix. Repeated core
+sampling and statistics allocate nothing. Public design failures remain typed
+across `Study` and the Moirai adapter; see [ADR 0002] and [ADR 0003].
 
 ## Mathematical evidence
 
@@ -81,6 +83,11 @@ For sample count `n`, each dimension uses stride `a` coprime to `n` and offset
 `x_i=(pi(i)+u_i)/n`, `0<=u_i<1`, places one point in every stratum.
 Counter-addressed jitter depends only on `(seed,index,dimension)`, so Moirai
 scheduling cannot change inputs or output slots.
+
+Typed domains separate LHS stride, offset, jitter, and normal transform words.
+The explicit Mix13 schedule is pinned by raw-word, native-unit, normal, and LHS
+known-answer vectors. ADR 0003 proves equal-coordinate domain separation and
+records the controlled Criterion comparison against the untyped schedule.
 
 Welford's recurrence stores the mean and centered sum. Population variance
 divides by `n`; sample variance divides by `n-1`. The required zero-sized policy
@@ -95,6 +102,9 @@ borrowed calibration path.
 Proofs and consequences are the SSOT in
 [ADR 0001](docs/adr/0001-reproducible-study-boundary.md).
 
+[ADR 0002]: docs/adr/0002-typed-design-errors.md
+[ADR 0003]: docs/adr/0003-domain-separated-counter-schedule.md
+
 ## Verification
 
 ```text
@@ -105,13 +115,15 @@ cargo nextest run --workspace --all-features
 cargo test --doc --workspace --all-features
 cargo doc --workspace --no-deps --all-features
 cargo run -p tyche --example reproducible_study
+cargo bench -p tyche-core --bench counter_sampling
 cargo deny check
 ```
 
 ## Roadmap
 
-1. Add random-access Sobol, runtime-dimension views, categorical and weighted
-   sampling, and versioned distribution vectors.
+1. Add random-access Sobol, runtime-dimension views, categorical, weighted,
+   and discrete importance sampling on the delivered versioned stream
+   substrate.
 2. Consumer integration is delivered: merged [Helios PR 10] replaces its
    normal generator, merged [CFDrs PR 299] replaces its LHS, and merged
    [Kwavers PR 298] replaces its conformal, moment, and mislabeled sensitivity

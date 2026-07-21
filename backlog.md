@@ -34,8 +34,10 @@
 - Owner: `/root`; scope: `tyche-core` sampling/design modules, their tests,
   performance evidence, ADRs, README, changelog, and facade exports.
 
-- Runtime dimensions, Sobol, categorical, weighted, importance sampling, and
-  versioned stream vectors.
+- Domain-separated, explicitly versioned stream vectors are implemented with
+  native-precision unit conversion and controlled performance evidence.
+- Remaining: runtime dimensions, Sobol, categorical, weighted, and importance
+  sampling.
 
 ## TYCHE-004 — UQ breadth — planned
 

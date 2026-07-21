@@ -1,8 +1,12 @@
 //! Allocation-free random-access affine-permutation Latin hypercube.
 
-use core::num::NonZeroU32;
+use core::{marker::PhantomData, num::NonZeroU32};
 
-use super::{Design, SampleIndexError, Seed, SplitMix64};
+use super::{Design, SampleIndexError};
+use crate::sampling::counter::{
+    Counter, LatinHypercubeJitter, LatinHypercubeOffset, LatinHypercubeStride, Seed,
+    StreamAlgorithm,
+};
 
 /// A deterministic Latin hypercube with `PARAMETERS` compile-time dimensions.
 ///
@@ -12,14 +16,15 @@ use super::{Design, SampleIndexError, Seed, SplitMix64};
 /// design matrix.
 #[must_use]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct LatinHypercube<const PARAMETERS: usize> {
+pub struct LatinHypercube<const PARAMETERS: usize, A> {
     seed: Seed,
     sample_count: NonZeroU32,
     strides: [u32; PARAMETERS],
     offsets: [u32; PARAMETERS],
+    algorithm: PhantomData<A>,
 }
 
-impl<const PARAMETERS: usize> LatinHypercube<PARAMETERS> {
+impl<const PARAMETERS: usize, A: StreamAlgorithm> LatinHypercube<PARAMETERS, A> {
     /// Construct a random-access design.
     ///
     /// A non-zero sample count is carried by [`NonZeroU32`]. Bounding the
@@ -30,10 +35,13 @@ impl<const PARAMETERS: usize> LatinHypercube<PARAMETERS> {
     ///
     /// ```
     /// use std::num::NonZeroU32;
-    /// use tyche_core::sampling::{LatinHypercube, Seed, Design};
+    /// use tyche_core::sampling::{LatinHypercube, Seed, Design, SplitMix64};
     ///
     /// let seed = Seed::new(42);
-    /// let lh = LatinHypercube::<3>::new(seed, NonZeroU32::new(10).unwrap());
+    /// let lh = LatinHypercube::<3, SplitMix64>::new(
+    ///     seed,
+    ///     NonZeroU32::new(10).unwrap(),
+    /// );
     /// assert_eq!(lh.sample_count(), 10);
     /// ```
     pub fn new(seed: Seed, sample_count: NonZeroU32) -> Self {
@@ -41,16 +49,21 @@ impl<const PARAMETERS: usize> LatinHypercube<PARAMETERS> {
         let mut strides = [1; PARAMETERS];
         let mut offsets = [0; PARAMETERS];
         for dimension in 0..PARAMETERS {
-            let stream = u64_from_usize(dimension);
-            let candidate = u32_from_u64(SplitMix64::word(seed, 0, stream) % u64::from(count));
+            let coordinate = u64_from_usize(dimension);
+            let candidate = u32_from_u64(
+                Counter::<LatinHypercubeStride, A>::word(seed, coordinate, 0) % u64::from(count),
+            );
             strides[dimension] = coprime_stride(candidate, count);
-            offsets[dimension] = u32_from_u64(SplitMix64::word(seed, 1, stream) % u64::from(count));
+            offsets[dimension] = u32_from_u64(
+                Counter::<LatinHypercubeOffset, A>::word(seed, coordinate, 0) % u64::from(count),
+            );
         }
         Self {
             seed,
             sample_count,
             strides,
             offsets,
+            algorithm: PhantomData,
         }
     }
 
@@ -79,7 +92,9 @@ impl<const PARAMETERS: usize> LatinHypercube<PARAMETERS> {
     }
 }
 
-impl<const PARAMETERS: usize> Design<PARAMETERS> for LatinHypercube<PARAMETERS> {
+impl<const PARAMETERS: usize, A: StreamAlgorithm> Design<PARAMETERS>
+    for LatinHypercube<PARAMETERS, A>
+{
     fn sample_count(&self) -> usize {
         usize_from_u32(self.sample_count.get())
     }
@@ -99,10 +114,10 @@ impl<const PARAMETERS: usize> Design<PARAMETERS> for LatinHypercube<PARAMETERS> 
             let Ok(stratum) = u32::try_from(stratum) else {
                 unreachable!("invariant: stratum is bounded by u32 count");
             };
-            let jitter = SplitMix64::unit(
+            let jitter = Counter::<LatinHypercubeJitter, A>::unit::<f64>(
                 self.seed,
                 u64_from_usize(index),
-                u64_from_usize(dimension).wrapping_add(2),
+                u64_from_usize(dimension),
             );
             *coordinate = (f64::from(stratum) + jitter) * inverse_count;
         }
@@ -150,5 +165,30 @@ fn u64_from_usize(value: usize) -> u64 {
     match u64::try_from(value) {
         Ok(value) => value,
         Err(_) => unreachable!("invariant: Tyche supports targets with at most 64-bit usize"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::sampling::SplitMix64;
+
+    #[test]
+    fn coefficient_and_jitter_domains_do_not_reproduce_prior_aliases() {
+        let seed = Seed::new(0x5459_4348_455F_444F);
+        for dimension in 0..6_u64 {
+            let later_dimension = dimension + 2;
+            let stride =
+                Counter::<LatinHypercubeStride, SplitMix64>::word(seed, later_dimension, 0);
+            let offset =
+                Counter::<LatinHypercubeOffset, SplitMix64>::word(seed, later_dimension, 0);
+            let first_jitter =
+                Counter::<LatinHypercubeJitter, SplitMix64>::word(seed, 0, dimension);
+            let second_jitter =
+                Counter::<LatinHypercubeJitter, SplitMix64>::word(seed, 1, dimension);
+
+            assert_ne!(first_jitter, stride);
+            assert_ne!(second_jitter, offset);
+        }
     }
 }

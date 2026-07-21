@@ -42,14 +42,15 @@ fn borrowing_and_allocation_contracts_hold() {
         Parameter::borrowed("pressure", 10.0, 20.0).expect("valid"),
     ])
     .expect("unique");
-    let design = LatinHypercube::new(Seed::new(9), NonZeroU32::new(128).expect("positive"));
+    let design =
+        LatinHypercube::<2, SplitMix64>::new(Seed::new(9), NonZeroU32::new(128).expect("positive"));
     let study = Study::borrowed("pump", space, design).expect("named");
     assert!(core::ptr::eq(
         study.space().parameters()[0].name().as_ptr(),
         source.as_ptr()
     ));
     assert_eq!(size_of::<SplitMix64>(), 0);
-    assert_eq!(size_of::<StandardNormal<f64>>(), 0);
+    assert_eq!(size_of::<StandardNormal<f64, SplitMix64>>(), 0);
     assert_eq!(size_of::<PopulationVariance>(), 0);
 
     let mut point = [0.0; 2];
