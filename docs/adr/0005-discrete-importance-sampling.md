@@ -50,7 +50,8 @@ Then
 E_q[f(I) p_I / q_I] = sum_i q_i f_i p_i / q_i = sum_i p_i f_i.
 ```
 
-Uniform category reduction follows Lemire's multiply-high rejection rule. The
+Uniform category reduction follows Lemire's Algorithm 5 multiply-high
+rejection rule. The
 accepted 128-bit product partitions the accepted 64-bit words into equally
 sized residue classes, so every category receives exactly the same number of
 source words. `SplitMix64` maps the retry coordinate bijectively over `u64`,
@@ -78,6 +79,14 @@ through the same distribution contract rather than clone importance logic.
 Validation rejects empty, non-finite, negative, zero-total, mismatched, or
 unsupported mass functions before sampling.
 
+The weighted proof is exact for an ideal uniform real variate. The
+implementation samples from `T: SampleScalar`'s finite native unit grid, so
+weighted probabilities are quantized at that grid's resolution; the code does
+not claim bit-exact real-valued probabilities. The categorical integer path is
+unbiased over the complete `u64` source space. Importance ratios likewise obey
+the identity in `T` when the normalized probabilities and ratio remain finite;
+construction rejects a non-finite ratio.
+
 ## References
 
 - Luc Devroye, *Non-Uniform Random Variate Generation*, Chapter II,
@@ -86,3 +95,6 @@ unsupported mass functions before sampling.
 - Art B. Owen, *Monte Carlo Theory, Methods and Examples*, Chapter 9,
   Section 9.1, Theorem 9.1:
   https://artowen.su.domains/mc/Ch-var-is.pdf
+- Daniel Lemire, *Fast Random Integer Generation in an Interval*, Section 4,
+  Algorithm 5:
+  https://arxiv.org/abs/1805.10941

@@ -15,3 +15,7 @@ pub use design::{
     SobolDimensions, SobolRange, SobolRangeError, SobolScramble, Unscrambled,
 };
 pub use distribution::StandardNormal;
+pub use distribution::{
+    Categorical, CategoryCount, CategoryIndex, DiscreteImportance, DiscreteWeights,
+    ImportanceError, ImportanceSample, WeightError, WeightedCategorical,
+};

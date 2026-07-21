@@ -61,7 +61,7 @@ fn standard_normal_contract_holds_for_every_supported_primitive_field() {
             let value = StandardNormal::<T, SplitMix64>::at(seed, index, 2);
             let replay = StandardNormal::<T, SplitMix64>::at(seed, index, 2);
             assert!(<T as eunomia::NumericElement>::is_finite(value));
-            assert!(value == replay);
+            assert_eq!(value, replay);
         }
     }
 

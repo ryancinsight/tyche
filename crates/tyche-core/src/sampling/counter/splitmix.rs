@@ -62,7 +62,10 @@ impl SplitMix64 {
 ///
 /// The trait is sealed: new algorithms land in Tyche with known-answer vectors
 /// and a distinct semantic type. Callers select the algorithm explicitly in
-/// [`Counter`] and every distribution or design that consumes it.
+/// [`Counter`] and every distribution or design that consumes it. For each
+/// fixed seed, domain, and index, an implementation must map the complete
+/// `u64` draw coordinate bijectively over `u64`; exact categorical rejection
+/// reduction relies on an accepted word existing in that finite permutation.
 pub trait StreamAlgorithm: private::Sealed + private::Generate + Copy {
     /// Stable replay version.
     const VERSION: StreamVersion;

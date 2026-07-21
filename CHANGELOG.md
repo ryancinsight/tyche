@@ -32,6 +32,10 @@
 
 ### Added
 
+- Uniform categorical sampling with exact multiply-high rejection, borrowed
+  or owned validated discrete masses, native-precision weighted inverse-CDF
+  sampling, and support-checked discrete importance ratios. Repeated draws are
+  allocation-free. See ADR 0005.
 - Fixed and runtime one-through-three-dimensional random-access Sobol designs,
   explicit validated sequence ranges, unscrambled and versioned digital-shift
   policies, typed dimension/output failures, and an allocation-free row-major
