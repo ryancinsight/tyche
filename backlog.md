@@ -1,5 +1,12 @@
 # Tyche implementation backlog
 
+## TYCHE-007 — Provider source consolidation — implemented
+
+- Resolve Eunomia 0.7 through its canonical versioned Git source; no sampling,
+  statistics, or public API behavior changes.
+- Locked metadata contains one Eunomia package, and workspace format, check,
+  warning-denied Clippy, Nextest, doctest, and Rustdoc gates pass.
+
 ## TYCHE-001 — Phase 0 core — implemented
 
 - Reproducible design, study, ensemble, statistics, calibration, execution, and
