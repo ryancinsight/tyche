@@ -16,7 +16,12 @@
 
 - Public `ryancinsight/tyche` origin and the Atlas gitlink are registered.
 
-## TYCHE-006 — Consumer migrations — implemented
+## TYCHE-006 — Consumer migrations — in progress
+
+- Owner: Codex `/root`; scope: document merged Kwavers PR 304's direct Tyche
+  collocation-design adoption in `README.md`, `backlog.md`, `gap_audit.md`, and
+  `CHANGELOG.md`. Provider code, unrelated consumer surfaces, and release
+  metadata are non-goals.
 
 - Helios PR 10 delegates reproducible normal noise to `StandardNormal`; its
   package-local suite passes 27/27 tests.
@@ -29,6 +34,13 @@
   complete hosted migration, architecture, feature, stable/beta/nightly,
   Miri, CUDA, solver, PINN, coverage, benchmark, documentation, and
   security matrix.
+- Kwavers PR 304 merges as `9ad18523d0a936f3d32c2921dc3ff6fce2e35de9`
+  from source `cc382dbc2243678fef55101aa106e9f8d7ad7bbf`. It delegates
+  fixed Latin-hypercube and Sobol collocation designs to Tyche while retaining
+  rectangle, disk, ball, interface, and physics mappings in Kwavers. Local
+  value-semantic suites pass 46/46 grid tests and 21/21 PINN geometry/config
+  tests; the exact source head has 23 successful hosted checks, including code
+  coverage, while four full benchmark pairs remain in progress.
 - Moirai merge `91c802e` repairs the final-completion lifetime race exposed by
   Tyche's 257-item, seven-item-chunk adapter contract. The pinned Tyche
   workspace passes 18/18 tests, including the exact former access-violation
@@ -58,7 +70,17 @@
 
 ## TYCHE-004 — UQ breadth — planned
 
-- Reproducible bootstrap, Morris, true Saltelli Sobol, and multi-output reports.
+- First increment: a deterministic, allocation-free bootstrap index design over
+  validated runtime population and resample sizes. It reuses the canonical
+  multiply-high bounded-integer kernel under bootstrap-specific typed stream
+  domains and writes to caller-owned storage.
+- Consumer closure: replace Kwavers' private SplitMix/modulo percentile
+  bootstrap. Percentile interpolation remains consumer policy. Its nominal
+  ensemble bagging is not a valid migration target until it owns a real
+  trainable-model seam: the current model stores only an error-derived score
+  and prediction perturbs an external predictor without retained training.
+- Following increments: genuine Morris and Saltelli Sobol estimators plus
+  multi-output reports.
 
 ## TYCHE-005 — Study schema — planned
 

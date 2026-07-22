@@ -23,6 +23,14 @@ allocator, or physics ownership.
   1,251/1,251 solver tests. Final head `be5bd37f1` passes the complete hosted
   migration, architecture, feature, stable/beta/nightly, Miri, CUDA, solver,
   PINN, coverage, benchmark, documentation, and security matrix.
+- Kwavers PR 304 merges as `9ad18523d0a936f3d32c2921dc3ff6fce2e35de9`
+  from source `cc382dbc2243678fef55101aa106e9f8d7ad7bbf`. It deletes its
+  local fixed collocation LHS and pseudo-Sobol generators and consumes Tyche's
+  const-generic random-access designs. Kwavers retains measure-correct
+  rectangle, disk, ball, boundary, and interface mapping. Local evidence is
+  46/46 grid and 21/21 PINN geometry/config tests; 23 hosted checks, including
+  code coverage, have succeeded while four full benchmark pairs continue on
+  the exact source head.
 
 ## Provider residuals
 
@@ -80,3 +88,19 @@ The remaining hosted evidence limits are explicit.
   all 196 applicable minor-release checks pass against `origin/main`.
 - Moirai and Consus adapters require no change until runtime-dimensional
   studies or versioned persistence enter their respective scopes.
+
+## UQ breadth
+
+- Kwavers' percentile confidence interval owns a private stateful
+  SplitMix/modulo bootstrap reducer. Its nominal entropy-seeded ensemble
+  bagging is not a valid second implementation: `EnsembleModel::train` retains
+  no trained model and prediction only perturbs an external predictor. That
+  placeholder must gain a real trainable-model seam or be removed before it can
+  consume provider resampling.
+- The next Tyche increment shares the existing exact multiply-high bounded
+  reduction through one private kernel, adds bootstrap-specific stream domains,
+  validates population and resample sizes, and exposes random-access and
+  caller-owned fill forms. The first consumer deletion removes modulo bias and
+  the duplicate percentile generator without adding consumer-specific
+  statistics to Tyche. Ensemble entropy and `rand` ownership remain a separate
+  correctness item, not a bootstrap-API acceptance shortcut.

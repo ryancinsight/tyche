@@ -30,8 +30,9 @@
   lockfile remains the reproducible revision pin without creating a distinct
   revision-qualified provider identity in consumers.
 - Helios, CFDrs, and Kwavers consumer boundaries now delegate reproducible
-  normal sampling, Latin-hypercube designs, conformal calibration, moments,
-  and correlation screening to Tyche without retaining local algorithm copies.
+  normal sampling, Latin-hypercube and fixed Sobol designs, conformal
+  calibration, moments, and correlation screening to Tyche without retaining
+  local algorithm copies. Kwavers retains its geometry and physics mappings.
 
 ### Added
 
