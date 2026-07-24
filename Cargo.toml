@@ -20,11 +20,11 @@ publish = false
 tyche-core = { path = "crates/tyche-core", version = "0.1.0", default-features = false }
 tyche-moirai = { path = "crates/tyche-moirai", version = "0.1.0" }
 tyche-consus = { path = "crates/tyche-consus", version = "0.1.0" }
-eunomia = { version = "0.7.0", git = "https://github.com/ryancinsight/eunomia", default-features = false }
+eunomia = { path = "../eunomia/crates/eunomia", default-features = false }
 consus-core = { version = "0.1.0", git = "https://github.com/ryancinsight/consus.git", rev = "0106b709212033823a22782b0c491603e8ce1229", default-features = false, features = ["alloc"] }
 consus-zarr = { version = "0.1.0", git = "https://github.com/ryancinsight/consus.git", rev = "0106b709212033823a22782b0c491603e8ce1229", default-features = false, features = ["std"] }
-moirai-core = { path = "../moirai/moirai-core", version = "0.5.0" }
-moirai-executor = { path = "../moirai/moirai-executor", version = "0.5.0" }
+moirai-core = { path = "../moirai/moirai-core", version = "0.4.0" }
+moirai-executor = { path = "../moirai/moirai-executor", version = "0.4.0" }
 proptest = "1.11.0"
 stats_alloc = "0.1.10"
 criterion = "0.8.2"

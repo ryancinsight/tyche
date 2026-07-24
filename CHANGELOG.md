@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Fixed
+
+- [patch] Corrected stale `"0.5.0"` version requirements for `moirai-core` and
+  `moirai-executor` in the workspace; the upstream crates are `0.4.0`, so
+  `Cargo.toml` now declares `"0.4.0"` to match. Tests and benchmarks now
+  discover their targets.
+
 ### Breaking
 
 - Counter streams now require an explicit typed domain and algorithm policy;
