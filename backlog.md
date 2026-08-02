@@ -1,5 +1,14 @@
 # Tyche implementation backlog
 
+## TYCHE-008 — crates.io release automation — in progress
+
+- Owner: Codex `/root`; scope: publish `tyche-core` from an exact merged source
+  revision, configure crates.io Trusted Publishing for the repository release
+  workflow, and keep the adapter and facade crates private.
+- Acceptance: standalone locked package validation and focused tests pass; the
+  crate is indexed; the exact-source GitHub Release exists; crates.io accepts
+  only trusted-publisher updates.
+
 ## TYCHE-007 — Provider source consolidation — implemented
 
 - Resolve Eunomia 0.7 through its canonical versioned Git source; no sampling,

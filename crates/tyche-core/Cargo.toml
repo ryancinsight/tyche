@@ -10,14 +10,14 @@ license.workspace = true
 readme = "../../README.md"
 keywords = ["uncertainty", "sampling", "sensitivity", "no-std"]
 categories = ["no-std", "science"]
-publish.workspace = true
+publish = true
 
 [dependencies]
 eunomia.workspace = true
 
 [dev-dependencies]
 proptest.workspace = true
-stats_alloc.workspace = true
+allocation-counter.workspace = true
 criterion.workspace = true
 
 [[bench]]

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Distribution
+
+- Publish `tyche-core` through a tag-gated crates.io Trusted Publishing
+  workflow. Committed stack-local source overlays no longer affect standalone
+  package resolution.
+
 ### Fixed
 
 - [patch] Corrected stale `"0.5.0"` version requirements for `moirai-core` and
