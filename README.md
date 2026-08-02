@@ -16,6 +16,13 @@ keys. Moirai owns scheduling and runtime lifecycle. Consus owns stores,
 formats, compression, and durability. Domain packages own their physics and
 model semantics.
 
+## Distribution
+
+`tyche-core` is published to crates.io. Publishing is tag-gated through the
+`crates-io` GitHub environment and crates.io Trusted Publishing; the release
+tag format is `crate-tyche-core-v<version>`. The adapter and facade packages
+remain private until their upstream crates.io dependency closures are ready.
+
 ## Example
 
 ```rust
