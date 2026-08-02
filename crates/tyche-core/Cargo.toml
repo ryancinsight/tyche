@@ -17,7 +17,7 @@ eunomia.workspace = true
 
 [dev-dependencies]
 proptest.workspace = true
-stats_alloc.workspace = true
+allocation-counter.workspace = true
 criterion.workspace = true
 
 [[bench]]

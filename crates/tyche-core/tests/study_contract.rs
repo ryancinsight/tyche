@@ -2,14 +2,10 @@
 
 use core::mem::size_of;
 use core::num::NonZeroU32;
-use stats_alloc::{INSTRUMENTED_SYSTEM, Region, StatsAlloc};
 use tyche_core::{
     Design, LatinHypercube, Moments, Parameter, ParameterSpace, PopulationVariance,
     ResponseReducer, Seed, SplitMix64, StandardNormal, Study, StudyModel,
 };
-
-#[global_allocator]
-static ALLOCATOR: &StatsAlloc<std::alloc::System> = &INSTRUMENTED_SYSTEM;
 
 struct BorrowingModel;
 impl StudyModel<f64, 2> for BorrowingModel {
@@ -55,18 +51,16 @@ fn borrowing_and_allocation_contracts_hold() {
 
     let mut point = [0.0; 2];
     let mut moments = Moments::new();
-    let region = Region::new(ALLOCATOR);
-    for index in 0..study.sample_count() {
-        study
-            .design()
-            .sample_unit_into(index, &mut point)
-            .expect("valid");
-        moments.update(point[0]);
-    }
-    let change = region.change();
-    assert_eq!(change.allocations, 0);
-    assert_eq!(change.reallocations, 0);
-    assert_eq!(change.deallocations, 0);
+    let allocations = allocation_counter::measure(|| {
+        for index in 0..study.sample_count() {
+            study
+                .design()
+                .sample_unit_into(index, &mut point)
+                .expect("valid");
+            moments.update(point[0]);
+        }
+    });
+    assert_eq!(allocations, allocation_counter::AllocationInfo::default());
 
     let sample = study.sample(3).expect("valid");
     let response = BorrowingModel
