@@ -1,0 +1,2 @@
+# tyche -- Uncertainty Quantification for Atlas
+`tyche` owns study identity, parameter spaces, experimental designs (LHC, Sobol), ensemble statistics, and sensitivity screening. Moirai owns execution; Consus owns persistence.

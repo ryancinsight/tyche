@@ -1,0 +1,14 @@
+[book]
+title = "tyche: Uncertainty Quantification for Atlas"
+authors = ["Ryan Clanton"]
+src = "."
+language = "en"
+[build]
+build-dir = "../../target/book/tyche"
+create-missing = false
+[output.html]
+no-section-label = false
+mathjax-support = true
+site-url = "/tyche/"
+git-repository-url = "https://github.com/ryancinsight/tyche"
+default-theme = "rust"
