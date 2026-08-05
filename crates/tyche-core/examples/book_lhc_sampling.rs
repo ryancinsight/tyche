@@ -12,10 +12,10 @@ use tyche_core::{Design, LatinHypercube, Parameter, ParameterSpace, Seed, SplitM
 
 fn main() {
     // ── Two-parameter space: pressure [0.1, 1.0] MPa, temperature [300, 400] K ──
-    let pressure = Parameter::borrowed("pressure_MPa", 0.1_f64, 1.0)
-        .expect("finite, ordered bounds");
-    let temperature = Parameter::borrowed("temperature_K", 300.0_f64, 400.0)
-        .expect("finite, ordered bounds");
+    let pressure =
+        Parameter::borrowed("pressure_MPa", 0.1_f64, 1.0).expect("finite, ordered bounds");
+    let temperature =
+        Parameter::borrowed("temperature_K", 300.0_f64, 400.0).expect("finite, ordered bounds");
     let space = ParameterSpace::new([pressure, temperature]).expect("unique names");
 
     // ── LHC design: 8 samples in 2 dimensions ──
