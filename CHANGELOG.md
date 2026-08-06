@@ -49,6 +49,10 @@
 
 ### Added
 
+- Deterministic `Bootstrap` resampling validates population and resample sizes,
+  provides random-access indices, fills caller-owned output, and shares the
+  exact multiply-high reducer with categorical sampling. The provider owns
+  index generation; percentile interpolation remains a consumer policy.
 - Uniform categorical sampling with exact multiply-high rejection, borrowed
   or owned validated discrete masses, native-precision weighted inverse-CDF
   sampling, and support-checked discrete importance ratios. Repeated draws are

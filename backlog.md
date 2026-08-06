@@ -77,12 +77,14 @@
   Clippy/Rustdoc, the end-to-end example, supply-chain policy, Criterion, and
   all 196 applicable additive SemVer checks pass.
 
-## TYCHE-004 — UQ breadth — planned
+## TYCHE-004 — UQ breadth — in progress
 
-- First increment: a deterministic, allocation-free bootstrap index design over
-  validated runtime population and resample sizes. It reuses the canonical
-  multiply-high bounded-integer kernel under bootstrap-specific typed stream
-  domains and writes to caller-owned storage.
+- First increment delivered in `tyche-core`: `Bootstrap` validates runtime
+  population and resample sizes, exposes deterministic random-access indices,
+  fills caller-owned storage without allocation, and reuses the canonical
+  multiply-high bounded-integer kernel under a dedicated bootstrap domain.
+  Provider-owned index generation is now complete; percentile interpolation
+  remains a consumer policy.
 - Consumer closure: replace Kwavers' private SplitMix/modulo percentile
   bootstrap. Percentile interpolation remains consumer policy. Its nominal
   ensemble bagging is not a valid migration target until it owns a real

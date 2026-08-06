@@ -111,6 +111,15 @@ impl StreamDomain for WeightedSelection {
     const TAG: u64 = u64::from_le_bytes(*b"weighted");
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(in crate::sampling) struct BootstrapIndex;
+
+impl private::Sealed for BootstrapIndex {}
+
+impl StreamDomain for BootstrapIndex {
+    const TAG: u64 = u64::from_le_bytes(*b"bootindx");
+}
+
 const _: () = {
     let tags = [
         LatinHypercubeStride::TAG,
@@ -121,6 +130,7 @@ const _: () = {
         SobolDigitalShift::TAG,
         CategoricalSelection::TAG,
         WeightedSelection::TAG,
+        BootstrapIndex::TAG,
     ];
     let mut left = 0;
     while left < tags.len() {

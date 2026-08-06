@@ -4,6 +4,7 @@ mod contract;
 mod counter;
 mod design;
 mod distribution;
+mod resampling;
 
 pub use contract::{Design, SampleIndexError};
 pub use counter::{
@@ -19,3 +20,4 @@ pub use distribution::{
     Categorical, CategoryCount, CategoryIndex, DiscreteImportance, DiscreteWeights,
     ImportanceError, ImportanceSample, WeightError, WeightedCategorical,
 };
+pub use resampling::{Bootstrap, BootstrapError};

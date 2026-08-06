@@ -91,16 +91,18 @@ The remaining hosted evidence limits are explicit.
 
 ## UQ breadth
 
+- Tyche now owns deterministic bootstrap index generation: validated runtime
+  population/resample sizes, random-access `Bootstrap::at`, caller-owned
+  `fill_into`, a dedicated stream domain, and the shared exact multiply-high
+  reducer. The provider does not own percentile interpolation or consumer
+  confidence-interval policy.
 - Kwavers' percentile confidence interval owns a private stateful
   SplitMix/modulo bootstrap reducer. Its nominal entropy-seeded ensemble
   bagging is not a valid second implementation: `EnsembleModel::train` retains
   no trained model and prediction only perturbs an external predictor. That
   placeholder must gain a real trainable-model seam or be removed before it can
   consume provider resampling.
-- The next Tyche increment shares the existing exact multiply-high bounded
-  reduction through one private kernel, adds bootstrap-specific stream domains,
-  validates population and resample sizes, and exposes random-access and
-  caller-owned fill forms. The first consumer deletion removes modulo bias and
-  the duplicate percentile generator without adding consumer-specific
-  statistics to Tyche. Ensemble entropy and `rand` ownership remain a separate
+- The next consumer increment removes Kwavers' modulo-biased percentile index
+  generator and delegates only index generation to Tyche; interpolation stays
+  in the consumer. Ensemble entropy and `rand` ownership remain a separate
   correctness item, not a bootstrap-API acceptance shortcut.

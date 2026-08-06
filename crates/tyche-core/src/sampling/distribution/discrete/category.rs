@@ -4,9 +4,9 @@
 //! Interval*, Section 4, Algorithm 5:
 //! <https://arxiv.org/abs/1805.10941>.
 
-use core::{marker::PhantomData, num::NonZeroUsize};
+use core::{marker::PhantomData, num::NonZeroU64, num::NonZeroUsize};
 
-use crate::sampling::counter::{CategoricalSelection, Counter, Seed, StreamAlgorithm};
+use crate::sampling::counter::{CategoricalSelection, Seed, StreamAlgorithm, bounded_u64};
 
 /// A validated non-zero number of categories.
 #[must_use]
@@ -107,25 +107,16 @@ impl<A: StreamAlgorithm> Categorical<A> {
     /// Panics only if compiled for a target whose `usize` exceeds 64 bits, or
     /// if the multiply-high reduction violates its proven range invariant.
     pub fn at(self, seed: Seed, address: u64) -> CategoryIndex {
-        let bound = u64::try_from(self.categories.get())
-            .expect("invariant: Tyche supports targets with at most 64-bit usize");
-        let rejection_threshold = bound.wrapping_neg() % bound;
-        let mut attempt = 0_u64;
-
-        loop {
-            let word = Counter::<CategoricalSelection, A>::word(seed, address, attempt);
-            let product = u128::from(word) * u128::from(bound);
-            let low = u64::try_from(product & u128::from(u64::MAX))
-                .expect("invariant: product low half is bounded by u64");
-            if low >= rejection_threshold {
-                let high = u64::try_from(product >> 64)
-                    .expect("invariant: product high half is bounded by u64");
-                let category = usize::try_from(high)
-                    .expect("invariant: category is below the usize category count");
-                return CategoryIndex::new(category, self.categories)
-                    .expect("invariant: multiply-high result is below the category count");
-            }
-            attempt = attempt.wrapping_add(1);
-        }
+        let bound = NonZeroU64::new(
+            u64::try_from(self.categories.get())
+                .expect("invariant: Tyche supports targets with at most 64-bit usize"),
+        )
+        .expect("invariant: category count is non-zero");
+        let category = usize::try_from(bounded_u64::<CategoricalSelection, A>(
+            seed, address, 0, bound,
+        ))
+        .expect("invariant: category is below the usize category count");
+        CategoryIndex::new(category, self.categories)
+            .expect("invariant: multiply-high result is below the category count")
     }
 }

@@ -3,6 +3,7 @@
 Tyche is the Atlas owner for reproducible uncertainty studies. Phase 0
 provides validated parameter spaces, deterministic random-access Latin
 hypercube and Sobol designs, fixed and runtime dimension selection,
+deterministic bootstrap resampling with caller-owned output, and
 uniform and weighted finite-distribution sampling, support-checked discrete
 importance ratios, index-addressed ensemble execution, online moments,
 correlation screening, finite-sample split-conformal calibration, and provider
@@ -78,6 +79,9 @@ the statically dispatched reducer consumes it before its borrow ends. Designs,
 models, reducers, scalar precision, variance policy, and Moirai chunk width
 monomorphize without algorithm-path vtables.
 
+`Bootstrap` stores only validated population/resample sizes and a zero-sized
+algorithm policy; its random-access indices use the shared exact
+multiply-high reducer and its fill path allocates nothing after construction.
 `SplitMix64`, typed `Counter` domains, `StandardNormal`,
 `PopulationVariance`, and `SampleVariance` are zero-sized. Stream algorithm
 selection has no default: the type and nonzero version identify the bitwise
@@ -164,10 +168,10 @@ cargo deny check
    [Kwavers PR 298] replaces its conformal, moment, and mislabeled sensitivity
    implementations, and merged [Kwavers PR 304] replaces fixed collocation LHS
    and Sobol generation. Geometry mappings remain Kwavers-owned.
-2. Add deterministic bootstrap resampling and migrate Kwavers percentile-mean
-   index generation to that provider contract. Ensemble bagging adopts it only
-   with a real trainable-model seam; the current score-only placeholder is not
-   a valid consumer contract.
+2. Migrate Kwavers percentile-mean index generation to Tyche's deterministic
+   bootstrap contract. Percentile interpolation remains Kwavers-owned. Ensemble
+   bagging adopts provider resampling only with a real trainable-model seam; the
+   current score-only placeholder is not a valid consumer contract.
 3. Add genuine Morris and Saltelli Sobol estimators plus multi-output reports.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
