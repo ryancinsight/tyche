@@ -85,11 +85,18 @@
   multiply-high bounded-integer kernel under a dedicated bootstrap domain.
   Provider-owned index generation is now complete; percentile interpolation
   remains a consumer policy.
-- Consumer closure: replace Kwavers' private SplitMix/modulo percentile
-  bootstrap. Percentile interpolation remains consumer policy. Its nominal
-  ensemble bagging is not a valid migration target until it owns a real
-  trainable-model seam: the current model stores only an error-derived score
-  and prediction perturbs an external predictor without retained training.
+- Consumer closure: Kwavers' elastography percentile bootstrap now delegates
+  deterministic index generation to `Bootstrap::<SplitMix64>` in
+  `tyche-core`; percentile interpolation remains Kwavers-owned. The consumer
+  source slice is `crates/kwavers-analysis/src/signal_processing/
+  estimation_bounds.rs`, with locked metadata and source formatting verified.
+  This is a replay-boundary migration: consumers persisting results must record
+  `SplitMix64::VERSION` and must not compare new output vectors with the former
+  local continuous modulo schedule as if they were identical.
+  The nominal ensemble bagging path remains separate and is not a valid
+  migration target until it owns a real trainable-model seam: the current
+  model stores only an error-derived score and prediction perturbs an external
+  predictor without retained training.
 - Following increments: genuine Morris and Saltelli Sobol estimators plus
   multi-output reports.
 

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Added
+
+- Morris elementary-effect screening: `ElementaryEffects::from_steps` reduces
+  a validated trajectory (one perturbation per parameter, strictly positive
+  step) to per-parameter effects, and `MorrisScreening` accumulates them into
+  a `MorrisReport` with `mu`, `mu_star`, and `sigma`. Two effects per
+  parameter are required so `sigma` is defined.
+- Saltelli first- and total-order Sobol' index estimation: `SobolIndices`
+  folds one A/B/`A_i^B` row triple at a time and `SobolReport` exposes
+  `S_i = sum(f(B)(f(A_i^B) - f(A))) / (N V)` and
+  `S_Ti = sum((f(A) - f(A_i^B))^2) / (2 N V)` with unit-interval clamping.
+  Independent A and B matrices are required; the integration tests draw them
+  from distinct `UserDomain`-tagged `Counter`/`SplitMix64` streams.
+- Book chapters for moments, parameter spaces, Sobol sequences, sensitivity
+  screening, and the Atlas stack position are now delivered prose.
+
 ### Distribution
 
 - Publish `tyche-core` through a tag-gated crates.io Trusted Publishing
