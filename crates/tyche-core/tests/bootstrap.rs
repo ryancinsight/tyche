@@ -32,6 +32,20 @@ fn bootstrap_is_random_access_and_stays_in_population_support() {
             forward[usize::try_from(draw).expect("bounded test address")]
         );
     }
+    assert_eq!(SplitMix64::VERSION.get(), 1, "known-answer stream version");
+    let known_answer = Bootstrap::<SplitMix64>::new(5, 5).expect("known-answer sizes");
+    assert_eq!(
+        known_answer.at(Seed::new(42), 0, 0),
+        1,
+        "version-1 SplitMix64 bootstrap known-answer vector"
+    );
+    assert_eq!(
+        (0_u64..5)
+            .map(|draw| known_answer.at(Seed::new(42), 0, draw))
+            .collect::<Vec<_>>(),
+        vec![1, 0, 4, 3, 0],
+        "version-1 SplitMix64 bootstrap replay vector"
+    );
     assert_eq!(
         design.at(SEED, 2, 0),
         design.at(SEED, 2, 0),

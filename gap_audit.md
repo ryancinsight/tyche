@@ -96,13 +96,15 @@ The remaining hosted evidence limits are explicit.
   `fill_into`, a dedicated stream domain, and the shared exact multiply-high
   reducer. The provider does not own percentile interpolation or consumer
   confidence-interval policy.
-- Kwavers' percentile confidence interval owns a private stateful
-  SplitMix/modulo bootstrap reducer. Its nominal entropy-seeded ensemble
-  bagging is not a valid second implementation: `EnsembleModel::train` retains
-  no trained model and prediction only perturbs an external predictor. That
-  placeholder must gain a real trainable-model seam or be removed before it can
-  consume provider resampling.
-- The next consumer increment removes Kwavers' modulo-biased percentile index
-  generator and delegates only index generation to Tyche; interpolation stays
-  in the consumer. Ensemble entropy and `rand` ownership remain a separate
-  correctness item, not a bootstrap-API acceptance shortcut.
+- Kwavers' elastography percentile confidence interval now delegates
+  deterministic index generation to Tyche's `Bootstrap::<SplitMix64>` through
+  `crates/kwavers-analysis/src/signal_processing/estimation_bounds.rs`;
+  percentile interpolation stays in Kwavers. The consumer source slice is
+  format-clean and locked workspace metadata resolves. Its nominal
+  entropy-seeded ensemble bagging remains a separate correctness item, not a
+  bootstrap-API acceptance shortcut: `EnsembleModel::train` retains no trained
+  model and prediction only perturbs an external predictor.
+- The remaining consumer bootstrap work is therefore limited to any other
+  consumer-specific confidence policies; Tyche's provider index-generation
+  contract is consumed at this audited Kwavers boundary. Ensemble entropy and
+  `rand` ownership remain separate until a real trainable-model seam exists.
