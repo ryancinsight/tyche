@@ -8,18 +8,18 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.95"
 authors = ["Ryan Clanton <ryanclanton@outlook.com>"]
 repository = "https://github.com/ryancinsight/tyche"
 license = "MIT OR Apache-2.0"
-publish = false
+publish = true
 
 [workspace.dependencies]
-tyche-core = { path = "crates/tyche-core", version = "0.1.0", default-features = false }
-tyche-moirai = { path = "crates/tyche-moirai", version = "0.1.0" }
-tyche-consus = { path = "crates/tyche-consus", version = "0.1.0" }
+tyche-core = { path = "crates/tyche-core", version = "0.2.0", default-features = false }
+tyche-moirai = { path = "crates/tyche-moirai", version = "0.2.0" }
+tyche-consus = { path = "crates/tyche-consus", version = "0.2.0" }
 eunomia = { version = "0.8.0", git = "https://github.com/ryancinsight/eunomia", default-features = false }
 consus-core = { version = "0.1.0", git = "https://github.com/ryancinsight/consus.git", default-features = false, features = ["alloc"] }
 consus-zarr = { version = "0.1.0", git = "https://github.com/ryancinsight/consus.git", default-features = false, features = ["std"] }
