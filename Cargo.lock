@@ -206,7 +206,7 @@ checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 [[package]]
 name = "consus-compression"
 version = "0.1.0"
-source = "git+https://github.com/ryancinsight/consus.git#c667cfd997752e247663c94007fbe2a3d7f26b53"
+source = "git+https://github.com/ryancinsight/consus.git#e8f6b228f012d859fe39c73296e5bffa1e4a1180"
 dependencies = [
  "byteorder",
  "consus-core",
@@ -218,7 +218,7 @@ dependencies = [
 [[package]]
 name = "consus-core"
 version = "0.1.0"
-source = "git+https://github.com/ryancinsight/consus.git#c667cfd997752e247663c94007fbe2a3d7f26b53"
+source = "git+https://github.com/ryancinsight/consus.git#e8f6b228f012d859fe39c73296e5bffa1e4a1180"
 dependencies = [
  "byteorder",
  "smallvec",
@@ -228,7 +228,7 @@ dependencies = [
 [[package]]
 name = "consus-io"
 version = "0.1.0"
-source = "git+https://github.com/ryancinsight/consus.git#c667cfd997752e247663c94007fbe2a3d7f26b53"
+source = "git+https://github.com/ryancinsight/consus.git#e8f6b228f012d859fe39c73296e5bffa1e4a1180"
 dependencies = [
  "consus-core",
 ]
@@ -236,7 +236,7 @@ dependencies = [
 [[package]]
 name = "consus-zarr"
 version = "0.1.0"
-source = "git+https://github.com/ryancinsight/consus.git#c667cfd997752e247663c94007fbe2a3d7f26b53"
+source = "git+https://github.com/ryancinsight/consus.git#e8f6b228f012d859fe39c73296e5bffa1e4a1180"
 dependencies = [
  "consus-compression",
  "consus-core",
@@ -603,7 +603,7 @@ dependencies = [
 [[package]]
 name = "moirai-core"
 version = "0.5.0"
-source = "git+https://github.com/ryancinsight/Moirai#a09e9d9fe9dc2599ea3e445debd3ec3befce1f1a"
+source = "git+https://github.com/ryancinsight/Moirai#20f2ad0371ff3f522bb78c0c6f2c6939cf3f4f89"
 dependencies = [
  "bytemuck",
  "libc",
@@ -615,7 +615,7 @@ dependencies = [
 [[package]]
 name = "moirai-executor"
 version = "0.5.0"
-source = "git+https://github.com/ryancinsight/Moirai#a09e9d9fe9dc2599ea3e445debd3ec3befce1f1a"
+source = "git+https://github.com/ryancinsight/Moirai#20f2ad0371ff3f522bb78c0c6f2c6939cf3f4f89"
 dependencies = [
  "melinoe",
  "mnemosyne-memory",
@@ -629,7 +629,7 @@ dependencies = [
 [[package]]
 name = "moirai-pal"
 version = "0.5.0"
-source = "git+https://github.com/ryancinsight/Moirai#a09e9d9fe9dc2599ea3e445debd3ec3befce1f1a"
+source = "git+https://github.com/ryancinsight/Moirai#20f2ad0371ff3f522bb78c0c6f2c6939cf3f4f89"
 dependencies = [
  "js-sys",
  "libc",
@@ -644,7 +644,7 @@ dependencies = [
 [[package]]
 name = "moirai-scheduler"
 version = "0.5.0"
-source = "git+https://github.com/ryancinsight/Moirai#a09e9d9fe9dc2599ea3e445debd3ec3befce1f1a"
+source = "git+https://github.com/ryancinsight/Moirai#20f2ad0371ff3f522bb78c0c6f2c6939cf3f4f89"
 dependencies = [
  "mnemosyne-memory",
  "moirai-core",
@@ -656,7 +656,7 @@ dependencies = [
 [[package]]
 name = "moirai-utils"
 version = "0.5.0"
-source = "git+https://github.com/ryancinsight/Moirai#a09e9d9fe9dc2599ea3e445debd3ec3befce1f1a"
+source = "git+https://github.com/ryancinsight/Moirai#20f2ad0371ff3f522bb78c0c6f2c6939cf3f4f89"
 
 [[package]]
 name = "num-traits"
@@ -1067,7 +1067,7 @@ dependencies = [
 
 [[package]]
 name = "tyche-consus"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "consus-core",
  "consus-zarr",
@@ -1076,7 +1076,7 @@ dependencies = [
 
 [[package]]
 name = "tyche-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "allocation-counter",
  "criterion",
@@ -1086,7 +1086,7 @@ dependencies = [
 
 [[package]]
 name = "tyche-moirai"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "eunomia",
  "moirai-core",
@@ -1096,7 +1096,7 @@ dependencies = [
 
 [[package]]
 name = "tyche-uncertainty"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "tyche-consus",
  "tyche-core",
