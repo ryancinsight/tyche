@@ -17,12 +17,12 @@ license.workspace = true
 readme = "../../README.md"
 keywords = ["uncertainty", "sampling", "sensitivity", "simulation"]
 categories = ["science"]
+publish.workspace = true
 
 [lib]
 # Import path stays `tyche` regardless of the registry name above.
 name = "tyche"
 path = "src/lib.rs"
-publish.workspace = true
 
 [dependencies]
 tyche-core = { workspace = true }
