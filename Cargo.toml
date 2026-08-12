@@ -14,6 +14,8 @@ rust-version = "1.95"
 authors = ["Ryan Clanton <ryanclanton@outlook.com>"]
 repository = "https://github.com/ryancinsight/tyche"
 license = "MIT OR Apache-2.0"
+# The workspace is published to crates.io; individual crates opt out with
+# their own `publish = false` if they are ever build-only.
 publish = true
 
 [workspace.dependencies]
