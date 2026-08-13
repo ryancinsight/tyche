@@ -27,7 +27,8 @@
 
 ## TYCHE-006 — Consumer migrations — in progress
 
-- Owner: Codex `/root`; scope: document merged Kwavers PR 304's direct Tyche
+- Owner: Codex on `codex/tyche-pm-closeout`; PM closeout claimed 2026-08-13;
+  scope: document merged Kwavers PR 304's direct Tyche
   collocation-design adoption in `README.md`, `backlog.md`, `gap_audit.md`, and
   `CHANGELOG.md`. Provider code, unrelated consumer surfaces, and release
   metadata are non-goals.
@@ -78,6 +79,9 @@
   all 196 applicable additive SemVer checks pass.
 
 ## TYCHE-004 — UQ breadth — in progress
+
+- PM closeout claimed on `codex/tyche-pm-closeout` after confirming the merged
+  sensitivity-estimator implementation and exact current CI evidence.
 
 - First increment delivered in `tyche-core`: `Bootstrap` validates runtime
   population and resample sizes, exposes deterministic random-access indices,
