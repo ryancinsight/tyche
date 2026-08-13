@@ -82,10 +82,12 @@
   Clippy/Rustdoc, the end-to-end example, supply-chain policy, Criterion, and
   all 196 applicable additive SemVer checks pass.
 
-## TYCHE-004 — UQ breadth — in progress
+## TYCHE-004 — UQ breadth — complete 2026-08-13
 
-- PM closeout claimed on `codex/tyche-pm-closeout` after confirming the merged
-  sensitivity-estimator implementation and exact current CI evidence.
+- Sensitivity-estimator source `dc96f5ecd6af643e34f2146b9f3dbb49ba85dbae`
+  merged through PR #18 as provider default `4a6f8cd495c78beaaa6e4081705b33ed0da8be9e`.
+  Provider verification and supply-chain checks passed in hosted run
+  `31675476210`; book build passed in `31675476477`.
 
 - First increment delivered in `tyche-core`: `Bootstrap` validates runtime
   population and resample sizes, exposes deterministic random-access indices,
