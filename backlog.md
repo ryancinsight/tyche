@@ -109,9 +109,12 @@
   effects and Saltelli first/total-order Sobol estimators, merged through PR #9
   as `deabe0b`; the current default CI run `31645405288` passes the full
   provider gate.
-- Remaining scope: multi-output reports and a real trainable-model seam for
-  ensemble bagging. The current scalar-response reports and score-only model
-  are not being represented as multi-output or trainable implementations.
+- Multi-output correlation, Morris, and Saltelli reports are delivered in the
+  current increment through an `OUTPUTS` const-generic dimension. Scalar APIs
+  remain the default specialization; two-output analytical laws pass in the
+  `tyche-core` package suite.
+- Remaining scope: a real trainable-model seam for ensemble bagging. The
+  current score-only model is not represented as a trainable implementation.
 
 ## TYCHE-005 — Study schema — planned
 
