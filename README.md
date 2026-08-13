@@ -17,6 +17,15 @@ keys. Moirai owns scheduling and runtime lifecycle. Consus owns stores,
 formats, compression, and durability. Domain packages own their physics and
 model semantics.
 
+Tyche's merged consumer integrations delegate provider-owned uncertainty work:
+Helios uses `StandardNormal`, CFDrs uses Tyche's const-width Latin-hypercube
+designs, and Kwavers uses Tyche for conformal calibration, moments, correlation
+screening, fixed collocation designs, and Sobol generation. Kwavers retains
+measure-correct geometry and physics mappings; Moirai retains scheduling and
+runtime lifecycle. The integration records are [tracked in the gap audit].
+
+[tracked in the gap audit]: gap_audit.md
+
 ## Distribution
 
 `tyche-core` is published to crates.io. Publishing is tag-gated through the

@@ -25,12 +25,12 @@
 
 - Public `ryancinsight/tyche` origin and the Atlas gitlink are registered.
 
-## TYCHE-006 — Consumer migrations — in progress
+## TYCHE-006 — Consumer migrations — complete
 
-- Owner: Codex `/root`; scope: document merged Kwavers PR 304's direct Tyche
-  collocation-design adoption in `README.md`, `backlog.md`, `gap_audit.md`, and
-  `CHANGELOG.md`. Provider code, unrelated consumer surfaces, and release
-  metadata are non-goals.
+- Owner: Codex; PM closeout delivered on `codex/tyche-pm-closeout`; scope was
+  to document merged Kwavers PR 304's direct Tyche collocation-design adoption
+  in `README.md`, `backlog.md`, `gap_audit.md`, and `CHANGELOG.md`. Provider
+  code, unrelated consumer surfaces, and release metadata remain non-goals.
 
 - Helios PR 10 delegates reproducible normal noise to `StandardNormal`; its
   package-local suite passes 27/27 tests.
@@ -56,6 +56,11 @@
   case.
 - ADR 0002 closes the public `Design` error-construction gap and replaces the
   adapter's contained panic path with a typed `DesignContract` failure.
+- **Status:** complete. The required consumer evidence is synchronized in the
+  four named records, and the current Tyche default `92cb29f` passes CI run
+  `31645405288` (format, check, warning-denied Clippy, Nextest, doctests,
+  Rustdoc, example, and supply-chain checks). The four Kwavers benchmark pairs
+  remain a consumer-performance watchpoint outside this documentation item.
 
 ## TYCHE-003 — Sampling breadth — implemented
 
@@ -79,6 +84,9 @@
 
 ## TYCHE-004 — UQ breadth — in progress
 
+- PM closeout claimed on `codex/tyche-pm-closeout` after confirming the merged
+  sensitivity-estimator implementation and exact current CI evidence.
+
 - First increment delivered in `tyche-core`: `Bootstrap` validates runtime
   population and resample sizes, exposes deterministic random-access indices,
   fills caller-owned storage without allocation, and reuses the canonical
@@ -97,8 +105,13 @@
   migration target until it owns a real trainable-model seam: the current
   model stores only an error-derived score and prediction perturbs an external
   predictor without retained training.
-- Following increments: genuine Morris and Saltelli Sobol estimators plus
-  multi-output reports.
+- Delivered in the sensitivity-estimator increment: genuine Morris elementary
+  effects and Saltelli first/total-order Sobol estimators, merged through PR #9
+  as `deabe0b`; the current default CI run `31645405288` passes the full
+  provider gate.
+- Remaining scope: multi-output reports and a real trainable-model seam for
+  ensemble bagging. The current scalar-response reports and score-only model
+  are not being represented as multi-output or trainable implementations.
 
 ## TYCHE-005 — Study schema — planned
 
