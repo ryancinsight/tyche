@@ -6,11 +6,12 @@ influence without storing the full response history.
 
 ## Squared-correlation screening
 
-`CorrelationScreening<T, PARAMETERS>` is an online squared-Pearson
-accumulator. Feed `(parameters, response)` pairs with `update`, then call
-`report` once the stream ends. The resulting `SensitivityReport` carries the
-`sample_count` and one squared correlation per parameter, clamped to the
-unit interval. Two observations are required for a defined correlation.
+`CorrelationScreening<T, PARAMETERS, OUTPUTS = 1>` is an online squared-Pearson
+accumulator. The default single-output form accepts `(parameters, response)`
+pairs through `update`; multi-output studies use `update_outputs` with one
+response array per observation. `report` returns one independent correlation
+vector per output, clamped to the unit interval. Two observations are required
+for a defined correlation.
 
 The following is a focused, non-standalone API fragment:
 
@@ -42,10 +43,11 @@ be strictly positive. Violations are typed as
 NonPositiveStep}`.
 
 `MorrisScreening` accumulates one effect vector per trajectory and reports,
-per parameter, the mean `mu`, the mean absolute `mu_star`, and the standard
-deviation `sigma`. `mu_star` ranks influence; a large `sigma` relative to
-`mu_star` marks a parameter whose effect is nonlinear or interaction-driven.
-Two effects per parameter are required so `sigma` is defined.
+per parameter and output, the mean `mu`, the mean absolute `mu_star`, and the
+standard deviation `sigma`. `mu_star` ranks influence; a large `sigma` relative
+to `mu_star` marks a parameter whose effect is nonlinear or interaction-driven.
+The default single-output form uses `update`; multi-output studies use
+`update_outputs`. Two effects per parameter are required so `sigma` is defined.
 
 ```rust,ignore
 use tyche_core::statistics::{ElementaryEffects, MorrisScreening};
@@ -81,7 +83,25 @@ triple per sample — `base` is `f(A)`, `independent` is `f(B)`, and
 `recombined[i]` is `f(A_i^B)`. `SobolReport` exposes `sample_count`,
 `first_order` (`S_i`), and `total_order` (`S_Ti`). Two rows are required so
 the `A` variance is defined, and finite-sample estimates are clamped to the
-unit interval exactly like the squared-correlation screening.
+unit interval exactly like the squared-correlation screening. The default form
+is scalar-output; `SobolIndices<T, PARAMETERS, OUTPUTS>` and
+`update_outputs` retain one pair of index vectors per output without storing
+the response history.
+
+For a two-output study, the output axis is explicit:
+
+```rust,ignore
+use tyche_core::statistics::SobolIndices;
+
+let mut estimator = SobolIndices::<f64, 2, 2>::new();
+estimator.update_outputs(
+    &[f_a0, f_a1],
+    &[f_b0, f_b1],
+    &[[f_a0_b0, f_a0_b1], [f_a1_b0, f_a1_b1]],
+);
+let report = estimator.report()?;
+let first_order_by_output = report.first_order_by_output();
+```
 
 > **Independent A and B are required.** Consecutive points of one
 > low-discrepancy sequence are far too correlated to serve as both matrices;

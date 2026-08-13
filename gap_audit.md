@@ -1,5 +1,21 @@
 # Tyche ownership gap audit
 
+## TYCHE-004 multi-output sensitivity closure (2026-08-13)
+
+The scalar Morris and Saltelli estimators were already real and provider-owned;
+the remaining sensitivity gap was the missing output dimension. `tyche-core`
+now parameterizes correlation, Morris, and Saltelli accumulation and reports by
+`OUTPUTS` with a default single-output specialization preserving existing calls.
+The `update_outputs` surfaces retain fixed-size arrays and no per-observation
+allocation. A two-output test verifies independent correlation vectors, Morris
+`mu`/`mu_star`/`sigma`, and Saltelli first/total-order indices against linear
+oracles. Local evidence: fmt, warning-denied Clippy, `cargo nextest run -p
+tyche-core` 48/48, and 17/17 doctests pass.
+
+The only remaining TYCHE-004 scope is a genuine trainable-model seam for
+ensemble bagging; the current score-only model remains excluded from the
+provider migration.
+
 ## Phase 0 closure
 
 Tyche owns one complete vertical study design without runtime, format, array,

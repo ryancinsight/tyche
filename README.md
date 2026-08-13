@@ -181,7 +181,9 @@ cargo deny check
    bootstrap contract. Percentile interpolation remains Kwavers-owned. Ensemble
    bagging adopts provider resampling only with a real trainable-model seam; the
    current score-only placeholder is not a valid consumer contract.
-3. Add genuine Morris and Saltelli Sobol estimators plus multi-output reports.
+3. Multi-output Morris and Saltelli reports are delivered in `tyche-core`;
+   ensemble bagging still requires a real trainable-model seam before it can
+   adopt provider resampling.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
 
