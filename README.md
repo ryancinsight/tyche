@@ -22,7 +22,9 @@ model semantics.
 `tyche-core` is published to crates.io. Publishing is tag-gated through the
 `crates-io` GitHub environment and crates.io Trusted Publishing; the release
 tag format is `crate-tyche-core-v<version>`. The adapter and facade packages
-remain private until their upstream crates.io dependency closures are ready.
+are workspace artifacts and remain unreleased until their upstream crates.io
+dependency closures are ready. The facade package is named
+`tyche-uncertainty` on crates.io while its Rust import remains `tyche`.
 
 ## Example
 
@@ -156,7 +158,7 @@ cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo nextest run --workspace --all-features
 cargo test --doc --workspace --all-features
 cargo doc --workspace --no-deps --all-features
-cargo run -p tyche --example reproducible_study
+cargo run -p tyche-uncertainty --example reproducible_study
 cargo bench -p tyche-core --bench counter_sampling
 cargo deny check
 ```
@@ -172,7 +174,8 @@ cargo deny check
    bootstrap contract. Percentile interpolation remains Kwavers-owned. Ensemble
    bagging adopts provider resampling only with a real trainable-model seam; the
    current score-only placeholder is not a valid consumer contract.
-3. Add genuine Morris and Saltelli Sobol estimators plus multi-output reports.
+3. Add multi-output sensitivity reports around the existing Morris and
+   Saltelli Sobol estimators.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
 
