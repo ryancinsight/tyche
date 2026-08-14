@@ -15,6 +15,10 @@
   `S_Ti = sum((f(A) - f(A_i^B))^2) / (2 N V)` with unit-interval clamping.
   Independent A and B matrices are required; the integration tests draw them
   from distinct `UserDomain`-tagged `Counter`/`SplitMix64` streams.
+- Multi-output correlation, Morris, and Saltelli reports: add an `OUTPUTS`
+  const-generic dimension with allocation-free `update_outputs` methods while
+  preserving the scalar APIs as the default specialization. Value-semantic
+  two-output laws cover each output independently.
 - Book chapters for moments, parameter spaces, Sobol sequences, sensitivity
   screening, and the Atlas stack position are now delivered prose.
 

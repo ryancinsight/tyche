@@ -251,3 +251,77 @@ fn saltelli_constant_response_leaves_indices_at_zero() {
         [0.0_f64.to_bits(); 2]
     );
 }
+
+#[test]
+fn multi_output_sensitivity_preserves_each_output_contract() {
+    type MultiBaseDomain = UserDomain<0x006d_756c_7469_6261>;
+    type MultiIndependentDomain = UserDomain<0x006d_756c_7469_6262>;
+    let seed = Seed::new(0x5361_6c74_656c_6c69);
+    let mut correlation = CorrelationScreening::<f64, 2, 2>::new();
+    for x0 in [-1.0_f64, 0.0, 1.0] {
+        for x1 in [-1.0_f64, 0.0, 1.0] {
+            correlation.update_outputs(&[x0, x1], &[x0 + 2.0 * x1, 3.0 * x0 - x1]);
+        }
+    }
+    let correlation_report = correlation.report().expect("defined");
+    assert!((correlation_report.squared_correlations_by_output()[0][0] - 0.2).abs() <= 1e-12);
+    assert!((correlation_report.squared_correlations_by_output()[0][1] - 0.8).abs() <= 1e-12);
+    assert!((correlation_report.squared_correlations_by_output()[1][0] - 0.9).abs() <= 1e-12);
+    assert!((correlation_report.squared_correlations_by_output()[1][1] - 0.1).abs() <= 1e-12);
+
+    let effects = ElementaryEffects::<f64, 2, 2>::from_steps_outputs(
+        &[1, 0],
+        &[0.0, 0.0],
+        &[[0.25, -0.75], [0.5, -0.25]],
+        0.25,
+    )
+    .expect("valid multi-output trajectory");
+    assert_eq!(
+        effects.effects_by_output()[0].map(f64::to_bits),
+        [1.0_f64.to_bits(), 1.0_f64.to_bits()]
+    );
+    assert_eq!(
+        effects.effects_by_output()[1].map(f64::to_bits),
+        [2.0_f64.to_bits(), (-3.0_f64).to_bits()]
+    );
+    let mut morris = MorrisScreening::<f64, 2, 2>::new();
+    morris.update_outputs(effects.effects_by_output());
+    morris.update_outputs(effects.effects_by_output());
+    let morris_report = morris.report().expect("defined");
+    assert_eq!(
+        morris_report.mu_by_output()[0].map(f64::to_bits),
+        [1.0_f64.to_bits(), 1.0_f64.to_bits()]
+    );
+    assert_eq!(
+        morris_report.mu_by_output()[1].map(f64::to_bits),
+        [2.0_f64.to_bits(), (-3.0_f64).to_bits()]
+    );
+    assert_eq!(
+        morris_report.sigma_by_output()[0].map(f64::to_bits),
+        [0.0_f64.to_bits(), 0.0_f64.to_bits()]
+    );
+    let mut sobol = SobolIndices::<f64, 2, 2>::new();
+    for row in 0..16_384_u64 {
+        let a0 = Counter::<MultiBaseDomain, SplitMix64>::open_unit::<f64>(seed, row, 0);
+        let a1 = Counter::<MultiBaseDomain, SplitMix64>::open_unit::<f64>(seed, row, 1);
+        let b0 = Counter::<MultiIndependentDomain, SplitMix64>::open_unit::<f64>(seed, row, 0);
+        let b1 = Counter::<MultiIndependentDomain, SplitMix64>::open_unit::<f64>(seed, row, 1);
+        sobol.update_outputs(
+            &[a0 + a1, 2.0 * a0 - 3.0 * a1],
+            &[b0 + b1, 2.0 * b0 - 3.0 * b1],
+            &[
+                [b0 + a1, a0 + b1],
+                [2.0 * b0 - 3.0 * a1, 2.0 * a0 - 3.0 * b1],
+            ],
+        );
+    }
+    let sobol_report = sobol.report().expect("defined");
+    let first = sobol_report.first_order_by_output();
+    let total = sobol_report.total_order_by_output();
+    assert!((first[0][0] - 0.5).abs() <= 0.05);
+    assert!((first[0][1] - 0.5).abs() <= 0.05);
+    assert!((first[1][0] - 4.0 / 13.0).abs() <= 0.05);
+    assert!((first[1][1] - 9.0 / 13.0).abs() <= 0.05);
+    assert!((total[1][0] - 4.0 / 13.0).abs() <= 0.05);
+    assert!((total[1][1] - 9.0 / 13.0).abs() <= 0.05);
+}

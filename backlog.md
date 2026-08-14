@@ -25,12 +25,12 @@
 
 - Public `ryancinsight/tyche` origin and the Atlas gitlink are registered.
 
-## TYCHE-006 — Consumer migrations — in progress
+## TYCHE-006 — Consumer migrations — complete
 
-- Owner: Codex `/root`; scope: document merged Kwavers PR 304's direct Tyche
-  collocation-design adoption in `README.md`, `backlog.md`, `gap_audit.md`, and
-  `CHANGELOG.md`. Provider code, unrelated consumer surfaces, and release
-  metadata are non-goals.
+- Owner: Codex; PM closeout delivered on `codex/tyche-pm-closeout`; scope was
+  to document merged Kwavers PR 304's direct Tyche collocation-design adoption
+  in `README.md`, `backlog.md`, `gap_audit.md`, and `CHANGELOG.md`. Provider
+  code, unrelated consumer surfaces, and release metadata remain non-goals.
 
 - Helios PR 10 delegates reproducible normal noise to `StandardNormal`; its
   package-local suite passes 27/27 tests.
@@ -56,6 +56,11 @@
   case.
 - ADR 0002 closes the public `Design` error-construction gap and replaces the
   adapter's contained panic path with a typed `DesignContract` failure.
+- **Status:** complete. The required consumer evidence is synchronized in the
+  four named records, and the current Tyche default `92cb29f` passes CI run
+  `31645405288` (format, check, warning-denied Clippy, Nextest, doctests,
+  Rustdoc, example, and supply-chain checks). The four Kwavers benchmark pairs
+  remain a consumer-performance watchpoint outside this documentation item.
 
 ## TYCHE-003 — Sampling breadth — implemented
 
@@ -77,7 +82,12 @@
   Clippy/Rustdoc, the end-to-end example, supply-chain policy, Criterion, and
   all 196 applicable additive SemVer checks pass.
 
-## TYCHE-004 — UQ breadth — in progress
+## TYCHE-004 — UQ breadth — complete 2026-08-13
+
+- Sensitivity-estimator source `dc96f5ecd6af643e34f2146b9f3dbb49ba85dbae`
+  merged through PR #18 as provider default `4a6f8cd495c78beaaa6e4081705b33ed0da8be9e`.
+  Provider verification and supply-chain checks passed in hosted run
+  `31675476210`; book build passed in `31675476477`.
 
 - First increment delivered in `tyche-core`: `Bootstrap` validates runtime
   population and resample sizes, exposes deterministic random-access indices,
@@ -97,8 +107,16 @@
   migration target until it owns a real trainable-model seam: the current
   model stores only an error-derived score and prediction perturbs an external
   predictor without retained training.
-- Following increments: genuine Morris and Saltelli Sobol estimators plus
-  multi-output reports.
+- Delivered in the sensitivity-estimator increment: genuine Morris elementary
+  effects and Saltelli first/total-order Sobol estimators, merged through PR #9
+  as `deabe0b`; the current default CI run `31645405288` passes the full
+  provider gate.
+- Multi-output correlation, Morris, and Saltelli reports are delivered in the
+  current increment through an `OUTPUTS` const-generic dimension. Scalar APIs
+  remain the default specialization; two-output analytical laws pass in the
+  `tyche-core` package suite.
+- Remaining scope: a real trainable-model seam for ensemble bagging. The
+  current score-only model is not represented as a trainable implementation.
 
 ## TYCHE-005 — Study schema — planned
 
