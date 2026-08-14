@@ -25,6 +25,11 @@ tag format is `crate-tyche-core-v<version>`. The adapter and facade packages
 are workspace artifacts and remain unreleased until their upstream crates.io
 dependency closures are ready. The facade package is named
 `tyche-uncertainty` on crates.io while its Rust import remains `tyche`.
+Consumers select that registry package explicitly:
+
+```toml
+tyche = { package = "tyche-uncertainty", version = "0.2" }
+```
 
 ## Example
 
