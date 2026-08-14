@@ -30,8 +30,9 @@ runtime lifecycle. The integration records are [tracked in the gap audit].
 
 `tyche-core` is published to crates.io. Publishing is tag-gated through the
 `crates-io` GitHub environment and crates.io Trusted Publishing; the release
-tag format is `crate-tyche-core-v<version>`. The adapter and facade packages
-remain private until their upstream crates.io dependency closures are ready.
+tag format is `crate-tyche-core-v<version>`. The adapter and facade manifests
+are packageable and publishable, but their release remains dependency-ordered
+until the required first-party crates.io closures are indexed.
 
 ## Example
 
@@ -165,7 +166,7 @@ cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo nextest run --workspace --all-features
 cargo test --doc --workspace --all-features
 cargo doc --workspace --no-deps --all-features
-cargo run -p tyche --example reproducible_study
+cargo run -p tyche-uncertainty --example reproducible_study
 cargo bench -p tyche-core --bench counter_sampling
 cargo deny check
 ```
