@@ -7,6 +7,9 @@ authors.workspace = true
 description = "Moirai execution adapter for Tyche studies"
 repository.workspace = true
 license.workspace = true
+readme = "../../README.md"
+keywords = ["uncertainty", "parallel", "scheduling", "simulation"]
+categories = ["science"]
 publish.workspace = true
 
 [dependencies]

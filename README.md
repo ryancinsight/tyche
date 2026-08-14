@@ -31,8 +31,14 @@ runtime lifecycle. The integration records are [tracked in the gap audit].
 `tyche-core` is published to crates.io. Publishing is tag-gated through the
 `crates-io` GitHub environment and crates.io Trusted Publishing; the release
 tag format is `crate-tyche-core-v<version>`. The adapter and facade manifests
-are packageable and publishable, but their release remains dependency-ordered
-until the required first-party crates.io closures are indexed.
+are packageable and publishable, but remain unreleased until their upstream
+first-party crates.io dependency closures are indexed. The facade package is
+named `tyche-uncertainty` on crates.io while its Rust import remains `tyche`.
+Consumers select that registry package explicitly:
+
+```toml
+tyche = { package = "tyche-uncertainty", version = "0.2" }
+```
 
 ## Example
 
