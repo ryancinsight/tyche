@@ -6,8 +6,8 @@
 
 | ADR | Title | Status |
 | --- | ----- | ------ |
-| [0001](0001-reproducible-study-boundary.md) | Reproducible uncertainty-study boundary | accepted |
-| [0002](0002-typed-design-errors.md) | Preserve typed design failures | accepted |
-| [0003](0003-domain-separated-counter-schedule.md) | Domain-separated counter schedule | accepted |
-| [0004](0004-random-access-sobol.md) | Random-access Sobol designs | accepted |
+| [0001](0001-reproducible-study-boundary.md) | Reproducible uncertainty-study boundary | Accepted |
+| [0002](0002-typed-design-errors.md) | Preserve typed design failures | Accepted |
+| [0003](0003-domain-separated-counter-schedule.md) | Domain-separated counter schedule | Accepted |
+| [0004](0004-random-access-sobol.md) | Random-access Sobol designs | Accepted |
 | [0005](0005-discrete-importance-sampling.md) | Borrowed discrete importance sampling | Accepted |
