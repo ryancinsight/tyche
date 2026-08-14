@@ -1,6 +1,6 @@
 # ADR 0002: Preserve typed design failures
 
-- Status: Accepted
+- Status: accepted
 - Change class: major, architectural
 - Date: 2026-07-20
 

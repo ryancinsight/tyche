@@ -1,6 +1,6 @@
 # ADR 0004: Random-access Sobol designs
 
-- Status: Accepted
+- Status: accepted
 - Change class: minor, architectural
 - Date: 2026-07-21
 

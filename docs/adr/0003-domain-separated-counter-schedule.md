@@ -1,6 +1,6 @@
 # ADR 0003: Domain-separated counter schedule
 
-- Status: Accepted
+- Status: accepted
 - Change class: major, architectural
 - Date: 2026-07-21
 

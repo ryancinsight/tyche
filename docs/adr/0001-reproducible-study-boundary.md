@@ -1,6 +1,6 @@
 # ADR 0001: Reproducible uncertainty-study boundary
 
-- Status: Accepted
+- Status: accepted
 - Change class: minor, architectural
 - Date: 2026-07-20
 
