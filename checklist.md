@@ -1,5 +1,10 @@
 # Tyche checklist
 
+- [x] ATLAS-TYCHE-SENSITIVITY-STRUCTURE [patch]: split the 672-line
+      `statistics/sensitivity.rs` implementation into dedicated estimator
+      modules, preserve the public API and tests, and reduce the oversized-file
+      conformance count from 1 to 0.
+
 - [x] TYCHE-001: Phase 0 core — reproducible design, study, ensemble,
       statistics, calibration, execution, and artifact-access vertical slice.
 - [x] TYCHE-002: Public promotion — public `ryancinsight/tyche` origin and the
@@ -10,10 +15,12 @@
       and 18/18 doctests at delivery.
 - [x] TYCHE-007: Provider source consolidation — Eunomia 0.7 through its
       canonical versioned Git source; locked metadata and full gate set pass.
-- [x] TYCHE-004 (first increment): deterministic random-access bootstrap index
-      generation (`Bootstrap::<SplitMix64>`) with validated sizes, caller-owned
+- [x] TYCHE-004: deterministic random-access bootstrap index generation
+      (`Bootstrap::<SplitMix64>`) with validated sizes, caller-owned
       fill, and the shared multiply-high reducer; Kwavers elastography
-      percentile bootstrap delegates to it.
+      percentile bootstrap delegates to it. Morris elementary effects,
+      Saltelli Sobol indices, and multi-output sensitivity reports are also
+      implemented and covered by the statistics evidence suite.
 - [x] Re-release at 0.2.0 onto Eunomia 0.8 (`45354e6`), facade packaging and
       documentation (`ee3a52b`), and CI package-selector fixes.
 - [x] Canonical provider gates at the audited revision (2026-08-12): strict
