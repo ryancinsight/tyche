@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Changed
+
+- [patch] Split the sensitivity estimators into dedicated correlation,
+  elementary-effect, and Sobol modules; each module stays below the repository
+  file-size target while the public re-export surface remains unchanged.
+
 ### Added
 
 - Morris elementary-effect screening: `ElementaryEffects::from_steps` reduces
