@@ -19,11 +19,14 @@ model semantics.
 
 ## Distribution
 
-`tyche-core` is published to crates.io. Publishing is tag-gated through the
-`crates-io` GitHub environment and crates.io Trusted Publishing; the release
-tag format is `crate-tyche-core-v<version>`. The adapter and facade packages
-are workspace artifacts and remain unreleased until their upstream crates.io
-dependency closures are ready. The facade package is named
+`tyche-core` is published to crates.io. Every workspace member declares
+`publish = true`, and the release pipeline is package-generic: publishing is
+tag-gated through the `crates-io` GitHub environment and crates.io Trusted
+Publishing, with the release tag format `crate-<package>-v<version>`. The
+adapter and facade packages are nevertheless still unreleased, because each
+depends on a Moirai or Consus version that is not yet on crates.io; the
+declared `publish = true` states that nothing blocks them once those
+dependency closures land. The facade package is named
 `tyche-uncertainty` on crates.io while its Rust import remains `tyche`.
 Consumers select that registry package explicitly:
 
@@ -164,9 +167,14 @@ cargo nextest run --workspace --all-features
 cargo test --doc --workspace --all-features
 cargo doc --workspace --no-deps --all-features
 cargo run -p tyche-uncertainty --example reproducible_study
-cargo bench -p tyche-core --bench counter_sampling
-cargo deny check
+cargo bench -p tyche-core --bench counter_sampling -- --test
 ```
+
+Every command above is a `verify` job step in
+[`ci.yml`](.github/workflows/ci.yml), verbatim. The final line is the
+single-iteration bench smoke; drop `-- --test` for a timing run. The separate
+`supply-chain` job runs `cargo deny check` through the pinned
+`EmbarkStudios/cargo-deny-action`.
 
 ## Roadmap
 

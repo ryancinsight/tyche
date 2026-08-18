@@ -4,7 +4,7 @@
 # `[lib] name` keeps the import path `tyche` — the same split the stack uses
 # for `moirai-runtime`, `mnemosyne-memory`, `themis-topology`, `iris-viz`, and
 # `gaia-mesh`. Consumers write
-# `tyche = { package = "tyche-uncertainty", version = "0.1.0" }` and every
+# `tyche = { package = "tyche-uncertainty", version = "0.2" }` and every
 # `use tyche::…` is unchanged.
 name = "tyche-uncertainty"
 version.workspace = true
