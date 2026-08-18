@@ -6,7 +6,7 @@
 
 use core::{marker::PhantomData, num::NonZeroU64, num::NonZeroUsize};
 
-use crate::sampling::counter::{CategoricalSelection, Seed, StreamAlgorithm, bounded_u64};
+use crate::sampling::counter::{CategoricalSelection, Seed, StreamAlgorithm, bounded_integer};
 
 /// A validated non-zero number of categories.
 #[must_use]
@@ -112,7 +112,7 @@ impl<A: StreamAlgorithm> Categorical<A> {
                 .expect("invariant: Tyche supports targets with at most 64-bit usize"),
         )
         .expect("invariant: category count is non-zero");
-        let category = usize::try_from(bounded_u64::<CategoricalSelection, A>(
+        let category = usize::try_from(bounded_integer::<CategoricalSelection, A>(
             seed, address, 0, bound,
         ))
         .expect("invariant: category is below the usize category count");

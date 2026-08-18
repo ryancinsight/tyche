@@ -1,5 +1,12 @@
 # Tyche checklist
 
+- [x] ATLAS-TYCHE-TYPE-SURFACE-001 [patch]: consolidate the checked index
+      conversions shared by Latin-hypercube and Sobol designs, rename the
+      bounded counter helper to its domain contract, and remove all five
+      production type-suffixed function names. Verification at delivery:
+      conformance is zero across all tracked debt classes; nextest 51/51,
+      doctests 18/18, Clippy `-D warnings`, and workspace documentation pass.
+
 - [x] ATLAS-TYCHE-SENSITIVITY-STRUCTURE [patch]: split the 672-line
       `statistics/sensitivity.rs` implementation into dedicated estimator
       modules, preserve the public API and tests, and reduce the oversized-file

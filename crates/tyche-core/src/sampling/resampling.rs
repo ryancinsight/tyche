@@ -2,7 +2,7 @@
 
 use core::{fmt, marker::PhantomData, num::NonZeroU64, num::NonZeroUsize};
 
-use super::counter::{BootstrapIndex, Seed, StreamAlgorithm, bounded_u64};
+use super::counter::{BootstrapIndex, Seed, StreamAlgorithm, bounded_integer};
 
 /// A validated bootstrap index design over a finite population.
 ///
@@ -80,7 +80,7 @@ impl<A: StreamAlgorithm> Bootstrap<A> {
                 .expect("invariant: constructor validates the population bound"),
         )
         .expect("invariant: constructor validates a non-zero population");
-        usize::try_from(bounded_u64::<BootstrapIndex, A>(
+        usize::try_from(bounded_integer::<BootstrapIndex, A>(
             seed, replicate, draw, bound,
         ))
         .expect("invariant: population index fits usize")

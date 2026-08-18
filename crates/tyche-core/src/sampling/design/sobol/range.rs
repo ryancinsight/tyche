@@ -2,6 +2,7 @@
 
 use core::num::NonZeroU32;
 
+use super::super::design_index;
 use super::{SobolDimensionError, SobolRangeError, direction::MAX_DIMENSIONS};
 use crate::sampling::SampleIndexError;
 
@@ -111,13 +112,6 @@ impl SobolRange {
     }
 
     pub(super) fn sample_count_usize(self) -> usize {
-        usize_from_u32(self.sample_count.get())
-    }
-}
-
-fn usize_from_u32(value: u32) -> usize {
-    match usize::try_from(value) {
-        Ok(value) => value,
-        Err(_) => unreachable!("invariant: Tyche requires a target with at least 32-bit usize"),
+        design_index(self.sample_count.get())
     }
 }
