@@ -17,6 +17,15 @@ keys. Moirai owns scheduling and runtime lifecycle. Consus owns stores,
 formats, compression, and durability. Domain packages own their physics and
 model semantics.
 
+Tyche's merged consumer integrations delegate provider-owned uncertainty work:
+Helios uses `StandardNormal`, CFDrs uses Tyche's const-width Latin-hypercube
+designs, and Kwavers uses Tyche for conformal calibration, moments, correlation
+screening, fixed collocation designs, and Sobol generation. Kwavers retains
+measure-correct geometry and physics mappings; Moirai retains scheduling and
+runtime lifecycle. The integration records are [tracked in the gap audit].
+
+[tracked in the gap audit]: gap_audit.md
+
 ## Distribution
 
 `tyche-core` is published to crates.io. Every workspace member declares
@@ -187,8 +196,9 @@ single-iteration bench smoke; drop `-- --test` for a timing run. The separate
    bootstrap contract. Percentile interpolation remains Kwavers-owned. Ensemble
    bagging adopts provider resampling only with a real trainable-model seam; the
    current score-only placeholder is not a valid consumer contract.
-3. Add multi-output sensitivity reports around the existing Morris and
-   Saltelli Sobol estimators.
+3. Multi-output Morris and Saltelli reports are delivered in `tyche-core`;
+   ensemble bagging still requires a real trainable-model seam before it can
+   adopt provider resampling.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
 
