@@ -36,7 +36,20 @@ missing_docs = "deny"
 unsafe_code = "forbid"
 
 [workspace.lints.clippy]
-pedantic = { level = "warn", priority = -1 }
+# Single source of truth for the lint floor. Members inherit with
+# `[lints] workspace = true`; a member re-declaring a level forks this table.
+# `priority = -1` would let individual entries below override the group -- there
+# are none: a full `cargo clippy --workspace --all-targets --all-features`
+# census measured 0 pedantic hits (0 in production), so no class is allowed and
+# every pedantic lint is a hard error. Any new hit must be fixed, never added
+# here as an allow.
+pedantic = { level = "deny", priority = -1 }
+
+# --- Restriction floor ---
+# Zero production `unwrap` sites: denied outright with no ratchet. The 20
+# `.unwrap()` occurrences in `crates/` are all inside `///` doc examples, which
+# clippy does not lint but `cargo test --doc` does compile and run; a real
+# production unwrap would not compile under this line.
 unwrap_used = "deny"
 
 [profile.dev]

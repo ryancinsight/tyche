@@ -28,6 +28,9 @@ jobs:
         env:
           RUSTDOCFLAGS: -D warnings
       - run: cargo run -p tyche-uncertainty --example reproducible_study
+      # Single-iteration smoke: the bench binary is a delivered target, so it
+      # must compile and execute every case. Timing runs are local.
+      - run: cargo bench -p tyche-core --bench counter_sampling -- --test
 
   supply-chain:
     runs-on: ubuntu-latest

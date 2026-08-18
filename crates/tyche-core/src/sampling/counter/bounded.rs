@@ -8,7 +8,7 @@ use super::{Counter, Seed, StreamAlgorithm, StreamDomain};
 ///
 /// Rejected words advance only the retry coordinate for this logical address;
 /// the caller's index and draw coordinates remain stable and random-accessible.
-pub(in crate::sampling) fn bounded_u64<D: StreamDomain, A: StreamAlgorithm>(
+pub(in crate::sampling) fn bounded_integer<D: StreamDomain, A: StreamAlgorithm>(
     seed: Seed,
     index: u64,
     draw: u64,

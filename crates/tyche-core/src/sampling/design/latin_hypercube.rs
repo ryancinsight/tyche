@@ -3,6 +3,7 @@
 use core::{marker::PhantomData, num::NonZeroU32};
 
 use super::super::{Design, SampleIndexError};
+use super::{counter_coordinate, design_index, stratum_index};
 use crate::sampling::counter::{
     Counter, LatinHypercubeJitter, LatinHypercubeOffset, LatinHypercubeStride, Seed,
     StreamAlgorithm,
@@ -49,12 +50,12 @@ impl<const PARAMETERS: usize, A: StreamAlgorithm> LatinHypercube<PARAMETERS, A> 
         let mut strides = [1; PARAMETERS];
         let mut offsets = [0; PARAMETERS];
         for dimension in 0..PARAMETERS {
-            let coordinate = u64_from_usize(dimension);
-            let candidate = u32_from_u64(
+            let coordinate = counter_coordinate(dimension);
+            let candidate = stratum_index(
                 Counter::<LatinHypercubeStride, A>::word(seed, coordinate, 0) % u64::from(count),
             );
             strides[dimension] = coprime_stride(candidate, count);
-            offsets[dimension] = u32_from_u64(
+            offsets[dimension] = stratum_index(
                 Counter::<LatinHypercubeOffset, A>::word(seed, coordinate, 0) % u64::from(count),
             );
         }
@@ -78,7 +79,7 @@ impl<const PARAMETERS: usize, A: StreamAlgorithm> LatinHypercube<PARAMETERS, A> 
     ///
     /// Returns [`SampleIndexError`] for an out-of-range sample or dimension.
     pub fn stratum(&self, sample: usize, dimension: usize) -> Result<usize, SampleIndexError> {
-        let sample_count = usize_from_u32(self.sample_count.get());
+        let sample_count = design_index(self.sample_count.get());
         if sample >= sample_count || dimension >= PARAMETERS {
             return Err(SampleIndexError::new(sample, sample_count));
         }
@@ -87,8 +88,8 @@ impl<const PARAMETERS: usize, A: StreamAlgorithm> LatinHypercube<PARAMETERS, A> 
         };
         let count = u64::from(self.sample_count.get());
         let product = u64::from(self.strides[dimension]) * u64::from(sample);
-        let stratum = u32_from_u64((product + u64::from(self.offsets[dimension])) % count);
-        Ok(usize_from_u32(stratum))
+        let stratum = stratum_index((product + u64::from(self.offsets[dimension])) % count);
+        Ok(design_index(stratum))
     }
 }
 
@@ -96,7 +97,7 @@ impl<const PARAMETERS: usize, A: StreamAlgorithm> Design<PARAMETERS>
     for LatinHypercube<PARAMETERS, A>
 {
     fn sample_count(&self) -> usize {
-        usize_from_u32(self.sample_count.get())
+        design_index(self.sample_count.get())
     }
 
     fn sample_unit_into(
@@ -104,7 +105,7 @@ impl<const PARAMETERS: usize, A: StreamAlgorithm> Design<PARAMETERS>
         index: usize,
         output: &mut [f64; PARAMETERS],
     ) -> Result<(), SampleIndexError> {
-        let sample_count = usize_from_u32(self.sample_count.get());
+        let sample_count = design_index(self.sample_count.get());
         if index >= sample_count {
             return Err(SampleIndexError::new(index, sample_count));
         }
@@ -116,8 +117,8 @@ impl<const PARAMETERS: usize, A: StreamAlgorithm> Design<PARAMETERS>
             };
             let jitter = Counter::<LatinHypercubeJitter, A>::unit::<f64>(
                 self.seed,
-                u64_from_usize(index),
-                u64_from_usize(dimension),
+                counter_coordinate(index),
+                counter_coordinate(dimension),
             );
             *coordinate = (f64::from(stratum) + jitter) * inverse_count;
         }
@@ -145,27 +146,6 @@ const fn greatest_common_divisor(mut left: u32, mut right: u32) -> u32 {
         right = remainder;
     }
     left
-}
-
-fn u32_from_u64(value: u64) -> u32 {
-    match u32::try_from(value) {
-        Ok(value) => value,
-        Err(_) => unreachable!("invariant: value is reduced modulo a u32 count"),
-    }
-}
-
-fn usize_from_u32(value: u32) -> usize {
-    match usize::try_from(value) {
-        Ok(value) => value,
-        Err(_) => unreachable!("invariant: Tyche requires a target with at least 32-bit usize"),
-    }
-}
-
-fn u64_from_usize(value: usize) -> u64 {
-    match u64::try_from(value) {
-        Ok(value) => value,
-        Err(_) => unreachable!("invariant: Tyche supports targets with at most 64-bit usize"),
-    }
 }
 
 #[cfg(test)]
