@@ -41,8 +41,10 @@
       publishable package and keep the Consus, Moirai, and facade adapters
       private; synchronize the release documentation and package metadata.
 
-- [ ] TYCHE-004 remaining increments: genuine Morris and Saltelli Sobol
-      estimators plus multi-output reports.
+- [x] TYCHE-004: Morris elementary effects, Saltelli first- and total-order
+      Sobol indices, and multi-output reports are implemented and covered by
+      the sensitivity evidence suite; the provider backlog and CHANGELOG carry
+      the implementation contract and verification record.
 - [ ] TYCHE-005: versioned Consus study schema (metadata/payload schema and
       manifest-last completeness); durability waits for a Consus transaction
       contract.
