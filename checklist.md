@@ -1,5 +1,10 @@
 # Tyche checklist
 
+- [ ] ATLAS-TYCHE-WORKFLOW-PIN-2026-08-20: refresh the Pages caller to Atlas
+      `20c9398`, preserving the executable `tyche-core` book gate; run local
+      workflow-shape, strict-link, and mdBook build checks, then publish and
+      collect exact-head hosted evidence.
+
 - [x] ATLAS-TYCHE-TYPE-SURFACE-001 [patch]: consolidate the checked index
       conversions shared by Latin-hypercube and Sobol designs, rename the
       bounded counter helper to its domain contract, and remove all five
