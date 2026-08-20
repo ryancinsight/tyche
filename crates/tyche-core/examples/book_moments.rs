@@ -4,6 +4,8 @@
 //! takes O(1) time and O(1) space.  The algorithm is numerically stable
 //! against catastrophic cancellation in the variance calculation.
 
+extern crate tyche_core;
+
 use tyche_core::{Moments, PopulationVariance, SampleVariance};
 
 fn main() {

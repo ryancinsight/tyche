@@ -7,6 +7,9 @@
 //! [`Parameter::map_unit`] scales a unit-interval value to the parameter
 //! bounds, completing the unit-hypercube → physical-space mapping.
 
+extern crate core;
+extern crate tyche_core;
+
 use core::num::NonZeroU32;
 use tyche_core::{Design, LatinHypercube, Parameter, ParameterSpace, Seed, SplitMix64};
 
