@@ -28,14 +28,13 @@ runtime lifecycle. The integration records are [tracked in the gap audit].
 
 ## Distribution
 
-`tyche-core` is published to crates.io. Every workspace member declares
-`publish = true`, and the release pipeline is package-generic: publishing is
-tag-gated through the `crates-io` GitHub environment and crates.io Trusted
-Publishing, with the release tag format `crate-<package>-v<version>`. The
-adapter and facade packages are nevertheless still unreleased, because each
-depends on a Moirai or Consus version that is not yet on crates.io; the
-declared `publish = true` states that nothing blocks them once those
-dependency closures land. The facade package is named
+`tyche-core` is the only publishable workspace package. The Consus and Moirai
+adapters and the facade are build-time integration packages with
+`publish = false`; they remain private until their external dependency
+contracts and release authority are established. The release pipeline is
+package-generic for publishable packages: publishing is tag-gated through the
+`crates-io` GitHub environment and crates.io Trusted Publishing, with the
+release tag format `crate-<package>-v<version>`. The facade package is named
 `tyche-uncertainty` on crates.io while its Rust import remains `tyche`.
 Consumers select that registry package explicitly:
 

@@ -37,6 +37,10 @@
 
 ## Open (not locally actionable or planned increments)
 
+- [x] TYCHE-008 publication boundary slice: mark `tyche-core` as the sole
+      publishable package and keep the Consus, Moirai, and facade adapters
+      private; synchronize the release documentation and package metadata.
+
 - [ ] TYCHE-004 remaining increments: genuine Morris and Saltelli Sobol
       estimators plus multi-output reports.
 - [ ] TYCHE-005: versioned Consus study schema (metadata/payload schema and

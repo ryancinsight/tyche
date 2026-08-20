@@ -40,6 +40,8 @@
 - Publish `tyche-core` through a tag-gated crates.io Trusted Publishing
   workflow. Committed stack-local source overlays no longer affect standalone
   package resolution.
+- Keep the Consus adapter, Moirai adapter, and facade private in Cargo
+  metadata; only `tyche-core` is currently a publishable registry artifact.
 
 ### Fixed
 
