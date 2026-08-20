@@ -2,7 +2,7 @@
 
 - [x] ATLAS-TYCHE-WORKFLOW-PIN-2026-08-20: refresh the Pages caller to Atlas
       `20c9398`, preserving the executable `tyche-core` book gate. Commit
-      `04c4400` passes workflow-shape, strict-link, and mdBook build checks;
+      `04c4400` and `5782c69` pass workflow-shape, strict-link, and mdBook build checks;
       Tyche PR [#34](https://github.com/ryancinsight/tyche/pull/34) is open.
 - [ ] Collect exact-head hosted book evidence before advancing the Atlas
       gitlink.

@@ -17,7 +17,7 @@
   `20c93980f7c98f2e23a89c4a0540f16c8f2d7239` in the current caller-only
   follow-up. The clean provider default is `10410f2de1ce1529ecbff50fa740b23a1c8f77b9`;
   Tyche PR [#34](https://github.com/ryancinsight/tyche/pull/34) is at exact head
-  `04c4400`; hosted verification and the Atlas pointer advance remain open.
+  `5782c69`; hosted verification and the Atlas pointer advance remain open.
 
 ## TYCHE-008 — crates.io release automation — in progress
 
