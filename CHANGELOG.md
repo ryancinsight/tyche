@@ -4,6 +4,10 @@
 
 ### Changed
 
+- Close the shared workflow-pin integration with exact PR CI `32343473062`,
+  Pages build `32343473408`, post-merge CI `32343825023`, Deploy mdBook
+  `32343825746`, dynamic Pages `32343823918`, and live HTTP 200 evidence.
+
 - Refresh the Pages caller to the current Atlas reusable workflow revision;
   retain the existing package-staged executable book gate.
 
