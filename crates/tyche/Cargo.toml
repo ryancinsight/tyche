@@ -17,7 +17,7 @@ license.workspace = true
 readme = "../../README.md"
 keywords = ["uncertainty", "sampling", "sensitivity", "simulation"]
 categories = ["science"]
-publish.workspace = true
+publish = false
 
 [lib]
 # Import path stays `tyche` regardless of the registry name above.

@@ -1,5 +1,19 @@
 # Tyche ownership gap audit
 
+## TYCHE-008 publication boundary
+
+The release backlog requires `tyche-core` to be the publishable registry
+artifact while the Consus adapter, Moirai adapter, and facade remain private.
+The prior manifests inherited the workspace-level `publish = true` for all
+four packages, while the README described those private packages as merely
+unreleased. The three integration manifests now set `publish = false`, and
+the README, CHANGELOG, checklist, and backlog agree with the Cargo metadata.
+The remaining TYCHE-008 work is external registry configuration and exact
+release evidence; this slice does not claim publication. Formatting and
+locked no-dependency metadata pass. The locked Nextest gate is blocked before
+compilation by the Atlas overlay's unused local patches requiring a lockfile
+rewrite, so this change carries no focused-test claim.
+
 ## TYCHE-004 multi-output sensitivity closure (2026-08-13)
 
 The scalar Morris and Saltelli estimators were already real and provider-owned;

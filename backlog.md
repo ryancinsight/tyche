@@ -19,12 +19,22 @@
 
 ## TYCHE-008 — crates.io release automation — in progress
 
-- Owner: Codex `/root`; scope: publish `tyche-core` from an exact merged source
-  revision, configure crates.io Trusted Publishing for the repository release
-  workflow, and keep the adapter and facade crates private.
+- Owner: Codex `/root`; completed slice: make the publication boundary executable
+  by keeping `tyche-core` publishable and the Consus, Moirai, and facade
+  adapters private. The release workflow and registry configuration remain in
+  the parent item after this slice.
+- Scope: `crates/{tyche,tyche-consus,tyche-moirai}/Cargo.toml`, the distribution
+  section of `README.md`, and this PM record.
 - Acceptance: standalone locked package validation and focused tests pass; the
   crate is indexed; the exact-source GitHub Release exists; crates.io accepts
   only trusted-publisher updates.
+- Evidence for this slice: package manifests set `publish = false` on all
+  three integration packages, `publish = true` remains explicit on
+  `tyche-core`, and README/CHANGELOG/checklist now state the same boundary.
+  `cargo +1.97.0 fmt --all -- --check` and locked no-dependency metadata pass.
+  The locked Nextest command is blocked before compilation because the Atlas
+  overlay requests a Cargo.lock rewrite for unused local patches; no test
+  result is inferred from that blocked command.
 
 ## TYCHE-007 — Provider source consolidation — implemented
 

@@ -10,7 +10,7 @@ license.workspace = true
 readme = "../../README.md"
 keywords = ["uncertainty", "storage", "zarr", "simulation"]
 categories = ["science"]
-publish.workspace = true
+publish = false
 
 [dependencies]
 tyche-core = { workspace = true, features = ["std"] }
