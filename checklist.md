@@ -46,8 +46,10 @@
 - [ ] TYCHE-005: versioned Consus study schema (metadata/payload schema and
       manifest-last completeness); durability waits for a Consus transaction
       contract.
-- [ ] TYCHE-006: remaining consumer-migration documentation follow-ups
-      (Kwavers PR 304 record in README/CHANGELOG).
+- [x] TYCHE-006: consumer-migration documentation follow-ups. Kwavers PR 304
+      is recorded in the README, CHANGELOG, backlog, and gap audit; the merged
+      consumer delegates fixed Latin-hypercube and Sobol collocation designs
+      to Tyche while retaining geometry mappings locally.
 - [ ] TYCHE-008: crates.io Trusted Publishing release automation for
       `tyche-core` — owner-gated.
 
