@@ -4,6 +4,9 @@
 
 ### Changed
 
+- Refresh the Pages caller to the current Atlas reusable workflow revision;
+  retain the existing package-staged executable book gate.
+
 - [patch] Split the sensitivity estimators into dedicated correlation,
   elementary-effect, and Sobol modules; each module stays below the repository
   file-size target while the public re-export surface remains unchanged.
