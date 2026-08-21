@@ -1,6 +1,6 @@
 # Tyche implementation backlog
 
-## ATLAS-TYCHE-WORKFLOW-PIN-2026-08-20 — Refresh shared book workflow pin [patch] — done 2026-08-20
+## ATLAS-TYCHE-WORKFLOW-PIN-2026-08-20 — Refresh shared book workflow pin [patch] — in progress
 
 - Owner: Atlas integration. Scope is the Pages caller and this PM/changelog
   record; Tyche implementation, release work, and lockfile remain unchanged.
@@ -14,8 +14,10 @@
   `32343825023`, Deploy mdBook `32343825746`, and dynamic Pages
   `32343823918` pass; live Pages returns HTTP 200 with title `Tyche | tyche`.
 - Delivery: the Pages caller is pinned to Atlas workflow
-  `1fcd17c6f7923cb1734756c15e0a5a39e333ee32`; the Atlas gitlink may advance to
-  the merged default after this PM closure merges.
+  `20c93980f7c98f2e23a89c4a0540f16c8f2d7239` in the current caller-only
+  follow-up. The clean provider default is `10410f2de1ce1529ecbff50fa740b23a1c8f77b9`;
+  Tyche PR [#34](https://github.com/ryancinsight/tyche/pull/34) is at exact head
+  `5782c69`; hosted verification and the Atlas pointer advance remain open.
 
 ## TYCHE-008 — crates.io release automation — in progress
 

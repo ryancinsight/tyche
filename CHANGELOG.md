@@ -8,8 +8,8 @@
   Pages build `32343473408`, post-merge CI `32343825023`, Deploy mdBook
   `32343825746`, dynamic Pages `32343823918`, and live HTTP 200 evidence.
 
-- Refresh the Pages caller to the current Atlas reusable workflow revision;
-  retain the existing package-staged executable book gate.
+- Refresh the Pages caller to Atlas reusable workflow `20c9398`, retaining the
+  `tyche-core` executable book gate and its existing toolchain/output inputs.
 
 - [patch] Split the sensitivity estimators into dedicated correlation,
   elementary-effect, and Sobol modules; each module stays below the repository
