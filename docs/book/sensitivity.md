@@ -1,5 +1,10 @@
 # Sensitivity Screening
 
+<!-- generated-figure-start -->
+![Figure 4.1 — Sensitivity Screening](figures/ch04/fig01_4_sensitivity_screening.svg)
+*Figure 4.1 — Sensitivity Screening*
+<!-- generated-figure-end -->
+
 Tyche provides three global screening surfaces. All of them accumulate
 online and report typed, clamped summaries, so a study can rank parameter
 influence without storing the full response history.

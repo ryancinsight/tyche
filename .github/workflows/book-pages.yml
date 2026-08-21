@@ -2,9 +2,15 @@ name: Deploy mdBook
 on:
   push:
     branches: [main]
-    paths: ["docs/book/**",".github/workflows/book-pages.yml"]
+    paths:
+      - "docs/book/**"
+      - ".github/check-book-figures.py"
+      - ".github/workflows/book-pages.yml"
   pull_request:
-    paths: ["docs/book/**",".github/workflows/book-pages.yml"]
+    paths:
+      - "docs/book/**"
+      - ".github/check-book-figures.py"
+      - ".github/workflows/book-pages.yml"
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,7 +18,19 @@ concurrency:
   group: book-pages-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  check-figures:
+    name: Check book figures
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify referenced figure assets
+        run: python3 .github/check-book-figures.py docs/book
+
   deploy:
+    needs: check-figures
     uses: ryancinsight/atlas/.github/workflows/book-pages.yml@20c93980f7c98f2e23a89c4a0540f16c8f2d7239
     permissions:
       contents: read
