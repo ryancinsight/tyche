@@ -34,9 +34,19 @@
   three integration packages, `publish = true` remains explicit on
   `tyche-core`, and README/CHANGELOG/checklist now state the same boundary.
   `cargo +1.97.0 fmt --all -- --check` and locked no-dependency metadata pass.
-  The locked Nextest command is blocked before compilation because the Atlas
-  overlay requests a Cargo.lock rewrite for unused local patches; no test
-  result is inferred from that blocked command.
+- Current clean-lane verification at `origin/main` commit `89194f3`: full
+  workspace check and warning-denied Clippy pass; `cargo nextest run` passes
+  51/51; doctests pass (18 total); Rustdoc, the reproducible-study example,
+  benchmark smoke, and `cargo publish --dry-run --package tyche-core` pass.
+  `cargo deny` is not installed in this environment, so the workflow's
+  supply-chain job remains the authority for that gate.
+- The direct local `mdbook test` invocation cannot be treated as a provider
+  failure under the shared Atlas target: the target contains historical
+  `tyche_core` artifacts and rustdoc reports multiple candidates. The caller
+  already builds `tyche-core` and stages a fresh dependency directory before
+  testing; hosted Pages evidence remains required. No GitHub Release or
+  registry publication was performed because that is an explicit release
+  state outside this implementation slice.
 
 ## TYCHE-007 — Provider source consolidation — implemented
 
