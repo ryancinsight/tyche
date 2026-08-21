@@ -1,5 +1,10 @@
 # Online Moments
 
+<!-- generated-figure-start -->
+![Figure 3.1 — Online Moments](figures/ch03/fig01_3_online_moments.svg)
+*Figure 3.1 — Online Moments*
+<!-- generated-figure-end -->
+
 Tyche's ordered statistics are online accumulators with explicit denominator
 policies, so a study never buffers a response history in order to summarize
 it. `Moments<T>` tracks a scalar observation stream with the Welford-Chan
