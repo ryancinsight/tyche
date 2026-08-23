@@ -1,5 +1,10 @@
 # Parameter Spaces
 
+<!-- generated-figure-start -->
+![Figure 1.1 — Parameter Spaces](figures/ch01/fig01_1_parameter_spaces.svg)
+*Figure 1.1 — Parameter Spaces*
+<!-- generated-figure-end -->
+
 A study's inputs are named, bounded intervals. `Parameter<'a, T>` carries a
 `Cow<'a, str>` identity and a `[lower, upper)` sampling interval, and the
 compile-time-dimensional `ParameterSpace<'a, T, PARAMETERS>` composes an

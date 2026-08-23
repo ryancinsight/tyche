@@ -1,5 +1,10 @@
 # Sobol Sequences
 
+<!-- generated-figure-start -->
+![Figure 2.1 — Sobol Sequences](figures/ch02/fig01_2_sobol_sequences.svg)
+*Figure 2.1 — Sobol Sequences*
+<!-- generated-figure-end -->
+
 Tyche's Sobol designs are random-access: any sequence index maps to its
 point through a bounded bit loop without replaying earlier points, so a
 Moirai-parallel study can assign disjoint index blocks to workers and each

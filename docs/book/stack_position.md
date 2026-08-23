@@ -1,5 +1,10 @@
 # Position in the Stack
 
+<!-- generated-figure-start -->
+![Figure 5.1 — Position in the Stack](figures/ch05/fig01_5_position_in_the_stack.svg)
+*Figure 5.1 — Position in the Stack*
+<!-- generated-figure-end -->
+
 Tyche is the reproducible uncertainty-study foundation of the Atlas stack.
 It owns **study identity**, **parameter spaces**, **random-access
 experimental designs**, **ensemble summaries**, **sensitivity screening**,
