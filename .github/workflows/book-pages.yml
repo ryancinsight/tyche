@@ -16,9 +16,11 @@ permissions:
   contents: read
 concurrency:
   group: book-pages-${{ github.ref }}
-  # Deploys queue behind one another; a half-cancelled deploy is worse than a
-  # superseded one, and a cancelled default-branch run leaves that merge undeployed.
-  cancel-in-progress: false
+  # One group per ref. A pull request cancels its superseded runs, releasing
+  # its queued slot in the account's shared runner pool; default-branch
+  # deploys queue behind one another and never cancel, since a half-cancelled
+  # deploy is worse than a superseded one.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   check-figures:
     name: Check book figures
