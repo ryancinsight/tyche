@@ -2,6 +2,9 @@
 
 use eunomia::RealField;
 
+use super::estimator::OnlineEstimator;
+use super::private::Sealed;
+use super::report::SensitivityReport;
 use crate::statistics::InsufficientSamples;
 
 /// Online parameter-response correlation screening.
@@ -24,6 +27,11 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize> Default
     }
 }
 
+impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize> Sealed
+    for CorrelationScreening<T, PARAMETERS, OUTPUTS>
+{
+}
+
 impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
     CorrelationScreening<T, PARAMETERS, OUTPUTS>
 {
@@ -38,18 +46,40 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
             co_moments: [[T::ZERO; PARAMETERS]; OUTPUTS],
         }
     }
+
     /// Add one parameter vector and its output vector.
     ///
     /// The output dimension is a const generic so one estimator can retain
     /// independent correlation statistics for every model output without
     /// allocating per observation.
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "the generic numeric contract represents observation counts in T"
-    )]
     pub fn update_outputs(&mut self, parameters: &[T; PARAMETERS], responses: &[T; OUTPUTS]) {
+        OnlineEstimator::accumulate(self, (parameters, responses));
+    }
+
+    /// Produce squared Pearson indices.
+    ///
+    /// # Errors
+    ///
+    /// Requires two observations.
+    pub fn report(self) -> Result<SensitivityReport<T, PARAMETERS, OUTPUTS>, InsufficientSamples> {
+        OnlineEstimator::report(self)
+    }
+}
+
+impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
+    OnlineEstimator<T, PARAMETERS, OUTPUTS> for CorrelationScreening<T, PARAMETERS, OUTPUTS>
+{
+    type Report = SensitivityReport<T, PARAMETERS, OUTPUTS>;
+    type Observation<'a> = (&'a [T; PARAMETERS], &'a [T; OUTPUTS]);
+    const MINIMUM_SAMPLES: u64 = 2;
+
+    fn sample_count(&self) -> u64 {
+        self.count
+    }
+
+    fn accumulate(&mut self, (parameters, responses): Self::Observation<'_>) {
         self.count += 1;
-        let count = T::from_f64(self.count as f64);
+        let count = self.count_as();
         let mut response_delta = [T::ZERO; OUTPUTS];
         let mut response_after = [T::ZERO; OUTPUTS];
         for (((mean, delta), after), &response) in self
@@ -99,15 +129,7 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
         }
     }
 
-    /// Produce squared Pearson indices.
-    ///
-    /// # Errors
-    ///
-    /// Requires two observations.
-    pub fn report(self) -> Result<SensitivityReport<T, PARAMETERS, OUTPUTS>, InsufficientSamples> {
-        if self.count < 2 {
-            return Err(InsufficientSamples::new(2, self.count));
-        }
+    fn finish(self) -> Self::Report {
         let mut values = [[T::ZERO; PARAMETERS]; OUTPUTS];
         for (value_row, (co_moments, &response_sum)) in values
             .iter_mut()
@@ -125,39 +147,7 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
                 }
             }
         }
-        Ok(SensitivityReport {
-            sample_count: self.count,
-            squared_correlations: values,
-        })
-    }
-}
-
-/// Correlation-based screening report.
-#[must_use]
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct SensitivityReport<T, const PARAMETERS: usize, const OUTPUTS: usize = 1> {
-    sample_count: u64,
-    squared_correlations: [[T; PARAMETERS]; OUTPUTS],
-}
-
-impl<T, const PARAMETERS: usize, const OUTPUTS: usize> SensitivityReport<T, PARAMETERS, OUTPUTS> {
-    /// Sample count.
-    #[must_use]
-    pub const fn sample_count(&self) -> u64 {
-        self.sample_count
-    }
-    /// Borrow indices.
-    #[must_use]
-    pub const fn squared_correlations_by_output(&self) -> &[[T; PARAMETERS]; OUTPUTS] {
-        &self.squared_correlations
-    }
-}
-
-impl<T, const PARAMETERS: usize> SensitivityReport<T, PARAMETERS, 1> {
-    /// Borrow the single-output squared Pearson indices.
-    #[must_use]
-    pub const fn squared_correlations(&self) -> &[T; PARAMETERS] {
-        &self.squared_correlations[0]
+        SensitivityReport::from_correlations(self.count, values)
     }
 }
 

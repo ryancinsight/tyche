@@ -1,8 +1,8 @@
 //! Deterministic resampling designs.
 
-use core::{fmt, marker::PhantomData, num::NonZeroU64, num::NonZeroUsize};
+use core::{fmt, marker::PhantomData, num::NonZeroUsize};
 
-use super::counter::{BootstrapIndex, Seed, StreamAlgorithm, bounded_integer};
+use super::counter::{BootstrapIndex, Seed, StreamAlgorithm, bounded_index};
 
 /// A validated bootstrap index design over a finite population.
 ///
@@ -75,15 +75,7 @@ impl<A: StreamAlgorithm> Bootstrap<A> {
     /// [`Self::new`] is violated.
     #[must_use]
     pub fn at(self, seed: Seed, replicate: u64, draw: u64) -> usize {
-        let bound = NonZeroU64::new(
-            u64::try_from(self.population_size.get())
-                .expect("invariant: constructor validates the population bound"),
-        )
-        .expect("invariant: constructor validates a non-zero population");
-        usize::try_from(bounded_integer::<BootstrapIndex, A>(
-            seed, replicate, draw, bound,
-        ))
-        .expect("invariant: population index fits usize")
+        bounded_index::<BootstrapIndex, A>(seed, replicate, draw, self.population_size)
     }
 
     /// Fill one caller-owned resample without allocating.

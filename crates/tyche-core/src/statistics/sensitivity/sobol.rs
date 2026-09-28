@@ -2,6 +2,9 @@
 
 use eunomia::RealField;
 
+use super::estimator::OnlineEstimator;
+use super::private::Sealed;
+use super::report::SobolReport;
 use crate::statistics::InsufficientSamples;
 
 /// Online Saltelli first- and total-order Sobol' index estimator.
@@ -33,6 +36,11 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize> Default
     }
 }
 
+impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize> Sealed
+    for SobolIndices<T, PARAMETERS, OUTPUTS>
+{
+}
+
 impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
     SobolIndices<T, PARAMETERS, OUTPUTS>
 {
@@ -57,6 +65,35 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
         independent: &[T; OUTPUTS],
         recombined: &[[T; PARAMETERS]; OUTPUTS],
     ) {
+        OnlineEstimator::accumulate(self, (base, independent, recombined));
+    }
+
+    /// Produce first- and total-order indices.
+    ///
+    /// # Errors
+    ///
+    /// Requires two rows so the `A` variance is defined.
+    pub fn report(self) -> Result<SobolReport<T, PARAMETERS, OUTPUTS>, InsufficientSamples> {
+        OnlineEstimator::report(self)
+    }
+}
+
+impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
+    OnlineEstimator<T, PARAMETERS, OUTPUTS> for SobolIndices<T, PARAMETERS, OUTPUTS>
+{
+    type Report = SobolReport<T, PARAMETERS, OUTPUTS>;
+    type Observation<'a> = (
+        &'a [T; OUTPUTS],
+        &'a [T; OUTPUTS],
+        &'a [[T; PARAMETERS]; OUTPUTS],
+    );
+    const MINIMUM_SAMPLES: u64 = 2;
+
+    fn sample_count(&self) -> u64 {
+        self.count
+    }
+
+    fn accumulate(&mut self, (base, independent, recombined): Self::Observation<'_>) {
         self.count += 1;
         for (
             ((a_sum, a_sum_squares), (first_cross, total_squares)),
@@ -86,20 +123,8 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
         }
     }
 
-    /// Produce first- and total-order indices.
-    ///
-    /// # Errors
-    ///
-    /// Requires two rows so the `A` variance is defined.
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "the generic numeric contract represents observation counts in T"
-    )]
-    pub fn report(self) -> Result<SobolReport<T, PARAMETERS, OUTPUTS>, InsufficientSamples> {
-        if self.count < 2 {
-            return Err(InsufficientSamples::new(2, self.count));
-        }
-        let count = T::from_f64(self.count as f64);
+    fn finish(self) -> Self::Report {
+        let count = self.count_as();
         let mut first_order = [[T::ZERO; PARAMETERS]; OUTPUTS];
         let mut total_order = [[T::ZERO; PARAMETERS]; OUTPUTS];
         for ((((first_row, total_row), (&a_sum, &a_sum_squares)), first_cross), total_squares) in
@@ -126,54 +151,7 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
                 }
             }
         }
-        Ok(SobolReport {
-            sample_count: self.count,
-            first_order,
-            total_order,
-        })
-    }
-}
-
-/// Saltelli Sobol' index report.
-#[must_use]
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct SobolReport<T, const PARAMETERS: usize, const OUTPUTS: usize = 1> {
-    sample_count: u64,
-    first_order: [[T; PARAMETERS]; OUTPUTS],
-    total_order: [[T; PARAMETERS]; OUTPUTS],
-}
-
-impl<T, const PARAMETERS: usize, const OUTPUTS: usize> SobolReport<T, PARAMETERS, OUTPUTS> {
-    /// Rows per matrix.
-    #[must_use]
-    pub const fn sample_count(&self) -> u64 {
-        self.sample_count
-    }
-
-    /// First-order indices `S_i`.
-    #[must_use]
-    pub const fn first_order_by_output(&self) -> &[[T; PARAMETERS]; OUTPUTS] {
-        &self.first_order
-    }
-
-    /// Total-order indices `S_Ti`.
-    #[must_use]
-    pub const fn total_order_by_output(&self) -> &[[T; PARAMETERS]; OUTPUTS] {
-        &self.total_order
-    }
-}
-
-impl<T, const PARAMETERS: usize> SobolReport<T, PARAMETERS, 1> {
-    /// First-order indices for the single output.
-    #[must_use]
-    pub const fn first_order(&self) -> &[T; PARAMETERS] {
-        &self.first_order[0]
-    }
-
-    /// Total-order indices for the single output.
-    #[must_use]
-    pub const fn total_order(&self) -> &[T; PARAMETERS] {
-        &self.total_order[0]
+        SobolReport::from_indices(self.count, first_order, total_order)
     }
 }
 

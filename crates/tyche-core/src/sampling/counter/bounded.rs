@@ -1,6 +1,6 @@
 //! Exact bounded-integer reduction shared by discrete samplers.
 
-use core::num::NonZeroU64;
+use core::num::{NonZeroU64, NonZeroUsize};
 
 use super::{Counter, Seed, StreamAlgorithm, StreamDomain};
 
@@ -29,4 +29,25 @@ pub(in crate::sampling) fn bounded_integer<D: StreamDomain, A: StreamAlgorithm>(
         }
         attempt = attempt.wrapping_add(1);
     }
+}
+
+/// Reduce a typed counter word into a non-zero host `usize` index.
+///
+/// This owns the two conversions every bounded sampler restates: the validated
+/// `usize` bound into the counter's `u64` domain, and the reduced word back
+/// into the host index domain. The bound is non-zero by construction, so the
+/// intermediate stays a `NonZeroU64` and the reduction never divides by zero.
+pub(in crate::sampling) fn bounded_index<D: StreamDomain, A: StreamAlgorithm>(
+    seed: Seed,
+    index: u64,
+    draw: u64,
+    bound: NonZeroUsize,
+) -> usize {
+    let bound = NonZeroU64::new(
+        u64::try_from(bound.get())
+            .expect("invariant: Tyche supports targets with at most 64-bit usize"),
+    )
+    .expect("invariant: a validated non-zero usize bound stays non-zero as u64");
+    usize::try_from(bounded_integer::<D, A>(seed, index, draw, bound))
+        .expect("invariant: the reduced index is below the usize bound")
 }

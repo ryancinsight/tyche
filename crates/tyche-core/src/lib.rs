@@ -34,9 +34,10 @@ pub use sampling::{
     WeightError, WeightedCategorical,
 };
 pub use statistics::{
-    CorrelationScreening, ElementaryEffects, ElementaryEffectsError, InsufficientSamples, Moments,
-    MorrisReport, MorrisScreening, PopulationVariance, SampleVariance, SensitivityReport,
-    SobolIndices, SobolReport, VariancePolicy,
+    CorrelationKind, CorrelationScreening, ElementaryEffects, ElementaryEffectsError,
+    InsufficientSamples, Moments, MorrisKind, MorrisReport, MorrisScreening, OnlineEstimator,
+    PopulationVariance, Report, SampleVariance, SensitivityKind, SensitivityReport, SobolIndices,
+    SobolKind, SobolReport, VariancePolicy,
 };
 pub use study::{Sample, Study, StudyError};
 pub use uncertainty::{ConformalCalibrator, ConformalError, PredictionInterval};
