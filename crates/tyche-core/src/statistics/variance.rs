@@ -1,6 +1,6 @@
 //! Explicit variance denominator policies.
 
-use super::InsufficientSamples;
+use super::{InsufficientSamples, count_as};
 use eunomia::RealField;
 
 /// A statically selected variance convention.
@@ -22,10 +22,6 @@ pub struct PopulationVariance;
 
 impl<T: RealField> VariancePolicy<T> for PopulationVariance {
     const MINIMUM_SAMPLES: u64 = 1;
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "the generic numeric contract represents observation counts in T"
-    )]
     fn variance(count: u64, centered_sum: T) -> Result<T, InsufficientSamples> {
         if count == 0 {
             return Err(InsufficientSamples::new(
@@ -33,7 +29,7 @@ impl<T: RealField> VariancePolicy<T> for PopulationVariance {
                 count,
             ));
         }
-        Ok(centered_sum / T::from_f64(count as f64))
+        Ok(centered_sum / count_as(count))
     }
 }
 
@@ -44,10 +40,6 @@ pub struct SampleVariance;
 
 impl<T: RealField> VariancePolicy<T> for SampleVariance {
     const MINIMUM_SAMPLES: u64 = 2;
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "the generic numeric contract represents observation counts in T"
-    )]
     fn variance(count: u64, centered_sum: T) -> Result<T, InsufficientSamples> {
         if count < <Self as VariancePolicy<T>>::MINIMUM_SAMPLES {
             return Err(InsufficientSamples::new(
@@ -55,6 +47,6 @@ impl<T: RealField> VariancePolicy<T> for SampleVariance {
                 count,
             ));
         }
-        Ok(centered_sum / T::from_f64((count - 1) as f64))
+        Ok(centered_sum / count_as(count - 1))
     }
 }

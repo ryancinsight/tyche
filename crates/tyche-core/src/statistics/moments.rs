@@ -1,6 +1,6 @@
 //! Welford-Chan online moments.
 
-use super::{InsufficientSamples, VariancePolicy};
+use super::{InsufficientSamples, VariancePolicy, count_as};
 use eunomia::RealField;
 
 /// Online scalar mean and centered sum of squares.
@@ -50,22 +50,14 @@ impl<T: RealField> Moments<T> {
         self.count == 0
     }
     /// Add an observation.
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "the generic numeric contract represents observation counts in T"
-    )]
     pub fn update(&mut self, value: T) {
         self.count += 1;
-        let count = T::from_f64(self.count as f64);
+        let count = count_as(self.count);
         let delta = value - self.mean;
         self.mean += delta / count;
         self.centered_sum += delta * (value - self.mean);
     }
     /// Merge another accumulator using Chan's recurrence.
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "the generic numeric contract represents observation counts in T"
-    )]
     pub fn merge(&mut self, other: Self) {
         if other.count == 0 {
             return;
@@ -75,9 +67,9 @@ impl<T: RealField> Moments<T> {
             return;
         }
         let combined = self.count + other.count;
-        let left = T::from_f64(self.count as f64);
-        let right = T::from_f64(other.count as f64);
-        let total = T::from_f64(combined as f64);
+        let left = count_as::<T>(self.count);
+        let right = count_as::<T>(other.count);
+        let total = count_as::<T>(combined);
         let delta = other.mean - self.mean;
         self.mean += delta * (right / total);
         self.centered_sum += other.centered_sum + delta * delta * (left * right / total);

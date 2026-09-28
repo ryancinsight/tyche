@@ -7,28 +7,10 @@ use tyche_core::{
     ResponseReducer, Seed, SplitMix64, StandardNormal, Study, StudyModel,
 };
 
-struct BorrowingModel;
-impl StudyModel<f64, 2> for BorrowingModel {
-    type Error = core::convert::Infallible;
-    type Response<'a> = &'a f64;
-    fn evaluate<'a>(&'a self, parameters: &'a [f64; 2]) -> Result<Self::Response<'a>, Self::Error> {
-        Ok(&parameters[0])
-    }
-}
-struct CopyResponse;
-impl ResponseReducer<BorrowingModel, f64, 2> for CopyResponse {
-    type Output = f64;
-    fn reduce<'a>(
-        &self,
-        response: <BorrowingModel as StudyModel<f64, 2>>::Response<'a>,
-    ) -> Self::Output
-    where
-        BorrowingModel: 'a,
-        f64: 'a,
-    {
-        *response
-    }
-}
+#[path = "../fixtures/mod.rs"]
+mod fixtures;
+
+use fixtures::{BorrowingModel, CopyResponse};
 
 #[test]
 fn borrowing_and_allocation_contracts_hold() {
@@ -63,7 +45,7 @@ fn borrowing_and_allocation_contracts_hold() {
     assert_eq!(allocations, allocation_counter::AllocationInfo::default());
 
     let sample = study.sample(3).expect("valid");
-    let response = BorrowingModel
+    let response = BorrowingModel::<0>
         .evaluate(sample.values())
         .expect("infallible");
     assert!(core::ptr::eq(
@@ -71,7 +53,11 @@ fn borrowing_and_allocation_contracts_hold() {
         core::ptr::from_ref(&sample.values()[0])
     ));
     assert_eq!(
-        CopyResponse.reduce(response).to_bits(),
+        <CopyResponse as ResponseReducer<BorrowingModel<0>, f64, 2>>::reduce(
+            &CopyResponse,
+            response
+        )
+        .to_bits(),
         sample.values()[0].to_bits()
     );
 }

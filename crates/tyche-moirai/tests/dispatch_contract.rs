@@ -4,33 +4,14 @@ use core::num::NonZeroU32;
 use moirai_core::executor::ExecutorConfig;
 use moirai_executor::HybridExecutor;
 use tyche_core::{
-    Design, LatinHypercube, Parameter, ParameterSpace, ResponseReducer, SampleIndexError, Seed,
-    SplitMix64, Study, StudyModel,
+    Design, LatinHypercube, Parameter, ParameterSpace, SampleIndexError, Seed, SplitMix64, Study,
 };
 use tyche_moirai::{DispatchError, MoiraiDispatch};
 
-struct BorrowingModel;
-impl StudyModel<f64, 2> for BorrowingModel {
-    type Error = core::convert::Infallible;
-    type Response<'a> = &'a f64;
-    fn evaluate<'a>(&'a self, parameters: &'a [f64; 2]) -> Result<Self::Response<'a>, Self::Error> {
-        Ok(&parameters[1])
-    }
-}
-struct CopyResponse;
-impl ResponseReducer<BorrowingModel, f64, 2> for CopyResponse {
-    type Output = f64;
-    fn reduce<'a>(
-        &self,
-        response: <BorrowingModel as StudyModel<f64, 2>>::Response<'a>,
-    ) -> Self::Output
-    where
-        BorrowingModel: 'a,
-        f64: 'a,
-    {
-        *response
-    }
-}
+#[path = "../../tyche-core/tests/fixtures/mod.rs"]
+mod fixtures;
+
+use fixtures::{BorrowingModel, CopyResponse};
 
 struct RejectingDesign;
 
@@ -72,7 +53,7 @@ fn dispatch_preserves_logical_indices() {
     let mut output: Vec<Option<Result<f64, core::convert::Infallible>>> =
         (0..257).map(|_| None).collect();
     MoiraiDispatch::<7>::new(&executor)
-        .evaluate_into(&study, &BorrowingModel, &CopyResponse, &mut output)
+        .evaluate_into(&study, &BorrowingModel::<1>, &CopyResponse, &mut output)
         .expect("dispatch");
     for (index, slot) in output.into_iter().enumerate() {
         let actual = slot.expect("initialized").expect("infallible");
@@ -101,7 +82,7 @@ fn dispatch_surfaces_design_contract_violations() {
         (0..study.sample_count()).map(|_| None).collect();
 
     let error = MoiraiDispatch::<2>::new(&executor)
-        .evaluate_into(&study, &BorrowingModel, &CopyResponse, &mut output)
+        .evaluate_into(&study, &BorrowingModel::<1>, &CopyResponse, &mut output)
         .expect_err("contract violation");
     assert!(matches!(
         error,

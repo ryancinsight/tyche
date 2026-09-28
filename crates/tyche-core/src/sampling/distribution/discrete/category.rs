@@ -4,9 +4,9 @@
 //! Interval*, Section 4, Algorithm 5:
 //! <https://arxiv.org/abs/1805.10941>.
 
-use core::{marker::PhantomData, num::NonZeroU64, num::NonZeroUsize};
+use core::{marker::PhantomData, num::NonZeroUsize};
 
-use crate::sampling::counter::{CategoricalSelection, Seed, StreamAlgorithm, bounded_integer};
+use crate::sampling::counter::{CategoricalSelection, Seed, StreamAlgorithm, bounded_index};
 
 /// A validated non-zero number of categories.
 #[must_use]
@@ -107,16 +107,8 @@ impl<A: StreamAlgorithm> Categorical<A> {
     /// Panics only if compiled for a target whose `usize` exceeds 64 bits, or
     /// if the multiply-high reduction violates its proven range invariant.
     pub fn at(self, seed: Seed, address: u64) -> CategoryIndex {
-        let bound = NonZeroU64::new(
-            u64::try_from(self.categories.get())
-                .expect("invariant: Tyche supports targets with at most 64-bit usize"),
-        )
-        .expect("invariant: category count is non-zero");
-        let category = usize::try_from(bounded_integer::<CategoricalSelection, A>(
-            seed, address, 0, bound,
-        ))
-        .expect("invariant: category is below the usize category count");
-        CategoryIndex::new(category, self.categories)
-            .expect("invariant: multiply-high result is below the category count")
+        let category =
+            bounded_index::<CategoricalSelection, A>(seed, address, 0, self.categories.0);
+        CategoryIndex::from_validated(category)
     }
 }

@@ -4,6 +4,9 @@ use core::fmt;
 
 use eunomia::RealField;
 
+use super::estimator::OnlineEstimator;
+use super::private::Sealed;
+use super::report::MorrisReport;
 use crate::statistics::InsufficientSamples;
 
 /// Morris trajectory elementary-effect batch.
@@ -181,6 +184,11 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize> Default
     }
 }
 
+impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize> Sealed
+    for MorrisScreening<T, PARAMETERS, OUTPUTS>
+{
+}
+
 impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
     MorrisScreening<T, PARAMETERS, OUTPUTS>
 {
@@ -196,6 +204,31 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
 
     /// Add one trajectory's elementary effects for every output.
     pub fn update_outputs(&mut self, effects: &[[T; PARAMETERS]; OUTPUTS]) {
+        OnlineEstimator::accumulate(self, effects);
+    }
+
+    /// Produce Morris statistics.
+    ///
+    /// # Errors
+    ///
+    /// Requires two effects per parameter so `sigma` is defined.
+    pub fn report(self) -> Result<MorrisReport<T, PARAMETERS, OUTPUTS>, InsufficientSamples> {
+        OnlineEstimator::report(self)
+    }
+}
+
+impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
+    OnlineEstimator<T, PARAMETERS, OUTPUTS> for MorrisScreening<T, PARAMETERS, OUTPUTS>
+{
+    type Report = MorrisReport<T, PARAMETERS, OUTPUTS>;
+    type Observation<'a> = &'a [[T; PARAMETERS]; OUTPUTS];
+    const MINIMUM_SAMPLES: u64 = 2;
+
+    fn sample_count(&self) -> u64 {
+        self.count
+    }
+
+    fn accumulate(&mut self, effects: Self::Observation<'_>) {
         self.count += 1;
         for (output_sums, (output_absolute, (output_squares, effects))) in self.sums.iter_mut().zip(
             self.absolute_sums
@@ -215,23 +248,11 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
         }
     }
 
-    /// Produce Morris statistics.
-    ///
-    /// # Errors
-    ///
-    /// Requires two effects per parameter so `sigma` is defined.
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "the generic numeric contract represents observation counts in T"
-    )]
-    pub fn report(self) -> Result<MorrisReport<T, PARAMETERS, OUTPUTS>, InsufficientSamples> {
-        if self.count < 2 {
-            return Err(InsufficientSamples::new(2, self.count));
-        }
+    fn finish(self) -> Self::Report {
         let mut mu = [[T::ZERO; PARAMETERS]; OUTPUTS];
         let mut mu_star = [[T::ZERO; PARAMETERS]; OUTPUTS];
         let mut sigma = [[T::ZERO; PARAMETERS]; OUTPUTS];
-        let count = T::from_f64(self.count as f64);
+        let count = self.count_as();
         for (((mu_row, mu_star_row), sigma_row), (sums, (absolute_sums, sums_of_squares))) in mu
             .iter_mut()
             .zip(mu_star.iter_mut())
@@ -255,68 +276,7 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
                 *sigma = (mean_square - *mu * *mu).max_scalar(T::ZERO).sqrt();
             }
         }
-        Ok(MorrisReport {
-            effect_count: self.count,
-            mu,
-            mu_star,
-            sigma,
-        })
-    }
-}
-
-/// Morris elementary-effect screening report.
-#[must_use]
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct MorrisReport<T, const PARAMETERS: usize, const OUTPUTS: usize = 1> {
-    effect_count: u64,
-    mu: [[T; PARAMETERS]; OUTPUTS],
-    mu_star: [[T; PARAMETERS]; OUTPUTS],
-    sigma: [[T; PARAMETERS]; OUTPUTS],
-}
-
-impl<T, const PARAMETERS: usize, const OUTPUTS: usize> MorrisReport<T, PARAMETERS, OUTPUTS> {
-    /// Elementary effects per parameter.
-    #[must_use]
-    pub const fn effect_count(&self) -> u64 {
-        self.effect_count
-    }
-
-    /// Mean elementary effect per parameter.
-    #[must_use]
-    pub const fn mu_by_output(&self) -> &[[T; PARAMETERS]; OUTPUTS] {
-        &self.mu
-    }
-
-    /// Mean absolute elementary effect per parameter.
-    #[must_use]
-    pub const fn mu_star_by_output(&self) -> &[[T; PARAMETERS]; OUTPUTS] {
-        &self.mu_star
-    }
-
-    /// Elementary-effect standard deviation per parameter.
-    #[must_use]
-    pub const fn sigma_by_output(&self) -> &[[T; PARAMETERS]; OUTPUTS] {
-        &self.sigma
-    }
-}
-
-impl<T, const PARAMETERS: usize> MorrisReport<T, PARAMETERS, 1> {
-    /// Mean elementary effect for the single output.
-    #[must_use]
-    pub const fn mu(&self) -> &[T; PARAMETERS] {
-        &self.mu[0]
-    }
-
-    /// Mean absolute elementary effect for the single output.
-    #[must_use]
-    pub const fn mu_star(&self) -> &[T; PARAMETERS] {
-        &self.mu_star[0]
-    }
-
-    /// Elementary-effect standard deviation for the single output.
-    #[must_use]
-    pub const fn sigma(&self) -> &[T; PARAMETERS] {
-        &self.sigma[0]
+        MorrisReport::from_moments(self.count, mu, mu_star, sigma)
     }
 }
 
