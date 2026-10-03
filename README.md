@@ -39,7 +39,7 @@ release tag format `crate-<package>-v<version>`. The facade package is named
 Consumers select that registry package explicitly:
 
 ```toml
-tyche = { package = "tyche-uncertainty", version = "0.2" }
+tyche = { package = "tyche-uncertainty", version = "0.3" }
 ```
 
 ## Example
