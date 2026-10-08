@@ -1,7 +1,11 @@
 //! Study, GAT, Cow, layout, and allocation contracts.
+//!
+//! The allocation window counts allocations made by the calling thread
+//! only, through the stack's shared `mnemosyne::counting` instrument.
 
 use core::mem::size_of;
 use core::num::NonZeroU32;
+use mnemosyne::counting::{AllocationDelta, measure};
 use tyche_core::{
     Design, LatinHypercube, Moments, Parameter, ParameterSpace, PopulationVariance,
     ResponseReducer, Seed, SplitMix64, StandardNormal, Study, StudyModel,
@@ -33,7 +37,7 @@ fn borrowing_and_allocation_contracts_hold() {
 
     let mut point = [0.0; 2];
     let mut moments = Moments::new();
-    let allocations = allocation_counter::measure(|| {
+    let ((), allocations) = measure(|| {
         for index in 0..study.sample_count() {
             study
                 .design()
@@ -42,7 +46,7 @@ fn borrowing_and_allocation_contracts_hold() {
             moments.update(point[0]);
         }
     });
-    assert_eq!(allocations, allocation_counter::AllocationInfo::default());
+    assert_eq!(allocations, AllocationDelta::default());
 
     let sample = study.sample(3).expect("valid");
     let response = BorrowingModel::<0>

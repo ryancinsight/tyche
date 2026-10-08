@@ -16,8 +16,8 @@ publish = true
 eunomia.workspace = true
 
 [dev-dependencies]
+mnemosyne.workspace = true
 proptest.workspace = true
-allocation-counter.workspace = true
 criterion.workspace = true
 
 [[bench]]
