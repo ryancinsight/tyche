@@ -6,6 +6,16 @@
 //! test, and the committed timeout/serial-group profile applies unchanged:
 //! test-name filters match the trailing test name with or without the
 //! harness module prefix.
+//!
+//! The harness installs the stack's shared `mnemosyne::counting`
+//! allocator, so each leaf's allocation window counts allocations made
+//! by the calling thread only.
+
+use mnemosyne::counting::CountingAllocator;
+use std::alloc::System;
+
+#[global_allocator]
+static ALLOCATOR: CountingAllocator<System> = CountingAllocator::new(System);
 
 mod bootstrap;
 mod conformal_laws;

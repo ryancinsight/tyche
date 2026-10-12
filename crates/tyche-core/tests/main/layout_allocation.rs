@@ -1,7 +1,11 @@
 //! Representation and allocation invariants.
+//!
+//! Allocation windows count allocations made by the calling thread only,
+//! through the stack's shared `mnemosyne::counting` instrument.
 
 use core::mem::size_of;
 use core::num::NonZeroU32;
+use mnemosyne::counting::{AllocationDelta, measure};
 use std::borrow::Cow;
 
 use tyche_core::{
@@ -73,7 +77,7 @@ fn repeated_sampling_and_statistics_allocate_nothing() {
     )
     .expect("compatible target and proposal");
 
-    let allocations = allocation_counter::measure(|| {
+    let ((), allocations) = measure(|| {
         for index in 0..design.sample_count() {
             design
                 .sample_unit_into(index, &mut point)
@@ -108,5 +112,5 @@ fn repeated_sampling_and_statistics_allocate_nothing() {
     });
 
     assert_eq!(moments.count(), 128);
-    assert_eq!(allocations, allocation_counter::AllocationInfo::default());
+    assert_eq!(allocations, AllocationDelta::default());
 }

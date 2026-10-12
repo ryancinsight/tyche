@@ -1,5 +1,9 @@
 //! Bootstrap resampling contracts.
+//!
+//! The allocation window counts allocations made by the calling thread
+//! only, through the stack's shared `mnemosyne::counting` instrument.
 
+use mnemosyne::counting::{AllocationDelta, measure};
 use tyche_core::{Bootstrap, BootstrapError, Seed, SplitMix64};
 
 const SEED: Seed = Seed::new(0x5459_4348_455F_4253);
@@ -79,12 +83,12 @@ fn bootstrap_fill_is_caller_owned_and_failure_atomic() {
 fn bootstrap_fill_allocates_nothing_after_construction() {
     let design = Bootstrap::<SplitMix64>::new(31, 64).expect("positive sizes");
     let mut output = [0_usize; 64];
-    let allocations = allocation_counter::measure(|| {
+    let ((), allocations) = measure(|| {
         design
             .fill_into(SEED, 12, &mut output)
             .expect("exact output length");
     });
 
-    assert_eq!(allocations, allocation_counter::AllocationInfo::default());
+    assert_eq!(allocations, AllocationDelta::default());
     assert!(output.iter().all(|&index| index < 31));
 }
