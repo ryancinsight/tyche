@@ -6,6 +6,7 @@
 
 use alloc::borrow::Cow;
 
+use super::ratio::likelihood_ratio;
 use super::{CategoryIndex, DiscreteWeights, ImportanceError, WeightedCategorical};
 use crate::sampling::{SampleScalar, Seed, StreamAlgorithm};
 
@@ -101,10 +102,11 @@ impl<'a, T: SampleScalar, A: StreamAlgorithm> DiscreteImportance<'a, T, A> {
                 });
             }
             if proposal_mass > T::ZERO {
-                let target_probability = target_mass / target.total();
-                let proposal_probability = proposal_mass / proposal.total();
-                let ratio = target_probability / proposal_probability;
+                let ratio =
+                    likelihood_ratio(target_mass, target.total(), proposal_mass, proposal.total());
                 if !ratio.is_finite() {
+                    let target_probability = target_mass / target.total();
+                    let proposal_probability = proposal_mass / proposal.total();
                     return Err(ImportanceError::NonFiniteLikelihoodRatio {
                         category,
                         target_probability,
@@ -144,9 +146,12 @@ impl<'a, T: SampleScalar, A: StreamAlgorithm> DiscreteImportance<'a, T, A> {
             return None;
         }
 
-        let target_probability = target_mass / self.target.total();
-        let proposal_probability = proposal_mass / proposal_weights.total();
-        Some(target_probability / proposal_probability)
+        Some(likelihood_ratio(
+            target_mass,
+            self.target.total(),
+            proposal_mass,
+            proposal_weights.total(),
+        ))
     }
 
     /// Draw a proposal category and its target/proposal likelihood ratio.

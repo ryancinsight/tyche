@@ -161,3 +161,21 @@
 
 - Versioned metadata/payload schema and manifest-last completeness; durability
   waits for Consus transaction support.
+
+
+## TYCHE-IMPORTANCE-RANGE [patch] — implementation under review
+
+- Baseline `348f8e0` divides separately normalized masses: `[s, 2]` against
+  itself rejects `0/0`, and `[s, 2]` against `[1, 3]` silently returns zero
+  instead of `2s`, where `s` is the least positive subnormal in either field.
+  Four regression cases fail before the repair; both ordinary controls pass.
+- The shared evaluator preserves ordinary bits and rounds the exceptional
+  four-factor ratio once using bounded integer representation fields, with all
+  floating operations native to the selected scalar. See ADR 0005's range note.
+- Tests retain support/count/invalid-weight/true-overflow errors, zero signs,
+  borrowed pointer identity, allocation-free draws, and category replay.
+- Provider PR #109 owns the Consus/Moirai upgrade. This branch preserves the
+  default branch's locked providers; no downgrade or provider implementation is
+  included. Both drafts select 0.3.1, so merge order, final unpublished patch
+  version, and the combined latest coherent provider graph require reconciliation
+  before merge/publication. Exact-head independent acceptance remains open.

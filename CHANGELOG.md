@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.1 — pending review
+
+### Fixed
+
+- [patch] Evaluate discrete importance ratios from validated masses without
+  intermediate probability underflow. Matching tiny masses retain ratio one;
+  representable subnormal ratios no longer silently become zero. Ordinary
+  normal-probability operations retain their existing bits, and true overflow,
+  invalid weights, and missing proposal support remain errors.
+- Constructor validation and lookup use the same native-format evaluator.
+  Borrowed storage, allocation behavior, stream addresses, and category replay
+  are unchanged.
+
+### Distribution
+
+- This draft shares the pending 0.3.1 version with provider-coherence PR #109.
+  Reconcile merge order, provider cohort, and the final unpublished patch version
+  before merge or publication. This change does not claim registry delivery.
+
 ## Unreleased
 
 ### Changed

@@ -3,6 +3,7 @@
 mod category;
 mod error;
 mod importance;
+mod ratio;
 mod weighted;
 mod weights;
 

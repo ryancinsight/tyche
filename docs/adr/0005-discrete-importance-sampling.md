@@ -98,3 +98,26 @@ construction rejects a non-finite ratio.
 - Daniel Lemire, *Fast Random Integer Generation in an Interval*, Section 4,
   Algorithm 5:
   https://arxiv.org/abs/1805.10941
+
+
+## Native-format range correction (0.3.1, pending review)
+
+For validated masses `a,c` and totals `b,d`, the likelihood ratio is `ad/(bc)`.
+Separately rounded `a/b` and `c/d` can underflow even when that ratio is finite.
+The constructor and getter use one evaluator. When both probabilities are normal,
+its existing division sequence stays bit-identical. Zero target mass retains its
+sign. Otherwise the evaluator normalizes each positive finite factor with native
+binary scaling, extracts its exact significand bits, and divides the two exact
+significand products with a retained remainder and ties-to-even rounding on the
+final normal/subnormal grid. Exact common factors cancel before extraction.
+
+Binary32/binary64 are the sealed scalar layouts. At most 53 bits per factor mean
+106-bit products; normalization and doubled remainders stay below 2^109. A u128
+holds representation bits, without floating widening or heap storage. Exponents
+fit i32. Underflow below half the least subnormal rounds to zero; overflow beyond
+the finite rounding boundary returns infinity and the existing constructor error.
+No log-space approximation, input epsilon, cached ratio allocation, or altered
+support validation is introduced. The slower exceptional computation is isolated
+from the ordinary path. Tests cover native boundaries, nonfinite/invalid inputs,
+ordinary replay bits, borrowed storage, and allocation behavior. An independent
+rational oracle checks exact exceptional rounding through the public API.
