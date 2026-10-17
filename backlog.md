@@ -164,7 +164,7 @@
 
 
 <a id="tyche-importance-range"></a>
-## TYCHE-IMPORTANCE-RANGE [patch] — blocked
+## TYCHE-IMPORTANCE-RANGE — Preserve native ratio range [patch] — blocked
 
 - Priority: correctness (P2).
 - Implementation is verified locally; merge/publication await the review and
