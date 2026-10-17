@@ -9,9 +9,10 @@ use mnemosyne::counting::{AllocationDelta, measure};
 use std::borrow::Cow;
 
 use tyche_core::{
-    Categorical, CategoryCount, Counter, Design, DigitalShift, DiscreteImportance, DiscreteWeights,
-    LatinHypercube, Moments, PopulationVariance, RuntimeSobol, Seed, Sobol, SobolDimensions,
-    SobolRange, SplitMix64, StandardNormal, Unscrambled, UserDomain, WeightedCategorical,
+    Categorical, CategoryCount, CategoryIndex, Counter, Design, DigitalShift, DiscreteImportance,
+    DiscreteWeights, LatinHypercube, Moments, PopulationVariance, RuntimeSobol, SampleScalar, Seed,
+    Sobol, SobolDimensions, SobolRange, SplitMix64, StandardNormal, Unscrambled, UserDomain,
+    WeightedCategorical,
 };
 
 #[test]
@@ -113,4 +114,50 @@ fn repeated_sampling_and_statistics_allocate_nothing() {
 
     assert_eq!(moments.count(), 128);
     assert_eq!(allocations, AllocationDelta::default());
+}
+
+fn exceptional_importance_allocation<T: SampleScalar>(
+    target: [T; 2],
+    proposal: [T; 2],
+    expected: T,
+) {
+    let ((), allocations) = measure(|| {
+        for address in 0..128 {
+            let sampler = DiscreteImportance::<T, SplitMix64>::new(
+                Cow::Borrowed(&target[..]),
+                Cow::Borrowed(&proposal[..]),
+            )
+            .expect("representable subnormal likelihood ratios");
+            assert_eq!(sampler.target().as_slice().as_ptr(), target.as_ptr());
+            assert_eq!(
+                sampler.proposal().weights().as_slice().as_ptr(),
+                proposal.as_ptr()
+            );
+            let first =
+                CategoryIndex::new(0, sampler.target().category_count()).expect("in support");
+            assert_eq!(sampler.likelihood_ratio(first), Some(expected));
+            let sample = sampler.at(Seed::new(17), address);
+            assert_eq!(
+                Some(sample.likelihood_ratio()),
+                sampler.likelihood_ratio(sample.category())
+            );
+        }
+    });
+    assert_eq!(allocations, AllocationDelta::default());
+}
+
+#[test]
+fn exceptional_importance_retains_borrows_and_allocates_nothing() {
+    exceptional_importance_allocation([f32::from_bits(1), 2.0], [1.0, 3.0], f32::from_bits(2));
+    exceptional_importance_allocation([f64::from_bits(1), 2.0], [1.0, 3.0], f64::from_bits(2));
+    exceptional_importance_allocation(
+        [1.25_f32, f32::MAX / 2.0],
+        [1.5, f32::MAX / 4.0],
+        f32::from_bits(0x3ed5_5555),
+    );
+    exceptional_importance_allocation(
+        [1.25_f64, f64::MAX / 2.0],
+        [1.5, f64::MAX / 4.0],
+        f64::from_bits(0x3fda_aaaa_aaaa_aaab),
+    );
 }

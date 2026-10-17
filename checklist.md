@@ -1,5 +1,18 @@
 # Tyche checklist
 
+Active target: **0.3.1 [patch]**, pending review and PR #109 version/cohort
+reconciliation. Publication remains held.
+
+- [x] TYCHE-IMPORTANCE-RANGE [patch]: retain representable subnormal ratios
+      and accept identical tiny target/proposal masses through one shared
+      constructor/lookup evaluator; add exact-bit regression, invalid-input,
+      overflow, borrowing, and allocation checks. Locked workspace tests 64/64,
+      release core 61/61, doctests 18/18, strict Clippy/Rustdoc, no-default core,
+      Rust 1.95 core, benchmark smoke, and unchanged cargo-deny policy pass.
+- [ ] TYCHE-IMPORTANCE-RANGE [patch]: exact-head independent review, hosted
+      gates, and merge-order/version/provider-cohort reconciliation with #109
+      before merge or publication.
+
 - [x] ATLAS-TYCHE-WORKFLOW-PIN-2026-08-20: refresh the Pages caller to Atlas
       `20c9398`, preserving the executable `tyche-core` book gate. Commit
       `04c4400` and `5782c69` pass workflow-shape, strict-link, and mdBook build checks;

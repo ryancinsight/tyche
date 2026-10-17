@@ -145,3 +145,31 @@ The remaining hosted evidence limits are explicit.
   consumer-specific confidence policies; Tyche's provider index-generation
   contract is consumed at this audited Kwavers boundary. Ensemble entropy and
   `rand` ownership remain separate until a real trainable-model seam exists.
+
+
+## Discrete importance range [patch]
+
+The bounded audit demonstrates one P2 defect with two manifestations: false
+rejection of matching subnormal probabilities and silent loss of representable
+subnormal likelihood ratios. The regression fixture preserves the four red
+baseline cases and two ordinary controls for binary32/binary64. Constructor and
+lookup now share the range-stable evaluator documented in ADR 0005.
+
+The independent exact-rational campaign covers 57,478 directed/seeded public-API
+inputs. Exceptional cases require correctly rounded native output bits; ordinary
+cases require the legacy native-operation bits (observed within two ulps of the
+exact ratio). The shared allocation instrument observes zero calls/bytes for constructor,
+lookup, and draws in both exceptional regimes; layout tests still pass. Locked
+workspace tests pass 64/64 and release core tests 61/61. Rustdoc comparisons on
+native/default and Linux/no-default graphs pass all 196 applicable compatibility
+checks. An isolated source overlay on PR #109's unmodified provider graph also
+passes 64/64 workspace tests (Eunomia 0.9.1, Consus 0.2, Moirai 0.9).
+
+Nine alternating release timing rounds observe ordinary lookup medians of
+1.56 ns versus 1.09–1.13 ns baseline, width-16 draw medians of 16.27–16.49 ns
+versus 15.29–15.35 ns, and full-significand exceptional lookups of 131 ns
+(binary32) / 407 ns (binary64). These local observations quantify the added
+range checks and exact-rounding work; the exceptional baseline returns incorrect
+values, so its timings are not a correctness-equivalent comparison. Independent
+review, hosted gates, and PR #109 version/provider-cohort reconciliation remain
+open. No merge, registry publication, or service deployment is claimed.
