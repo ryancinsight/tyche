@@ -163,7 +163,12 @@
   waits for Consus transaction support.
 
 
-## TYCHE-IMPORTANCE-RANGE [patch] — implementation under review
+<a id="tyche-importance-range"></a>
+## TYCHE-IMPORTANCE-RANGE [patch] — blocked
+
+- Priority: correctness (P2).
+- Implementation is verified locally; merge/publication await the review and
+  provider/version reconciliation below.
 
 - Baseline `348f8e0` divides separately normalized masses: `[s, 2]` against
   itself rejects `0/0`, and `[s, 2]` against `[1, 3]` silently returns zero
