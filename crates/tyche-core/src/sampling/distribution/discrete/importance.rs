@@ -134,9 +134,10 @@ impl<'a, T: SampleScalar, A: StreamAlgorithm> DiscreteImportance<'a, T, A> {
 
     /// Target/proposal likelihood ratio at a category.
     ///
-    /// Returns `None` when the category is outside this distribution or has
-    /// zero proposal probability. A zero-proposal category is never sampled;
-    /// construction already rejects positive target mass at such a category.
+    /// Returns `None` when the category is outside this distribution or its raw
+    /// proposal mass is zero. Positive raw mass retains support even when its
+    /// normalized probability rounds to zero. Categories with zero raw proposal
+    /// mass are never sampled; construction rejects positive target mass there.
     #[must_use]
     pub fn likelihood_ratio(&self, category: CategoryIndex) -> Option<T> {
         let target_mass = self.target.mass(category)?;
