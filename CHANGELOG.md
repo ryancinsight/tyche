@@ -105,9 +105,3 @@
   conformal rank.
 - Borrowed Moirai and Consus adapters, proofs, tests, and documentation.
 - Exact-width Latin-hypercube counts and committed nextest time budgets.
-
-## [0.3.1] - 2026-10-13
-
-### Fixed
-
-- [patch] Resolve Consus 0.2.0 and Moirai 0.9.0 from approved defaults. Preserve the existing reconciliation branch and unrelated dependency identities; QUIC PR 618 is excluded.

@@ -68,9 +68,3 @@ The lower-case `checklist.md` is the sole tracked provider checklist. Atlas
 root `backlog.md` owns cross-repository hashes, hosted-run identifiers, and
 registration history; this file records only the local completion state and
 points inward to that SSOT to avoid duplicated evidence.
-
-### Atlas PR 530 provider coherence — target 0.3.1
-
-- [x] [patch] Resolve approved Moirai 0.9.0 and preserve registry identities.
-- [x] [patch] Pass standalone metadata and the complete native nextest suite.
-- [ ] [patch] Obtain hosted verification and merge review before Atlas adopts this revision.

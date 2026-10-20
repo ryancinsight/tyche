@@ -161,10 +161,3 @@
 
 - Versioned metadata/payload schema and manifest-last completeness; durability
   waits for Consus transaction support.
-
-<a id="atlas-pr530-provider-coherence"></a>
-## ATLAS-PR530-PROVIDER-COHERENCE — Approved provider requirements and canonical lock [patch] — todo
-
-- priority: correctness; target: 0.3.1; acceptance: standalone locked resolution and the full value-semantic suite pass against approved default providers.
-- Scope: requirements, internal patch version, Cargo.lock and this delivery record. QUIC PR 618 remains excluded.
-- Verification: current native suite passes; hosted review and default-branch promotion remain open.

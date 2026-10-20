@@ -145,7 +145,3 @@ The remaining hosted evidence limits are explicit.
   consumer-specific confidence policies; Tyche's provider index-generation
   contract is consumed at this audited Kwavers boundary. Ensemble entropy and
   `rand` ownership remain separate until a real trainable-model seam exists.
-
-### Atlas PR 530 provider coherence
-
-The proposal removes direct Moirai requirement lag using approved main `7828f5df7cf76b7fdec68695ee8b2a49da8e5ba7`; QUIC PR 618 stays separate. Standalone metadata and native value tests pass. The published default remains unchanged until review; Atlas must not record this proposal as a default dependency.
