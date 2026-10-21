@@ -23,8 +23,8 @@ tyche-core = { path = "crates/tyche-core", version = "0.4.0", default-features =
 tyche-moirai = { path = "crates/tyche-moirai", version = "0.4.0" }
 tyche-consus = { path = "crates/tyche-consus", version = "0.4.0" }
 eunomia = { version = "0.10.0", git = "https://github.com/ryancinsight/eunomia", default-features = false }
-consus-core = { version = "0.3.0", git = "https://github.com/ryancinsight/consus.git", default-features = false, features = ["alloc"] }
-consus-zarr = { version = "0.3.0", git = "https://github.com/ryancinsight/consus.git", default-features = false, features = ["std"] }
+consus-core = { version = "0.4.0", git = "https://github.com/ryancinsight/consus.git", default-features = false, features = ["alloc"] }
+consus-zarr = { version = "0.4.0", git = "https://github.com/ryancinsight/consus.git", default-features = false, features = ["std"] }
 moirai-core = { version = "0.10.0", git = "https://github.com/ryancinsight/Moirai" }
 moirai-executor = { version = "0.10.0", git = "https://github.com/ryancinsight/Moirai" }
 proptest = "1.11.0"

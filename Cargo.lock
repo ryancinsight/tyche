@@ -230,8 +230,8 @@ checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
 name = "consus-compression"
-version = "0.3.0"
-source = "git+https://github.com/ryancinsight/consus.git#441738cde38607a88c2c29920f137dabf58f45db"
+version = "0.4.0"
+source = "git+https://github.com/ryancinsight/consus.git#5bcaf33d4e8a86ef49319f1427a5a22c7f477d03"
 dependencies = [
  "byteorder",
  "consus-core",
@@ -242,8 +242,8 @@ dependencies = [
 
 [[package]]
 name = "consus-core"
-version = "0.3.0"
-source = "git+https://github.com/ryancinsight/consus.git#441738cde38607a88c2c29920f137dabf58f45db"
+version = "0.4.0"
+source = "git+https://github.com/ryancinsight/consus.git#5bcaf33d4e8a86ef49319f1427a5a22c7f477d03"
 dependencies = [
  "byteorder",
  "smallvec",
@@ -252,16 +252,16 @@ dependencies = [
 
 [[package]]
 name = "consus-io"
-version = "0.3.0"
-source = "git+https://github.com/ryancinsight/consus.git#441738cde38607a88c2c29920f137dabf58f45db"
+version = "0.4.0"
+source = "git+https://github.com/ryancinsight/consus.git#5bcaf33d4e8a86ef49319f1427a5a22c7f477d03"
 dependencies = [
  "consus-core",
 ]
 
 [[package]]
 name = "consus-zarr"
-version = "0.3.0"
-source = "git+https://github.com/ryancinsight/consus.git#441738cde38607a88c2c29920f137dabf58f45db"
+version = "0.4.0"
+source = "git+https://github.com/ryancinsight/consus.git#5bcaf33d4e8a86ef49319f1427a5a22c7f477d03"
 dependencies = [
  "consus-compression",
  "consus-core",
