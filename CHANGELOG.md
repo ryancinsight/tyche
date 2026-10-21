@@ -4,6 +4,12 @@
 
 ### Changed
 
+- [patch] Follow the Consus provider to 0.4.0. `consus-core` and `consus-zarr`
+  move from 0.3.0 to 0.4.0 and the lock resolves them at the published
+  0.4.0 revision, so the two edges and the rest of the Consus cohort agree
+  on one identity. Consus 0.4.0 changes the public HDF5 async reader
+  bounds; Tyche reads no HDF5 async surface, so no caller migrates.
+
 - Close the shared workflow-pin integration with exact PR CI `32343473062`,
   Pages build `32343473408`, post-merge CI `32343825023`, Deploy mdBook
   `32343825746`, dynamic Pages `32343823918`, and live HTTP 200 evidence.
