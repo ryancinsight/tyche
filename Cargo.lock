@@ -364,7 +364,7 @@ dependencies = [
 [[package]]
 name = "eunomia"
 version = "0.10.0"
-source = "git+https://github.com/ryancinsight/eunomia#15fbb94c8f7ed8fa7bce4baf4167e2ffbedeceb3"
+source = "git+https://github.com/ryancinsight/eunomia#f263446f9c9601fc5aaca1e9ff79737f30900265"
 dependencies = [
  "bytemuck",
  "eunomia-derive",
@@ -374,7 +374,7 @@ dependencies = [
 [[package]]
 name = "eunomia-derive"
 version = "0.10.0"
-source = "git+https://github.com/ryancinsight/eunomia#15fbb94c8f7ed8fa7bce4baf4167e2ffbedeceb3"
+source = "git+https://github.com/ryancinsight/eunomia#f263446f9c9601fc5aaca1e9ff79737f30900265"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1191,8 +1191,8 @@ dependencies = [
 
 [[package]]
 name = "themis-topology"
-version = "0.11.2"
-source = "git+https://github.com/ryancinsight/themis#5595fc0a5fdae7d9c017a26023f8960b8f8511fb"
+version = "0.11.3"
+source = "git+https://github.com/ryancinsight/themis#ce395b01a7c0eb7878a8b25a11031b3d2887cc91"
 dependencies = [
  "libc",
  "melinoe",
