@@ -19,9 +19,12 @@ vector per output, clamped to the unit interval. Two observations are required
 for a defined correlation.
 
 For finite accumulated centered sums `A`, `B` and covariance `C`, finalization
-computes `C²/(AB)` without allowing the intermediate products to erase a
-representable correlation. Exceptional products are normalized by powers of
-two in the selected scalar, then rescaled. Constant coordinates retain zero.
+evaluates `C²/(AB)` using power-of-two normalization when the direct products
+would lose range. All arithmetic stays in the selected scalar. Native rounding
+still applies: near a final subnormal midpoint, the result can round to zero
+even when the exact stored-moment ratio rounds to a positive value. The repair
+provides a forward-error bound, not correctly rounded exact statistics or
+universal zero/nonzero classification. Constant coordinates retain zero.
 This does not make the preceding online accumulation immune to non-finite
 inputs, moment overflow, or cancellation.
 
