@@ -1,8 +1,8 @@
 # Tyche implementation backlog
 
-## TYCHE-CORRELATION-RANGE-001 — Preserve finite-moment correlation [major] — blocked
-
 <a id="tyche-correlation-range-001"></a>
+
+## TYCHE-CORRELATION-RANGE-001 — Preserve finite-moment correlation [major] — blocked
 
 - Owner: `codex:01a17995-4c0b-701d-8625-8650165230c2`; branch
   `fix/correlation-report-range`; priority: P1; target: 0.5.0.
