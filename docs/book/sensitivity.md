@@ -26,6 +26,7 @@ This does not make the preceding online accumulation immune to non-finite
 inputs, moment overflow, or cancellation.
 
 ```rust
+# extern crate tyche_core;
 use tyche_core::CorrelationScreening;
 let mut screening = CorrelationScreening::<f64, 1>::new();
 let scale = 2.0_f64.powi(300);
