@@ -18,6 +18,22 @@ response array per observation. `report` returns one independent correlation
 vector per output, clamped to the unit interval. Two observations are required
 for a defined correlation.
 
+For finite accumulated centered sums `A`, `B` and covariance `C`, finalization
+computes `C²/(AB)` without allowing the intermediate products to erase a
+representable correlation. Exceptional products are normalized by powers of
+two in the selected scalar, then rescaled. Constant coordinates retain zero.
+This does not make the preceding online accumulation immune to non-finite
+inputs, moment overflow, or cancellation.
+
+```rust
+use tyche_core::CorrelationScreening;
+let mut screening = CorrelationScreening::<f64, 1>::new();
+let scale = 2.0_f64.powi(300);
+screening.update(&[-scale], -scale);
+screening.update(&[scale], scale);
+assert_eq!(screening.report().unwrap().squared_correlations()[0], 1.0);
+```
+
 The following is a focused, non-standalone API fragment:
 
 ```rust,ignore

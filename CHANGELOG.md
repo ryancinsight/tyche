@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.0
+
+### Breaking
+
+- The candidate carries current main's Eunomia 0.11 nominal scalar boundary;
+  published Tyche 0.4.0 used Eunomia 0.10. An old-provider F64 caller no longer
+  satisfies the new RealField bound. Update Tyche and the consumer's Eunomia
+  dependency together; recreate external wrapper values at that shared
+  provider boundary. Primitive f32/f64 correlation calls retain their API.
+- This release remains held: current floating Git Eunomia 0.12 does not
+  satisfy the recorded 0.11 requirement, and known consumers still require
+  Tyche 0.4. Existing owners must reconcile the latest coherent graph and
+  consumer requirements before merge/publication. See [ADR 0006](docs/adr/0006-correlation-provider-release-boundary.md).
+
+### Fixed
+
+- [patch] Preserve squared Pearson correlation when the accumulated moments
+  are finite but their products overflow or underflow. The private report
+  calculation normalizes exceptional products in the selected scalar's native
+  precision. Public APIs, accumulator layout, observation order, and external
+  dependency identities are unchanged. See [the numerical contract](docs/correlation-range.md).
+
 ## Unreleased
 
 ### Changed

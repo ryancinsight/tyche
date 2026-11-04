@@ -1,5 +1,26 @@
 # Tyche implementation backlog
 
+## TYCHE-CORRELATION-RANGE-001 — Preserve finite-moment correlation [major] — blocked
+
+<a id="tyche-correlation-range-001"></a>
+
+- Owner: `codex:01a17995-4c0b-701d-8625-8650165230c2`; branch
+  `fix/correlation-report-range`; priority: P1; target: 0.5.0.
+- Four executed public-API regressions return zero instead of one for
+  identical coordinates at large/small scales in both native fields.
+- Scope: private Pearson report finalization, regression coverage, numerical
+  contract, and own patch metadata. Importance sampling and owner-held
+  provider locks/hooks remain separate.
+- Acceptance: unchanged red witnesses pass in debug/release; independent
+  integer-rational, multi-output, subnormal, allocation and performance
+  evidence; all normal gates and independent final-source review.
+- Delivery hold: 0.5.0 records the inherited nominal provider break; the
+  private numerical repair is patch-class. Independent release-classification
+  signoff supports this boundary, while ADR 0006 remains Proposed until the
+  owner-led provider/consumer sequence is qualified. Fresh Git resolution,
+  consumer migration, hosted checks and publication/source receipts remain
+  required; local evidence is not release acceptance.
+
 ## ATLAS-TYCHE-WORKFLOW-PIN-2026-08-20 — Refresh shared book workflow pin [patch] — in progress
 
 - Owner: Atlas integration. Scope is the Pages caller and this PM/changelog

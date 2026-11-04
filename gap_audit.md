@@ -1,5 +1,25 @@
 # Tyche ownership gap audit
 
+## Squared Pearson finalization range — 0.5.0 [patch]
+
+Identical opposite coordinates at 2^40 and 2^-40 in binary32, and 2^300
+and 2^-300 in binary64, produce exact finite equal centered sums and
+covariance. The original final product quotient reports zero instead of one:
+ overflow produces NaN which the provider clamp maps to zero; underflow
+ makes the denominator zero. Debug and release reproduce all four failures.
+
+The local repair normalizes exceptional products with provider-owned binary
+ exponent/scaling operations. It retains one generic algorithm, unchanged
+ accumulation and public shape, and no allocations. Its numerical contract
+ and explicit limits are in [correlation-range.md](docs/correlation-range.md).
+The existing ordinary control and expanded laws pass locally; final review,
+ full gates and external delivery evidence remain pending.
+
+This does not claim range-safe accumulation for arbitrary finite observations,
+a new non-finite-input policy, or correctly rounded mathematical Pearson
+ values. Provider lock/hook proposals and importance-ratio work retain their
+ existing ownership.
+
 ## TYCHE-008 publication boundary
 
 The release backlog requires `tyche-core` to be the publishable registry
@@ -145,3 +165,13 @@ The remaining hosted evidence limits are explicit.
   consumer-specific confidence policies; Tyche's provider index-generation
   contract is consumed at this audited Kwavers boundary. Ensemble entropy and
   `rand` ownership remain separate until a real trainable-model seam exists.
+
+## Release boundary discovered during correlation qualification [major]
+
+Published Tyche 0.4.0 uses Eunomia 0.10; current main already uses 0.11.
+The unchanged old-provider F64 client runs with the published archive and
+fails E0599 with the preliminary normalized candidate. Fresh Git resolution
+fails separately because provider default is 0.12. All three inspected
+consumers, Helios/CFDrs/Kwavers, still require Tyche 0.4. The independently
+reviewed 0.5.0 classification records this boundary but does not clear it.
+ADR 0006 stays Proposed; existing provider/consumer owners retain integration.

@@ -152,7 +152,10 @@ divides by `n`; sample variance divides by `n-1`. The required zero-sized policy
 makes singleton sample variance a typed error instead of `NaN`.
 
 Squared Pearson screening lies in `[0,1]` by Cauchy-Schwarz and is deliberately
-not called Sobol. Split-conformal calibration uses corrected rank
+not called Sobol. Finite accumulated moments are finalized using
+native exponent normalization when their direct products would lose range;
+[the numerical contract](docs/correlation-range.md) separates this guarantee
+from accumulation and rounding limits. Split-conformal calibration uses corrected rank
 `ceil((n+1)(1-alpha))`, capped at `n`. Rank arithmetic remains in the score
 scalar's native precision; already sorted scores use an allocation-free
 borrowed calibration path.

@@ -1,5 +1,20 @@
 # Tyche checklist
 
+Active target: **0.5.0**.
+
+- [x] TYCHE-CORRELATION-RANGE-001 [patch]: reproduce the four finite-moment
+  public-API failures; preserve the original tests and external lock records.
+- [x] TYCHE-CORRELATION-RANGE-001 [patch]: implement native exponent
+  normalization and exercise independent-scale, multi-output, subnormal,
+  integer-rational and allocation laws.
+- [x] TYCHE-CORRELATION-RANGE-001 [major]: independently classify the inherited
+  provider identity break as a 0.5.0 boundary; retain ADR 0006 as Proposed.
+- [ ] TYCHE-CORRELATION-RANGE-001 [major]: reconcile the existing provider and
+  consumer owners before merge/publication; fresh Git currently rejects the
+  Eunomia requirement.
+- [ ] TYCHE-CORRELATION-RANGE-001 [patch]: complete final-source normal gates,
+  independent review, hosted checks and qualified release/source receipts.
+
 - [x] ATLAS-TYCHE-WORKFLOW-PIN-2026-08-20: refresh the Pages caller to Atlas
       `20c9398`, preserving the executable `tyche-core` book gate. Commit
       `04c4400` and `5782c69` pass workflow-shape, strict-link, and mdBook build checks;

@@ -14,3 +14,4 @@
 | [0003](0003-domain-separated-counter-schedule.md) | Domain-separated counter schedule | Accepted |
 | [0004](0004-random-access-sobol.md) | Random-access Sobol designs | Accepted |
 | [0005](0005-discrete-importance-sampling.md) | Borrowed discrete importance sampling | Accepted |
+| [0006](0006-correlation-provider-release-boundary.md) | Correlation repair and the provider release boundary | Proposed |
