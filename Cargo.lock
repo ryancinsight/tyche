@@ -767,8 +767,8 @@ dependencies = [
 
 [[package]]
 name = "moirai-core"
-version = "0.11.3"
-source = "git+https://github.com/ryancinsight/Moirai#b9ee63b04c5f72ce1977f6fb19c0059eb432b9d6"
+version = "0.11.4"
+source = "git+https://github.com/ryancinsight/Moirai#8a5bf9c1dfa71da2eaba990412f9ea6e0b63cef8"
 dependencies = [
  "bytemuck",
  "libc",
@@ -779,8 +779,8 @@ dependencies = [
 
 [[package]]
 name = "moirai-executor"
-version = "0.11.3"
-source = "git+https://github.com/ryancinsight/Moirai#b9ee63b04c5f72ce1977f6fb19c0059eb432b9d6"
+version = "0.11.4"
+source = "git+https://github.com/ryancinsight/Moirai#8a5bf9c1dfa71da2eaba990412f9ea6e0b63cef8"
 dependencies = [
  "melinoe",
  "mnemosyne-memory",
@@ -793,8 +793,8 @@ dependencies = [
 
 [[package]]
 name = "moirai-pal"
-version = "0.11.3"
-source = "git+https://github.com/ryancinsight/Moirai#b9ee63b04c5f72ce1977f6fb19c0059eb432b9d6"
+version = "0.11.4"
+source = "git+https://github.com/ryancinsight/Moirai#8a5bf9c1dfa71da2eaba990412f9ea6e0b63cef8"
 dependencies = [
  "accesskit",
  "accesskit_windows",
@@ -813,8 +813,8 @@ dependencies = [
 
 [[package]]
 name = "moirai-scheduler"
-version = "0.11.3"
-source = "git+https://github.com/ryancinsight/Moirai#b9ee63b04c5f72ce1977f6fb19c0059eb432b9d6"
+version = "0.11.4"
+source = "git+https://github.com/ryancinsight/Moirai#8a5bf9c1dfa71da2eaba990412f9ea6e0b63cef8"
 dependencies = [
  "loom",
  "mnemosyne-memory",
@@ -825,8 +825,8 @@ dependencies = [
 
 [[package]]
 name = "moirai-utils"
-version = "0.11.3"
-source = "git+https://github.com/ryancinsight/Moirai#b9ee63b04c5f72ce1977f6fb19c0059eb432b9d6"
+version = "0.11.4"
+source = "git+https://github.com/ryancinsight/Moirai#8a5bf9c1dfa71da2eaba990412f9ea6e0b63cef8"
 
 [[package]]
 name = "nu-ansi-term"
