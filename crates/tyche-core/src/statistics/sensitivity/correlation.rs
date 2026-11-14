@@ -174,8 +174,8 @@ fn squared_correlation<T: RealField>(covariance: T, left: T, right: T) -> T {
     normalized_correlation(covariance, left, right, numerator, denominator)
 }
 
-/// Keep exponent recovery out of the ordinary report's instruction footprint.
-#[cold]
+/// Evaluate `C²/(AB)` on power-of-two normalized mantissas, for products
+/// outside the ordinary range.
 fn normalized_correlation<T: RealField>(
     covariance: T,
     left: T,
@@ -188,7 +188,8 @@ fn normalized_correlation<T: RealField>(
         left.binary_exponent(),
         right.binary_exponent(),
     ) else {
-        // Preserve the existing zero-covariance and non-finite-moment policy.
+        // A zero or non-finite sum has no exponent: the plain IEEE quotient,
+        // clamped into the unit interval, is the index.
         return (numerator / denominator).clamp(T::ZERO, T::ONE);
     };
     let covariance_mantissa = covariance.scale_binary(-covariance_exponent);
