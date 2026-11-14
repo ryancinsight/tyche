@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Fixed
+
+- [patch] Preserve squared Pearson correlation when the accumulated centered
+  sums are finite but their products overflow or underflow. Report
+  finalization now normalizes exceptional products by powers of two in the
+  selected scalar, so identical nonconstant coordinates report one at any
+  finite scale instead of zero. Public APIs, accumulator layout, observation
+  order and the ordinary-range arithmetic are unchanged.
+
 ### Changed
 
 - [patch] Follow the Consus provider to 0.4.0. `consus-core` and `consus-zarr`
