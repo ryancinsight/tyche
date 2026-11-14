@@ -1,5 +1,21 @@
 # Tyche implementation backlog
 
+<a id="tyche-correlation-range-002"></a>
+
+## TYCHE-CORRELATION-RANGE-002 — Correlation range release evidence [major] — blocked
+
+- Outcome: the work dropped when the correlation repair took over the
+  patch slice of released claim `refs/pull/117/head`: the 0.5.0 version bump,
+  ADR 0006, the provider release-boundary hold, midpoint tests, and
+  multi-output, allocation and `report` cost evidence. The repair itself
+  ships with rational, subnormal and tiny-index tests.
+- Acceptance: ADR 0006 is Accepted and indexed; a stored Criterion baseline
+  covers `report`; the 0.5.0 release record cites the repair.
+- Blocker: release authority and the owner-led provider/consumer sequence.
+  Re-open when the repair lands and the owner starts that sequence.
+- Scope: `docs/adr/`, `crates/tyche-core/benches/`, workspace version.
+- Priority: P1; basis: `79733074`.
+
 ## TYCHE-008 — crates.io release automation — in progress
 
 - Owner: Codex `/root`; completed slice: make the publication boundary executable
