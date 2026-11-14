@@ -140,15 +140,65 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
                 .zip(co_moments.iter())
                 .zip(self.parameter_sums.iter())
             {
-                let denominator = parameter_sum * response_sum;
-                if denominator > T::ZERO {
-                    let raw = co_moment * co_moment / denominator;
-                    *value = raw.clamp(T::ZERO, T::ONE);
+                if parameter_sum > T::ZERO && response_sum > T::ZERO {
+                    *value = squared_correlation(co_moment, parameter_sum, response_sum);
                 }
             }
         }
         SensitivityReport::from_correlations(self.count, values)
     }
+}
+
+/// Evaluate `C²/(AB)` for centered sums `A`, `B` and covariance `C` without
+/// losing finite moments to intermediate range errors.
+///
+/// The ordinary quotient is kept when both products are finite and at least
+/// `T::EPSILON`. Every `RealField` implementor (binary32 and binary64 and
+/// their wrappers) has `EPSILON` above its smallest normal value, so the
+/// ordinary path never divides subnormal products. Otherwise
+/// [`normalized_correlation`] evaluates the quotient on power-of-two
+/// normalized mantissas. Both paths round in `T`: the relative forward error
+/// is at most `gamma_3 = 3u/(1-3u)` for unit roundoff `u`, plus half a least
+/// subnormal unit when the final index is subnormal.
+#[inline]
+fn squared_correlation<T: RealField>(covariance: T, left: T, right: T) -> T {
+    let numerator = covariance * covariance;
+    let denominator = left * right;
+    if numerator >= T::EPSILON
+        && denominator >= T::EPSILON
+        && numerator.is_finite()
+        && denominator.is_finite()
+    {
+        return (numerator / denominator).clamp(T::ZERO, T::ONE);
+    }
+    normalized_correlation(covariance, left, right, numerator, denominator)
+}
+
+/// Keep exponent recovery out of the ordinary report's instruction footprint.
+#[cold]
+fn normalized_correlation<T: RealField>(
+    covariance: T,
+    left: T,
+    right: T,
+    numerator: T,
+    denominator: T,
+) -> T {
+    let (Some(covariance_exponent), Some(left_exponent), Some(right_exponent)) = (
+        covariance.binary_exponent(),
+        left.binary_exponent(),
+        right.binary_exponent(),
+    ) else {
+        // Preserve the existing zero-covariance and non-finite-moment policy.
+        return (numerator / denominator).clamp(T::ZERO, T::ONE);
+    };
+    let covariance_mantissa = covariance.scale_binary(-covariance_exponent);
+    let left_mantissa = left.scale_binary(-left_exponent);
+    let right_mantissa = right.scale_binary(-right_exponent);
+    // Each magnitude lies in [1, 2): neither product can underflow or overflow.
+    let mantissa = (covariance_mantissa * covariance_mantissa) / (left_mantissa * right_mantissa);
+    mantissa
+        .scale_binary(2 * covariance_exponent - left_exponent - right_exponent)
+        .clamp(T::ZERO, T::ONE)
 }
 
 impl<T: RealField, const PARAMETERS: usize> CorrelationScreening<T, PARAMETERS, 1> {
