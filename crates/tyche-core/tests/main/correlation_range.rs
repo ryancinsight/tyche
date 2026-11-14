@@ -23,34 +23,37 @@ trait RangeScale: RealField {
     const SUBNORMAL_PRODUCT_EXPONENT: i32;
     /// Exponent `emin - p + 1` of the least positive subnormal value.
     const LEAST_SUBNORMAL_EXPONENT: i32;
-    /// Pairs `(m, q)` selecting the response perturbation `m*2^-q` of the tiny
-    /// index design: one index in the normal range and one subnormal.
-    const TINY_PERTURBATIONS: [(i64, i32); 2];
+    /// Triples `(t, m, q)` selecting the tiny-index design of scale `2^t` and
+    /// response perturbation `m*2^-q`. At scale one: an index in the normal
+    /// range and a subnormal one. At a smaller scale: `C^2` a nonzero
+    /// subnormal with `AB >= EPSILON` and a normal index (numerator-only
+    /// gradual underflow).
+    const TINY_DESIGNS: [(i32, i64, i32); 3];
 }
 
 impl RangeScale for f32 {
     const EXTREME_EXPONENT: i32 = 40;
     const SUBNORMAL_PRODUCT_EXPONENT: i32 = -45;
     const LEAST_SUBNORMAL_EXPONENT: i32 = -149;
-    const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 60), (5, 77)];
+    const TINY_DESIGNS: [(i32, i64, i32); 3] = [(0, 7, 60), (0, 5, 77), (-6, 7, 66)];
 }
 impl RangeScale for f64 {
     const EXTREME_EXPONENT: i32 = 300;
     const SUBNORMAL_PRODUCT_EXPONENT: i32 = -275;
     const LEAST_SUBNORMAL_EXPONENT: i32 = -1074;
-    const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 200), (7, 540)];
+    const TINY_DESIGNS: [(i32, i64, i32); 3] = [(0, 7, 200), (0, 7, 540), (-13, 5, 514)];
 }
 impl RangeScale for F32 {
     const EXTREME_EXPONENT: i32 = 40;
     const SUBNORMAL_PRODUCT_EXPONENT: i32 = -45;
     const LEAST_SUBNORMAL_EXPONENT: i32 = -149;
-    const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 60), (5, 77)];
+    const TINY_DESIGNS: [(i32, i64, i32); 3] = [(0, 7, 60), (0, 5, 77), (-6, 7, 66)];
 }
 impl RangeScale for F64 {
     const EXTREME_EXPONENT: i32 = 300;
     const SUBNORMAL_PRODUCT_EXPONENT: i32 = -275;
     const LEAST_SUBNORMAL_EXPONENT: i32 = -1074;
-    const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 200), (7, 540)];
+    const TINY_DESIGNS: [(i32, i64, i32); 3] = [(0, 7, 200), (0, 7, 540), (-13, 5, 514)];
 }
 
 fn power_of_two<T: RealField>(exponent: i32) -> T {
@@ -160,9 +163,10 @@ const RESPONSE_SHAPES: [[i64; 3]; 3] = [[1, 0, -1], [2, -1, -1], [3, 1, -4]];
 /// the expected value `e = fl(n/d)` carries one rounding. With
 /// `|r - x| <= gamma_3 x` and `|x - e| <= u x` for the exact index `x`, the
 /// result `r` satisfies `|r - e| <= (gamma_3 + u)/(1 - u) e <= gamma_4 e`,
-/// the bound asserted. A subnormal product keeps only 5 to 11 bits
-/// above the least unit, a relative rounding error up to `2^-6` (binary32) or
-/// `2^-10` (binary64), far above that bound.
+/// the bound asserted. The leading bit of each rounded subnormal product lies
+/// 5 to 11 places (binary32) or 10 to 16 places (binary64) above the least
+/// unit, so rounding costs a relative error up to `2^-6` or `2^-11` (half a
+/// unit over `2^5` or `2^10` units), far above that bound.
 fn subnormal_products_keep_exact_index<T: RangeScale>() {
     let scale = power_of_two::<T>(T::SUBNORMAL_PRODUCT_EXPONENT);
     let parameters = [PARAMETER, -PARAMETER, 0];
@@ -199,28 +203,36 @@ fn subnormal_products_report_the_exact_rational_index() {
 
 /// A near-orthogonal design keeps a tiny nonzero index, down to the subnormals.
 ///
-/// Parameters `(0, 0, 3)` and responses `(1, -1, 3e)` have exact running
-/// means, so `A = 6` and `C = 6e` exactly, and `B = 2 + 6e^2` rounds to `2`
-/// because `6e^2` lies below half an ulp of two. The stored sums give the
-/// exact index `(6e)^2/12 = 3e^2` with `e = m 2^-q`. Scaling the report by
-/// `2^2q` makes the exact value the integer `3m^2`, with a bound of `gamma_3`
-/// relative plus half a least subnormal unit (`2^(L-1)`, scaled likewise): the
-/// subnormal case admits only the nearest multiple of the least unit.
+/// Parameters `(0, 0, 3t)` and responses `(t, -t, 3et)` have exact running
+/// means, so `A = 6t^2` and `C = 6et^2` exactly, and `B = 2t^2 + 6e^2t^2`
+/// rounds to `2t^2` because `6e^2t^2` lies below half an ulp of `2t^2`. The
+/// stored sums give the exact index `(6et^2)^2/(6t^2 2t^2) = 3e^2`, for every
+/// `t`, with `e = m 2^-q`. Scaling the report by `2^2q` makes the exact value
+/// the integer `3m^2`, with a bound of `gamma_3` relative plus half a least
+/// subnormal unit (`2^(L-1)`, scaled likewise): a subnormal index admits only
+/// the nearest multiple of the least unit, and the second term is vacuous for
+/// a normal one. At `t < 1` the product `C^2 = 36e^2t^4` is `13.8` (binary32)
+/// or `14.1` (binary64) least units, so its leading bit sits 3 places up and
+/// an ordinary quotient of that rounded product errs by up to `2^-4`, far
+/// above `gamma_3`.
 fn tiny_index_keeps_exact_scale<T: RangeScale>() {
-    for (mantissa, exponent) in T::TINY_PERTURBATIONS {
+    for (scale_exponent, mantissa, exponent) in T::TINY_DESIGNS {
+        let scale = power_of_two::<T>(scale_exponent);
         let three = T::from_integer(3);
         let perturbation = T::from_integer(mantissa) * power_of_two::<T>(-exponent);
         let mut screening = CorrelationScreening::<T, 1>::new();
         for (parameter, response) in [
-            (T::ZERO, T::ONE),
-            (T::ZERO, -T::ONE),
-            (three, three * perturbation),
+            (T::ZERO, scale),
+            (T::ZERO, -scale),
+            (three * scale, three * perturbation * scale),
         ] {
             screening.update(&[parameter], response);
         }
         let scaled = single_index(screening).scale_binary(2 * exponent);
         let exact = T::from_integer(3 * mantissa * mantissa);
         let half_unit = power_of_two::<T>(T::LEAST_SUBNORMAL_EXPONENT - 1 + 2 * exponent);
+        // `exact` is the stored-sum index `3e^2` scaled by `2^2q`; the bound
+        // is the one derived above.
         assert!(
             (scaled - exact).abs() <= gamma::<T>(3) * exact + half_unit,
             "e = {mantissa}*2^-{exponent}: {scaled:?} vs {exact:?}"
