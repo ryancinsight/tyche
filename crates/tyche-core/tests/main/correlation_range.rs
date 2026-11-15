@@ -14,10 +14,11 @@ use tyche_core::CorrelationScreening;
 /// Scales and integer-design parameters that place the test moments in a
 /// precision's overflow, gradual-underflow and tiny-index regimes.
 trait RangeScale: RealField {
-    /// Power-of-two scale at which `A*B` overflows and `A*B` of the reciprocal
-    /// scale underflows, while `A = 2s^2` itself stays finite and normal.
+    /// Exponent `j` of the scale `s = 2^j` at which `A*B` overflows and `A*B`
+    /// of the reciprocal scale underflows, while `A = 2s^2` itself stays finite
+    /// and normal.
     const EXTREME_EXPONENT: i32;
-    /// Exponent `k` of the scale `s = 2^k` at which `C^2` and `AB` of the
+    /// Exponent `j` of the scale `s = 2^j` at which `C^2` and `AB` of the
     /// integer designs below lie in `[2^36 s^4, 2^43 s^4]`, strictly between
     /// the least subnormal and the smallest normal value, while `A` and `B`
     /// stay normal.
@@ -27,7 +28,7 @@ trait RangeScale: RealField {
     /// Pairs `(m, q)` selecting the response perturbation `m*2^-q` of the tiny
     /// index design: one index in the normal range and one subnormal.
     const TINY_PERTURBATIONS: [(i64, i32); 2];
-    /// Exponent `k` of the parameter scale `t = 2^k` of the subnormal-numerator
+    /// Exponent `j` of the parameter scale `t = 2^j` of the subnormal-numerator
     /// design: with responses `(t, -t, 3et)` the stored `C^2` is a nonzero
     /// subnormal while `AB` stays normal above `EPSILON`.
     const NUMERATOR_T_EXPONENT: i32;
@@ -173,9 +174,9 @@ const RESPONSE_SHAPES: [[i64; 3]; 3] = [[1, 0, -1], [2, -1, -1], [3, 1, -4]];
 /// `B = sum(r_i^2) s^2` and `C = sum(a_i r_i) s^2` and the exact index is the
 /// rational `(sum a_i r_i)^2 / (sum a_i^2 sum r_i^2)`, here `1/4`, `3/4` and
 /// `1/13`. Its numerator and denominator reduce to integers below `2^24`, so
-/// the expected value `e = fl(n/d)` carries one rounding. With
-/// `|r - x| <= gamma_3 x` and `|x - e| <= u x` for the exact index `x`, the
-/// result `r` satisfies `|r - e| <= (gamma_3 + u)/(1 - u) e <= gamma_4 e`,
+/// the expected value `v = fl(n/d)` carries one rounding. With
+/// `|r - x| <= gamma_3 x` and `|x - v| <= u x` for the exact index `x`, the
+/// result `r` satisfies `|r - v| <= (gamma_3 + u)/(1 - u) v <= gamma_4 v`,
 /// the bound asserted. A subnormal product keeps only 5 to 11 bits
 /// (binary32) or 10 to 16 bits (binary64) above the least unit, a relative
 /// rounding error up to `2^-6` or `2^-11`, far above that bound.
@@ -256,9 +257,11 @@ fn tiny_index_keeps_exact_scale<T: RangeScale>() {
 /// restores the direct quotient for a nonzero subnormal numerator reports a
 /// percent-scale error against the `gamma_3` bound asserted here. Scaling the
 /// report by `2^2q` makes the exact value the integer `3m^2` and keeps the
-/// bound in the normal range: a subnormal `gamma_3 * exact` at the index
-/// scale would round to whole least units and admit a larger error than
-/// `gamma_3`.
+/// bound in the normal range. At the index scale `gamma_3 * exact` is subnormal
+/// in both formats and rounds to whole least units. In binary64 (1 ulp is one
+/// unit) it rounds from 1.76 to 2, admitting a 2 ulp error where `gamma_3`
+/// admits 1.76 ulp. In binary32 (1 ulp is two units) it rounds from 3.45 to 3,
+/// admitting 1.5 ulp where `gamma_3` admits 1.72 ulp: no larger error.
 fn subnormal_numerator_keeps_exact_index<T: RangeScale>() {
     let scale = power_of_two::<T>(T::NUMERATOR_T_EXPONENT);
     let (mantissa, exponent) = T::NUMERATOR_PERTURBATION;
