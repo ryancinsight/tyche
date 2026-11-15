@@ -18,6 +18,15 @@ response array per observation. `report` returns one independent correlation
 vector per output, clamped to the unit interval. Two observations are required
 for a defined correlation.
 
+Finalization evaluates `C²/(AB)` for centered sums `A`, `B` and covariance `C`.
+When the direct products `C²` or `AB` would overflow or underflow although the
+sums themselves are finite, it normalizes `A`, `B` and `C` by powers of two and
+rescales the quotient, all in the selected scalar. The result then carries a
+relative forward error of at most three roundings plus half a least subnormal
+unit for a subnormal index, rather than collapsing to zero. This does not
+protect the preceding online accumulation from non-finite inputs, moment
+overflow or cancellation.
+
 The following is a focused, non-standalone API fragment:
 
 ```rust,ignore

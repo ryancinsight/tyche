@@ -19,6 +19,7 @@ static ALLOCATOR: CountingAllocator<System> = CountingAllocator::new(System);
 
 mod bootstrap;
 mod conformal_laws;
+mod correlation_range;
 mod discrete_sampling;
 mod layout_allocation;
 mod sampling_laws;
