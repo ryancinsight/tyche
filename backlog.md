@@ -2,6 +2,7 @@
 
 ## TYCHE-008 — crates.io release automation — in progress
 
+- **Milestone:** M-1.0 (publication-boundary slice delivered; registry configuration and exact release evidence remain).
 - Owner: Codex `/root`; completed slice: make the publication boundary executable
   by keeping `tyche-core` publishable and the Consus, Moirai, and facade
   adapters private. The release workflow and registry configuration remain in
@@ -102,8 +103,9 @@
   Clippy/Rustdoc, the end-to-end example, supply-chain policy, Criterion, and
   all 196 applicable additive SemVer checks pass.
 
-## TYCHE-004 — UQ breadth — complete 2026-08-13
+## TYCHE-004 — UQ breadth — complete 2026-08-13, remainder open
 
+- **Milestone:** M-uq-closure (delivered scope stays closed; the remaining trainable-model seam for ensemble bagging joins M-uq-closure).
 - Sensitivity-estimator source `dc96f5ecd6af643e34f2146b9f3dbb49ba85dbae`
   merged through PR #18 as provider default `4a6f8cd495c78beaaa6e4081705b33ed0da8be9e`.
   Provider verification and supply-chain checks passed in hosted run
@@ -140,5 +142,6 @@
 
 ## TYCHE-005 — Study schema — planned
 
+- **Milestone:** M-study-schema (durability waits on Consus transaction support as a dependency, not ladder content).
 - Versioned metadata/payload schema and manifest-last completeness; durability
   waits for Consus transaction support.
