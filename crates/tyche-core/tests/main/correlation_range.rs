@@ -17,18 +17,19 @@ trait RangeScale: RealField {
     /// Power-of-two scale at which `A*B` overflows and `A*B` of the reciprocal
     /// scale underflows, while `A = 2s^2` itself stays finite and normal.
     const EXTREME_EXPONENT: i32;
-    /// Scale `2^e` at which `C^2` and `AB` of the integer designs below lie in
-    /// `[2^36 s^4, 2^43 s^4]`, strictly between the least subnormal and the
-    /// smallest normal value, while `A` and `B` stay normal.
+    /// Exponent `k` of the scale `s = 2^k` at which `C^2` and `AB` of the
+    /// integer designs below lie in `[2^36 s^4, 2^43 s^4]`, strictly between
+    /// the least subnormal and the smallest normal value, while `A` and `B`
+    /// stay normal.
     const SUBNORMAL_PRODUCT_EXPONENT: i32;
     /// Exponent `emin - p + 1` of the least positive subnormal value.
     const LEAST_SUBNORMAL_EXPONENT: i32;
     /// Pairs `(m, q)` selecting the response perturbation `m*2^-q` of the tiny
     /// index design: one index in the normal range and one subnormal.
     const TINY_PERTURBATIONS: [(i64, i32); 2];
-    /// Power-of-two parameter scale `2^e` of the subnormal-numerator design:
-    /// with responses `(t, -t, 3et)` the stored `C^2` is a nonzero subnormal
-    /// while `AB` stays normal above `EPSILON`.
+    /// Exponent `k` of the parameter scale `t = 2^k` of the subnormal-numerator
+    /// design: with responses `(t, -t, 3et)` the stored `C^2` is a nonzero
+    /// subnormal while `AB` stays normal above `EPSILON`.
     const NUMERATOR_T_EXPONENT: i32;
     /// Pair `(m, q)` selecting the response perturbation `e = m*2^-q` of the
     /// subnormal-numerator design.
@@ -253,7 +254,11 @@ fn tiny_index_keeps_exact_scale<T: RangeScale>() {
 /// `AB = 12t^4` stays normal above `EPSILON`, so only the numerator half of
 /// the gradual-underflow guard routes to the normalized path: a mutant that
 /// restores the direct quotient for a nonzero subnormal numerator reports a
-/// percent-scale error against the `gamma_3` bound asserted here.
+/// percent-scale error against the `gamma_3` bound asserted here. Scaling the
+/// report by `2^2q` makes the exact value the integer `3m^2` and keeps the
+/// bound in the normal range: a subnormal `gamma_3 * exact` at the index
+/// scale would round to whole least units and admit a larger error than
+/// `gamma_3`.
 fn subnormal_numerator_keeps_exact_index<T: RangeScale>() {
     let scale = power_of_two::<T>(T::NUMERATOR_T_EXPONENT);
     let (mantissa, exponent) = T::NUMERATOR_PERTURBATION;
@@ -267,11 +272,11 @@ fn subnormal_numerator_keeps_exact_index<T: RangeScale>() {
     ] {
         screening.update(&[parameter], response);
     }
-    let index = single_index(screening);
-    let exact = T::from_integer(3 * mantissa * mantissa) * power_of_two::<T>(-2 * exponent);
+    let scaled = single_index(screening).scale_binary(2 * exponent);
+    let exact = T::from_integer(3 * mantissa * mantissa);
     assert!(
-        (index - exact).abs() <= gamma::<T>(3) * exact,
-        "t = 2^{}, e = {mantissa}*2^-{exponent}: {index:?} vs {exact:?}",
+        (scaled - exact).abs() <= gamma::<T>(3) * exact,
+        "t = 2^{}, e = {mantissa}*2^-{exponent}: {scaled:?} vs {exact:?}",
         T::NUMERATOR_T_EXPONENT,
     );
 }
