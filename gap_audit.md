@@ -145,3 +145,10 @@ The remaining hosted evidence limits are explicit.
   consumer-specific confidence policies; Tyche's provider index-generation
   contract is consumed at this audited Kwavers boundary. Ensemble entropy and
   `rand` ownership remain separate until a real trainable-model seam exists.
+
+## Commit message rules are unenforced
+
+`.githooks/` holds `pre-commit`, `pre-push` and `rescue-push`; no commit-msg
+hook checks the subject, body or trailers, and `bfb08954` merged with a
+59-character subject, a process tag and no trailers (post-merge review of
+PR 126, PF4). Re-open when the stack publishes a commit-msg hook to copy.

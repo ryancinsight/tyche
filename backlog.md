@@ -4,17 +4,31 @@
 
 ## TYCHE-CORRELATION-RANGE-002 — Correlation range release evidence [major] — blocked
 
-- Outcome: the work dropped when the correlation repair took over the
-  patch slice of released claim `refs/pull/117/head`: the 0.5.0 version bump,
-  ADR 0006, the provider release-boundary hold, midpoint tests, and
-  multi-output, allocation and `report` cost evidence. The repair itself
-  ships with rational, subnormal and tiny-index tests.
-- Acceptance: ADR 0006 is Accepted and indexed; a stored Criterion baseline
-  covers `report`; the 0.5.0 release record cites the repair.
+- **Milestone:** M-uq-closure (planned version 0.5.0, the release this item records).
+- Outcome: 0.5.0 bump, correlation-repair ADR, provider hold, midpoint tests and
+  `report` evidence that the repair dropped from released claim `refs/pull/117/head`.
+- Acceptance: ADR 0007 (0006 is the 1.0 release scope) is Accepted, indexed and
+  records the provider hold; a midpoint-index test passes; Criterion baselines
+  cover `report` for multiple outputs and a test beside `layout_allocation.rs`
+  counts its allocations; the 0.5.0 record cites the repair.
 - Blocker: release authority and the owner-led provider/consumer sequence.
-  Re-open when the repair lands and the owner starts that sequence.
+  Re-open when the owner starts that sequence; the repair landed in PR 126.
 - Scope: `docs/adr/`, `crates/tyche-core/benches/`, workspace version.
-- Priority: P1; basis: `79733074`.
+- Basis: `ddde0f81`; priority: verification; needs: none
+
+<a id="tyche-correlation-range-003"></a>
+
+## TYCHE-CORRELATION-RANGE-003 — Subnormal centered sums test [verification] — todo
+
+- **Milestone:** M-uq-closure (planned version 0.5.0).
+- Outcome: the CHANGELOG lower edge of the correlation index range holds where
+  the centered sums `A`, `B` and `C` are subnormal; no shipped test reaches them.
+- Acceptance: one generic test over f32, f64, F32 and F64 at `s = 2^-75`
+  (binary32) and `s = 2^-537` (binary64), where `A = B = C = 2s^2` is subnormal,
+  asserts the exact index 1 and fails when any subnormal sum is routed to the
+  plain quotient.
+- Scope: `crates/tyche-core/tests/main/correlation_range.rs`.
+- Basis: `ddde0f81`; priority: verification; needs: none
 
 ## TYCHE-008 — crates.io release automation — in progress
 
