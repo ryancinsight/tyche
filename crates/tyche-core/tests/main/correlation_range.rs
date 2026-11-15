@@ -26,6 +26,13 @@ trait RangeScale: RealField {
     /// Pairs `(m, q)` selecting the response perturbation `m*2^-q` of the tiny
     /// index design: one index in the normal range and one subnormal.
     const TINY_PERTURBATIONS: [(i64, i32); 2];
+    /// Power-of-two parameter scale `2^e` of the subnormal-numerator design:
+    /// with responses `(t, -t, 3et)` the stored `C^2` is a nonzero subnormal
+    /// while `AB` stays normal above `EPSILON`.
+    const NUMERATOR_T_EXPONENT: i32;
+    /// Pair `(m, q)` selecting the response perturbation `e = m*2^-q` of the
+    /// subnormal-numerator design.
+    const NUMERATOR_PERTURBATION: (i64, i32);
 }
 
 impl RangeScale for f32 {
@@ -33,24 +40,32 @@ impl RangeScale for f32 {
     const SUBNORMAL_PRODUCT_EXPONENT: i32 = -45;
     const LEAST_SUBNORMAL_EXPONENT: i32 = -149;
     const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 60), (5, 77)];
+    const NUMERATOR_T_EXPONENT: i32 = -6;
+    const NUMERATOR_PERTURBATION: (i64, i32) = (7, 66);
 }
 impl RangeScale for f64 {
     const EXTREME_EXPONENT: i32 = 300;
     const SUBNORMAL_PRODUCT_EXPONENT: i32 = -275;
     const LEAST_SUBNORMAL_EXPONENT: i32 = -1074;
     const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 200), (7, 540)];
+    const NUMERATOR_T_EXPONENT: i32 = -13;
+    const NUMERATOR_PERTURBATION: (i64, i32) = (5, 514);
 }
 impl RangeScale for F32 {
     const EXTREME_EXPONENT: i32 = 40;
     const SUBNORMAL_PRODUCT_EXPONENT: i32 = -45;
     const LEAST_SUBNORMAL_EXPONENT: i32 = -149;
     const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 60), (5, 77)];
+    const NUMERATOR_T_EXPONENT: i32 = -6;
+    const NUMERATOR_PERTURBATION: (i64, i32) = (7, 66);
 }
 impl RangeScale for F64 {
     const EXTREME_EXPONENT: i32 = 300;
     const SUBNORMAL_PRODUCT_EXPONENT: i32 = -275;
     const LEAST_SUBNORMAL_EXPONENT: i32 = -1074;
     const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 200), (7, 540)];
+    const NUMERATOR_T_EXPONENT: i32 = -13;
+    const NUMERATOR_PERTURBATION: (i64, i32) = (5, 514);
 }
 
 fn power_of_two<T: RealField>(exponent: i32) -> T {
@@ -161,8 +176,8 @@ const RESPONSE_SHAPES: [[i64; 3]; 3] = [[1, 0, -1], [2, -1, -1], [3, 1, -4]];
 /// `|r - x| <= gamma_3 x` and `|x - e| <= u x` for the exact index `x`, the
 /// result `r` satisfies `|r - e| <= (gamma_3 + u)/(1 - u) e <= gamma_4 e`,
 /// the bound asserted. A subnormal product keeps only 5 to 11 bits
-/// above the least unit, a relative rounding error up to `2^-6` (binary32) or
-/// `2^-10` (binary64), far above that bound.
+/// (binary32) or 10 to 16 bits (binary64) above the least unit, a relative
+/// rounding error up to `2^-6` or `2^-11`, far above that bound.
 fn subnormal_products_keep_exact_index<T: RangeScale>() {
     let scale = power_of_two::<T>(T::SUBNORMAL_PRODUCT_EXPONENT);
     let parameters = [PARAMETER, -PARAMETER, 0];
@@ -226,6 +241,47 @@ fn tiny_index_keeps_exact_scale<T: RangeScale>() {
             "e = {mantissa}*2^-{exponent}: {scaled:?} vs {exact:?}"
         );
     }
+}
+
+/// A nonzero subnormal `C^2` with a normal `AB` keeps the exact index.
+///
+/// Parameters `(0, 0, 3t)` and responses `(t, -t, 3et)` have exact running
+/// means, so the stored sums are exactly `A = 6t^2`, `B = 2t^2` (`6e^2t^2`
+/// lies below half an ulp of `2t^2`) and `C = 6et^2`, and the exact index
+/// from the stored sums is `3e^2`, here `147*2^-132` (binary32) and
+/// `75*2^-1028` (binary64), both normal. `C^2` is a nonzero subnormal while
+/// `AB = 12t^4` stays normal above `EPSILON`, so only the numerator half of
+/// the gradual-underflow guard routes to the normalized path: a mutant that
+/// restores the direct quotient for a nonzero subnormal numerator reports a
+/// percent-scale error against the `gamma_3` bound asserted here.
+fn subnormal_numerator_keeps_exact_index<T: RangeScale>() {
+    let scale = power_of_two::<T>(T::NUMERATOR_T_EXPONENT);
+    let (mantissa, exponent) = T::NUMERATOR_PERTURBATION;
+    let three = T::from_integer(3);
+    let perturbation = T::from_integer(mantissa) * power_of_two::<T>(-exponent);
+    let mut screening = CorrelationScreening::<T, 1>::new();
+    for (parameter, response) in [
+        (T::ZERO, scale),
+        (T::ZERO, -scale),
+        (three * scale, three * perturbation * scale),
+    ] {
+        screening.update(&[parameter], response);
+    }
+    let index = single_index(screening);
+    let exact = T::from_integer(3 * mantissa * mantissa) * power_of_two::<T>(-2 * exponent);
+    assert!(
+        (index - exact).abs() <= gamma::<T>(3) * exact,
+        "t = 2^{}, e = {mantissa}*2^-{exponent}: {index:?} vs {exact:?}",
+        T::NUMERATOR_T_EXPONENT,
+    );
+}
+
+#[test]
+fn subnormal_numerator_reports_the_exact_stored_index() {
+    subnormal_numerator_keeps_exact_index::<f32>();
+    subnormal_numerator_keeps_exact_index::<f64>();
+    subnormal_numerator_keeps_exact_index::<F32>();
+    subnormal_numerator_keeps_exact_index::<F64>();
 }
 
 #[test]
