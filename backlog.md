@@ -16,13 +16,16 @@
 - Scope: `docs/adr/`, `crates/tyche-core/benches/`, workspace version.
 - Basis: `ddde0f81`; priority: verification; needs: none
 
-## TYCHE-008 — crates.io release automation — in progress
+<a id="tyche-008"></a>
+
+## TYCHE-008 — crates.io release automation [feature] — todo
 
 - **Milestone:** M-1.0 (publication-boundary slice delivered; registry configuration and exact release evidence remain).
-- Owner: Codex `/root`; completed slice: make the publication boundary executable
+- Completed slice: make the publication boundary executable
   by keeping `tyche-core` publishable and the Consus, Moirai, and facade
   adapters private. The release workflow and registry configuration remain in
   the parent item after this slice.
+- Basis: `30ca9dc9`; priority: feature; needs: none
 - Scope: `crates/{tyche,tyche-consus,tyche-moirai}/Cargo.toml`, the distribution
   section of `README.md`, and this PM record.
 - Acceptance: standalone locked package validation and focused tests pass; the
@@ -46,82 +49,12 @@
   registry publication was performed because that is an explicit release
   state outside this implementation slice.
 
-## TYCHE-007 — Provider source consolidation — implemented
+<a id="tyche-004"></a>
 
-- Resolve Eunomia 0.7 through its canonical versioned Git source; no sampling,
-  statistics, or public API behavior changes.
-- Locked metadata contains one Eunomia package, and workspace format, check,
-  warning-denied Clippy, Nextest, doctest, and Rustdoc gates pass.
-
-## TYCHE-001 — Phase 0 core — implemented
-
-- Reproducible design, study, ensemble, statistics, calibration, execution, and
-  artifact-access vertical slice.
-
-## TYCHE-002 — Public promotion — implemented
-
-- Public `ryancinsight/tyche` origin and the Atlas gitlink are registered.
-
-## TYCHE-006 — Consumer migrations — complete
-
-- Owner: Codex; PM closeout delivered on `codex/tyche-pm-closeout`; scope was
-  to document merged Kwavers PR 304's direct Tyche collocation-design adoption
-  in `README.md`, `backlog.md`, `gap_audit.md`, and `CHANGELOG.md`. Provider
-  code, unrelated consumer surfaces, and release metadata remain non-goals.
-
-- Helios PR 10 delegates reproducible normal noise to `StandardNormal`; its
-  package-local suite passes 27/27 tests.
-- CFDrs PR 299 delegates const-width Latin-hypercube designs to Tyche; its
-  package-local suite passes 128/128 tests.
-- Kwavers merge `a8d797cc8bc4b3f032be3f12f586e5e1269837a1`
-  delegates conformal calibration, moments, and correlation screening to
-  Tyche. The local all-feature Analysis suite passes 764/764 tests, and the
-  solver suite passes 1,251/1,251 tests. Final head `be5bd37f1` passes the
-  complete hosted migration, architecture, feature, stable/beta/nightly,
-  Miri, CUDA, solver, PINN, coverage, benchmark, documentation, and
-  security matrix.
-- Kwavers PR 304 merges as `9ad18523d0a936f3d32c2921dc3ff6fce2e35de9`
-  from source `cc382dbc2243678fef55101aa106e9f8d7ad7bbf`. It delegates
-  fixed Latin-hypercube and Sobol collocation designs to Tyche while retaining
-  rectangle, disk, ball, interface, and physics mappings in Kwavers. Local
-  value-semantic suites pass 46/46 grid tests and 21/21 PINN geometry/config
-  tests; the exact source head has 23 successful hosted checks, including code
-  coverage, while four full benchmark pairs remain in progress.
-- Moirai merge `91c802e` repairs the final-completion lifetime race exposed by
-  Tyche's 257-item, seven-item-chunk adapter contract. The pinned Tyche
-  workspace passes 18/18 tests, including the exact former access-violation
-  case.
-- ADR 0002 closes the public `Design` error-construction gap and replaces the
-  adapter's contained panic path with a typed `DesignContract` failure.
-- **Status:** complete. The required consumer evidence is synchronized in the
-  four named records, and the current Tyche default `92cb29f` passes CI run
-  `31645405288` (format, check, warning-denied Clippy, Nextest, doctests,
-  Rustdoc, example, and supply-chain checks). The four Kwavers benchmark pairs
-  remain a consumer-performance watchpoint outside this documentation item.
-
-## TYCHE-003 — Sampling breadth — implemented
-
-- Owner: `/root`; scope: `tyche-core` sampling/design modules, their tests,
-  performance evidence, ADRs, README, changelog, and facade exports.
-
-- Domain-separated, explicitly versioned stream vectors are implemented with
-  native-precision unit conversion and controlled performance evidence.
-- Fixed and runtime random-access Sobol designs share one const-generic kernel,
-  explicit sequence ranges, static scrambling policies, typed failures, and an
-  allocation-free row-major fill. Exact vectors, sequential differential
-  checks, dyadic projection laws, and controlled performance evidence pass.
-- ADR 0005 delivers categorical, weighted, and discrete importance sampling
-  with typed validation, exact categorical reduction, `Cow` mass storage,
-  native-precision arithmetic, and allocation-free repeated draws.
-- Exact replay, generic `f32`/`f64` contracts, analytical importance identity,
-  empirical laws with derived bounds, support failures, and allocation/layout
-  invariants pass in the 40/40 workspace suite. All 18 doctests, warning-denied
-  Clippy/Rustdoc, the end-to-end example, supply-chain policy, Criterion, and
-  all 196 applicable additive SemVer checks pass.
-
-## TYCHE-004 — UQ breadth — complete 2026-08-13, remainder open
+## TYCHE-004 — UQ breadth [feature] — todo
 
 - **Milestone:** M-uq-closure (delivered scope stays closed; the remaining trainable-model seam for ensemble bagging joins M-uq-closure).
+- Basis: `30ca9dc9`; priority: feature; needs: none
 - Sensitivity-estimator source `dc96f5ecd6af643e34f2146b9f3dbb49ba85dbae`
   merged through PR #18 as provider default `4a6f8cd495c78beaaa6e4081705b33ed0da8be9e`.
   Provider verification and supply-chain checks passed in hosted run
@@ -156,8 +89,11 @@
 - Remaining scope: a real trainable-model seam for ensemble bagging. The
   current score-only model is not represented as a trainable implementation.
 
-## TYCHE-005 — Study schema — planned
+<a id="tyche-005"></a>
+
+## TYCHE-005 — Study schema [feature] — todo
 
 - **Milestone:** M-study-schema (durability waits on Consus transaction support as a dependency, not ladder content).
+- Basis: `30ca9dc9`; priority: feature; needs: none
 - Versioned metadata/payload schema and manifest-last completeness; durability
   waits for Consus transaction support.
