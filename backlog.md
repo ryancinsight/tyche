@@ -16,20 +16,6 @@
 - Scope: `docs/adr/`, `crates/tyche-core/benches/`, workspace version.
 - Basis: `ddde0f81`; priority: verification; needs: none
 
-<a id="tyche-correlation-range-003"></a>
-
-## TYCHE-CORRELATION-RANGE-003 — Subnormal centered sums test [verification] — todo
-
-- **Milestone:** M-uq-closure (planned version 0.5.0).
-- Outcome: the CHANGELOG lower edge of the correlation index range holds where
-  the centered sums `A`, `B` and `C` are subnormal; no shipped test reaches them.
-- Acceptance: one generic test over f32, f64, F32 and F64 at `s = 2^-75`
-  (binary32) and `s = 2^-537` (binary64), where `A = B = C = 2s^2` is subnormal,
-  asserts the exact index 1 and fails when any subnormal sum is routed to the
-  plain quotient.
-- Scope: `crates/tyche-core/tests/main/correlation_range.rs`.
-- Basis: `ddde0f81`; priority: verification; needs: none
-
 ## TYCHE-008 — crates.io release automation — in progress
 
 - **Milestone:** M-1.0 (publication-boundary slice delivered; registry configuration and exact release evidence remain).

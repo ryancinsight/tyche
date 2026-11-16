@@ -6,7 +6,9 @@
 //! moments are finite while `C^2` and `AB` overflow; at the reciprocal scales
 //! they underflow to zero. Integer designs with exact stored sums cover the
 //! gradual-underflow regime, where the products are nonzero but subnormal, and
-//! indices far below the ordinary range.
+//! indices far below the ordinary range. At the lower edge of the range
+//! (`s = 2^-75` in binary32, `s = 2^-537` in binary64) the centered sums
+//! themselves are subnormal.
 
 use eunomia::{F32, F64, RealField};
 use tyche_core::CorrelationScreening;
@@ -35,6 +37,10 @@ trait RangeScale: RealField {
     /// Pair `(m, q)` selecting the response perturbation `e = m*2^-q` of the
     /// subnormal-numerator design.
     const NUMERATOR_PERTURBATION: (i64, i32);
+    /// Exponent `j` of the lowest scale `s = 2^j` at which the two-point
+    /// design keeps nonzero centered sums: `2s^2 = 2^(2j+1)` is the least
+    /// subnormal (binary32) or twice it (binary64), and `s` is normal.
+    const SUBNORMAL_SUM_EXPONENT: i32;
 }
 
 impl RangeScale for f32 {
@@ -44,6 +50,7 @@ impl RangeScale for f32 {
     const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 60), (5, 77)];
     const NUMERATOR_T_EXPONENT: i32 = -6;
     const NUMERATOR_PERTURBATION: (i64, i32) = (7, 66);
+    const SUBNORMAL_SUM_EXPONENT: i32 = -75;
 }
 impl RangeScale for f64 {
     const EXTREME_EXPONENT: i32 = 300;
@@ -52,6 +59,7 @@ impl RangeScale for f64 {
     const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 200), (7, 540)];
     const NUMERATOR_T_EXPONENT: i32 = -13;
     const NUMERATOR_PERTURBATION: (i64, i32) = (5, 514);
+    const SUBNORMAL_SUM_EXPONENT: i32 = -537;
 }
 impl RangeScale for F32 {
     const EXTREME_EXPONENT: i32 = 40;
@@ -60,6 +68,7 @@ impl RangeScale for F32 {
     const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 60), (5, 77)];
     const NUMERATOR_T_EXPONENT: i32 = -6;
     const NUMERATOR_PERTURBATION: (i64, i32) = (7, 66);
+    const SUBNORMAL_SUM_EXPONENT: i32 = -75;
 }
 impl RangeScale for F64 {
     const EXTREME_EXPONENT: i32 = 300;
@@ -68,6 +77,7 @@ impl RangeScale for F64 {
     const TINY_PERTURBATIONS: [(i64, i32); 2] = [(7, 200), (7, 540)];
     const NUMERATOR_T_EXPONENT: i32 = -13;
     const NUMERATOR_PERTURBATION: (i64, i32) = (5, 514);
+    const SUBNORMAL_SUM_EXPONENT: i32 = -537;
 }
 
 fn power_of_two<T: RealField>(exponent: i32) -> T {
@@ -112,6 +122,64 @@ fn identical_coordinates_have_unit_index_at_scale_extremes() {
     unit_index_at_scale_extremes::<f64>();
     unit_index_at_scale_extremes::<F32>();
     unit_index_at_scale_extremes::<F64>();
+}
+
+/// Subnormal centered sums keep the exact unit index at the lower range edge.
+///
+/// Observations `(-s, -s)` and `(s, s)` with `s = 2^j` accumulate as follows.
+/// The first update leaves the means at `-s` and the deviations after the
+/// update at zero, so it adds `0` to every sum. The second update has
+/// `delta = s - (-s) = 2s`, moves each mean to `-s + 2s/2 = 0` (exact), and has
+/// `after = s - 0 = s`, so `A`, `B` and `C` each gain `delta * after = 2s^2 =
+/// 2^(2j+1)`, a power of two inside the format's range and therefore stored
+/// exactly. Mirroring the parameter gives `C = -2s^2`.
+///
+/// Binary32 at `j = -75`: `s` is normal (least normal `2^-126`) and
+/// `2s^2 = 2^-149` is the least subnormal. Binary64 at `j = -537`: `s` is
+/// normal (least normal `2^-1022`) and `2s^2 = 2^-1073` is twice the least
+/// subnormal `2^-1074`. In both formats `C^2 = AB = 2^(4j+2)` is below half the
+/// least subnormal and rounds to zero, so the ordinary guard rejects the
+/// products and only the power-of-two normalization sees the sums: their
+/// binary exponents are `2j+1` for `A`, `B` and `|C|`, every mantissa is one,
+/// and the index is `2^(2(2j+1) - 2(2j+1)) = 1` exactly. Routing any of the
+/// three subnormal sums to the plain quotient evaluates `0/0`, which is not
+/// one. One scale lower, `2s^2` is at most half the least subnormal and rounds
+/// to zero, the end of the range the CHANGELOG states.
+///
+/// The least normal exponent is the least subnormal exponent minus the
+/// exponent of `EPSILON = 2^(1-p)` (`-149 + 23 = -126`, `-1074 + 52 = -1022`),
+/// so the regime preconditions are asserted rather than assumed.
+fn subnormal_sums_keep_unit_index<T: RangeScale>() {
+    let scale_exponent = T::SUBNORMAL_SUM_EXPONENT;
+    let sum_exponent = 2 * scale_exponent + 1;
+    let precision_exponent = T::EPSILON
+        .binary_exponent()
+        .expect("invariant: EPSILON is finite and nonzero");
+    let least_normal_exponent = T::LEAST_SUBNORMAL_EXPONENT - precision_exponent;
+    assert!(
+        least_normal_exponent <= scale_exponent,
+        "the scale 2^{scale_exponent} is normal"
+    );
+    assert!(
+        T::LEAST_SUBNORMAL_EXPONENT <= sum_exponent && sum_exponent < least_normal_exponent,
+        "the sums 2^{sum_exponent} are nonzero subnormals"
+    );
+    let sum = power_of_two::<T>(sum_exponent);
+    assert_eq!(sum.binary_exponent(), Some(sum_exponent));
+    assert_eq!(sum * sum, T::ZERO, "the products underflow to zero");
+    let scale = power_of_two::<T>(scale_exponent);
+    for parameter_sign in [T::ONE, -T::ONE] {
+        let index = two_point_index(parameter_sign, scale);
+        assert_eq!(index, T::ONE, "scale 2^{scale_exponent}");
+    }
+}
+
+#[test]
+fn subnormal_centered_sums_report_unit_index() {
+    subnormal_sums_keep_unit_index::<f32>();
+    subnormal_sums_keep_unit_index::<f64>();
+    subnormal_sums_keep_unit_index::<F32>();
+    subnormal_sums_keep_unit_index::<F64>();
 }
 
 /// Orthogonal-design observations of two parameters and two outputs.
