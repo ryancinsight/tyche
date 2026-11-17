@@ -1,5 +1,9 @@
 # Tyche checklist
 
+- [ ] TYCHE-SOBOL-CENTERED-003 [patch], candidate 0.4.1: qualify the centered
+      Sobol denominator and exact regression suite through all delivery gates.
+      This does not close the separate correlation/provider/release hold.
+
 - [x] ATLAS-TYCHE-TYPE-SURFACE-001 [patch]: consolidate the checked index
       conversions shared by Latin-hypercube and Sobol designs, rename the
       bounded counter helper to its domain contract, and remove all five

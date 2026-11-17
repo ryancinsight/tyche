@@ -1351,7 +1351,7 @@ dependencies = [
 
 [[package]]
 name = "tyche-consus"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "consus-core",
  "consus-zarr",
@@ -1360,7 +1360,7 @@ dependencies = [
 
 [[package]]
 name = "tyche-core"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "criterion",
  "eunomia",
@@ -1370,7 +1370,7 @@ dependencies = [
 
 [[package]]
 name = "tyche-moirai"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "eunomia",
  "moirai-core",
@@ -1380,7 +1380,7 @@ dependencies = [
 
 [[package]]
 name = "tyche-uncertainty"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "tyche-consus",
  "tyche-core",

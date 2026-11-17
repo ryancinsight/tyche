@@ -129,6 +129,37 @@ fn morris_linear_model_has_unit_effects_and_zero_sigma() {
     );
 }
 
+// This independent two-pass reference is not the online recurrence.
+// For this four-row [0,1] fixture, all nonzero intermediates are normal.
+// With u=EPSILON/2, Welford's mean error is <=3*i*u. Its centered-product
+// and sum errors total sum(i=1..4)(6*i+4)*u=76u. Two-pass mean/deviation/
+// summation errors total <=50u, giving a denominator difference <=126u.
+// Separate four-term numerator evaluations differ by <=36u (first order)
+// or <=44u (total order). These are forward bounds, not fitted ULP limits.
+// Decimal-valued inputs do not promise bit equality across algorithms.
+fn assert_index(actual: f64, numerator: f64, denominator: f64, terms: f64, divisor: f64) {
+    let unit = f64::EPSILON / 2.0;
+    let denominator_error = 126.0 * unit;
+    let numerator_error = terms * unit;
+    let lower = (denominator - denominator_error).next_down();
+    assert!(lower > 0.0);
+    let numerator_term = (numerator_error / lower).next_up();
+    let denominator_term = ((numerator.abs() / denominator).next_up()
+        * (denominator_error / lower).next_up())
+    .next_up();
+    let propagated = (numerator_term + denominator_term).next_up();
+    let magnitude = ((numerator.abs() + numerator_error).next_up() / lower).next_up();
+    // Both final quotients contribute at most u/(1-u) times this bound.
+    // Dividing these ordinary-range values by two is exact.
+    let rounding = (((2.0 * unit / (1.0 - unit)).next_up()) * magnitude).next_up();
+    let bound = ((propagated + rounding).next_up() / divisor).next_up();
+    let expected = (numerator / denominator / divisor).clamp(0.0, 1.0);
+    assert!(
+        (actual - expected).abs() <= bound,
+        "{actual} vs {expected}, bound {bound}"
+    );
+}
+
 #[test]
 fn saltelli_matches_two_pass_oracle() {
     let a = [0.1_f64, 0.5, 0.9, 0.3];
@@ -143,35 +174,35 @@ fn saltelli_matches_two_pass_oracle() {
     let report = estimator.report().expect("defined");
     let count = f64::from(u32::try_from(a.len()).expect("fits u32"));
     let mean = a.iter().sum::<f64>() / count;
-    let variance = a.iter().map(|value| value * value).sum::<f64>() / count - mean * mean;
-    let expected_first = |recombined: &[f64; 4]| {
+    let centered_sum = a.iter().map(|value| (value - mean).powi(2)).sum::<f64>();
+    for (parameter, recombined) in [&recombined_0, &recombined_1].into_iter().enumerate() {
+        assert!(
+            a.iter()
+                .chain(&b)
+                .chain(recombined)
+                .all(|value| (0.0..=1.0).contains(value))
+        );
         let cross = (0..a.len())
             .map(|row| b[row] * (recombined[row] - a[row]))
             .sum::<f64>();
-        (cross / (count * variance)).clamp(0.0, 1.0)
-    };
-    let expected_total = |recombined: &[f64; 4]| {
         let squares = (0..a.len())
             .map(|row| (a[row] - recombined[row]).powi(2))
             .sum::<f64>();
-        (squares / (2.0 * count * variance)).clamp(0.0, 1.0)
-    };
-    assert_eq!(
-        report.first_order()[0].to_bits(),
-        expected_first(&recombined_0).to_bits()
-    );
-    assert_eq!(
-        report.first_order()[1].to_bits(),
-        expected_first(&recombined_1).to_bits()
-    );
-    assert_eq!(
-        report.total_order()[0].to_bits(),
-        expected_total(&recombined_0).to_bits()
-    );
-    assert_eq!(
-        report.total_order()[1].to_bits(),
-        expected_total(&recombined_1).to_bits()
-    );
+        assert_index(
+            report.first_order()[parameter],
+            cross,
+            centered_sum,
+            36.0,
+            1.0,
+        );
+        assert_index(
+            report.total_order()[parameter],
+            squares,
+            centered_sum,
+            44.0,
+            2.0,
+        );
+    }
     assert_eq!(report.sample_count(), 4);
     assert_eq!(
         SobolIndices::<f64, 2>::new()

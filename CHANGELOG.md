@@ -4,6 +4,13 @@
 
 ### Fixed
 
+- [patch] Accumulate the Sobol denominator with the canonical centered moments
+  rather than subtracting raw squared means. Balanced responses offset by
+  10,000 in binary32 or 100,000,000 in binary64 retain first- and total-order
+  influence instead of silently reporting zero. Population normalization,
+  constant-response behavior and allocation-free updates remain; first-cross
+  accumulation semantics and finite-range limits are unchanged.
+
 - [patch] Preserve squared Pearson correlation when the accumulated centered
   sums are finite and nonzero but their products overflow, underflow to zero,
   or lose bits as subnormals. Report finalization now normalizes exceptional

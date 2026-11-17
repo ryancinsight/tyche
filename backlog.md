@@ -1,5 +1,20 @@
 # Tyche implementation backlog
 
+<a id="tyche-sobol-centered-003"></a>
+
+## TYCHE-SOBOL-CENTERED-003 — Centered Sobol variance [patch] — todo
+
+- Milestone: M-uq-closure; proposed patch version 0.4.1, not release approval.
+- Outcome: offset responses do not lose influence through raw-moment cancellation.
+- Scope: Sobol accumulation, analytical regressions, sensitivity documentation.
+- Basis: `a14ab1ea`; priority: correctness; needs: none
+- Acceptance: native binary32/binary64 offset, population, constant-output and
+  allocation oracles pass; complete applicable gates and exact-head independent
+  review pass. The current correlation/provider/release hold remains unchanged.
+- Evidence: unchanged production code fails the exact shifted-response oracle
+  with zero rather than unit sensitivity; the centered candidate passes it.
+  Full qualification and delivery remain pending.
+
 <a id="tyche-correlation-range-002"></a>
 
 ## TYCHE-CORRELATION-RANGE-002 — Correlation range release evidence [major] — blocked

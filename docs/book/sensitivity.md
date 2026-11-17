@@ -83,7 +83,7 @@ let ranking = report.mu_star();
 The Saltelli A/B/`A_i^B` scheme draws `N` rows of an independent matrix `A`
 and `N` rows of an independent matrix `B`; for each parameter `i` it also
 evaluates the matrix `A_i^B` that agrees with `A` except that column `i`
-comes from `B`. With `V` the sample variance of the `f(A)` responses, the
+comes from `B`. With `V` the population variance of the `f(A)` responses, the
 first-order estimate is
 
 `S_i = sum(f(B)(f(A_i^B) - f(A))) / (N V)`
@@ -137,3 +137,10 @@ let report = estimator.report()?;
 let first_order = report.first_order();
 let total_order = report.total_order();
 ```
+
+The Sobol denominator uses the shared centered `Moments` accumulator: `N V`
+is its centered sum of squares, without subtracting two large raw moments.
+This preserves nonzero influence in the exact balanced offset regressions.
+It does not promise arbitrary-offset bit invariance: the finite-sample
+first-order numerator still has its stated Saltelli semantics and finite
+precision/range limits. Constant responses retain zero indices.

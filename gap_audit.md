@@ -1,5 +1,16 @@
 # Tyche ownership gap audit
 
+## TYCHE-SOBOL-CENTERED-003
+
+At `a14ab1ea`, `E[A²] - E[A]²` rounds to zero for balanced unit-variance
+responses with a large constant offset, silently returning zero Sobol indices.
+The isolated native regression fails before the repair. The candidate reuses
+centered `Moments`, retains population normalization and constant-output zero
+indices, and adds exact native-precision and allocation controls. The ordinary
+two-pass comparison uses a derived rounding envelope instead of requiring
+bit equality from differently ordered floating-point algorithms. Complete
+delivery qualification remains pending; no release hold is removed.
+
 ## TYCHE-008 publication boundary
 
 The release backlog requires `tyche-core` to be the publishable registry

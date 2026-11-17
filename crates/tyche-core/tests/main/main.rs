@@ -24,6 +24,7 @@ mod discrete_sampling;
 mod layout_allocation;
 mod sampling_laws;
 mod sobol_design;
+mod sobol_range;
 mod statistics_laws;
 mod stream_vectors;
 mod study_contract;
