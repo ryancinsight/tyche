@@ -144,3 +144,8 @@ This preserves nonzero influence in the exact balanced offset regressions.
 It does not promise arbitrary-offset bit invariance: the finite-sample
 first-order numerator still has its stated Saltelli semantics and finite
 precision/range limits. Constant responses retain zero indices.
+
+Total-order finalization divides once by `2 M2` when that denominator is finite.
+If doubling a finite `M2` overflows, it instead halves the numerator before
+dividing. This avoids rounding a tiny quotient twice while preserving finite
+centered sums near the top of the scalar range.

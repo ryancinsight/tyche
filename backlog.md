@@ -9,7 +9,8 @@
 - Scope: Sobol accumulation, analytical regressions, sensitivity documentation.
 - Basis: `a14ab1ea`; priority: correctness; needs: none
 - Acceptance: native binary32/binary64 offset, population, constant-output and
-  allocation oracles pass; complete applicable gates and exact-head independent
+  allocation oracles pass; binary32/binary64 final-division underflow and
+  denominator-overflow controls pass; complete applicable gates and exact-head independent
   review pass. The current correlation/provider/release hold remains unchanged.
 - Evidence: unchanged production code fails the exact shifted-response oracle
   with zero rather than unit sensitivity; the centered candidate passes it.

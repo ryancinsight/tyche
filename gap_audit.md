@@ -8,7 +8,11 @@ The isolated native regression fails before the repair. The candidate reuses
 centered `Moments`, retains population normalization and constant-output zero
 indices, and adds exact native-precision and allocation controls. The ordinary
 two-pass comparison uses a derived rounding envelope instead of requiring
-bit equality from differently ordered floating-point algorithms. Complete
+bit equality from differently ordered floating-point algorithms. Independent
+review also identified a candidate-only double-rounding error at the least
+subnormal. Native tests reproduced both precisions; finalization now divides
+once by finite `2*M2`, or halves the numerator before dividing when `2*M2`
+overflows. Exact public regressions cover both paths. Complete
 delivery qualification remains pending; no release hold is removed.
 
 ## TYCHE-008 publication boundary

@@ -9,7 +9,9 @@
   10,000 in binary32 or 100,000,000 in binary64 retain first- and total-order
   influence instead of silently reporting zero. Population normalization,
   constant-response behavior and allocation-free updates remain; first-cross
-  accumulation semantics and finite-range limits are unchanged.
+  accumulation semantics and finite-range limits are unchanged. Total-order
+  finalization avoids both double-rounding at the least subnormal and overflow
+  from doubling a finite centered sum.
 
 - [patch] Preserve squared Pearson correlation when the accumulated centered
   sums are finite and nonzero but their products overflow, underflow to zero,

@@ -135,6 +135,8 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
             // dividing by N and multiplying back adds avoidable rounding.
             let centered_sum = a_moments.centered_sum();
             if centered_sum > T::ZERO {
+                let two = T::from_f64(2.0);
+                let total_scale = centered_sum * two;
                 for (((first, total), &cross), &squares) in first_row
                     .iter_mut()
                     .zip(total_row.iter_mut())
@@ -142,9 +144,17 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
                     .zip(total_squares.iter())
                 {
                     *first = (cross / centered_sum).clamp(T::ZERO, T::ONE);
-                    // Divide by two last so a finite M2 is not overflowed
-                    // solely by forming the denominator 2 * M2.
-                    *total = ((squares / centered_sum) / T::from_f64(2.0)).clamp(T::ZERO, T::ONE);
+                    // A finite 2*M2 is exact in binary floating point: divide
+                    // once, rather than round a subnormal quotient twice.
+                    let total_index = if total_scale.is_finite() {
+                        squares / total_scale
+                    } else {
+                        // If 2*M2 overflows, halve the numerator first. Any
+                        // rounding on this half occurs only near underflow,
+                        // where division by such a large M2 must yield zero.
+                        (squares / two) / centered_sum
+                    };
+                    *total = total_index.clamp(T::ZERO, T::ONE);
                 }
             }
         }
