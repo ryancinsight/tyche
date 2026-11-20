@@ -1,5 +1,13 @@
 # Tyche ownership gap audit
 
+## Tyche Core 0.5.0 release verification
+
+Crates.io serves the archive from `c49c984f5fbe8238eeaf8ebd5838997ae38bc1e7`.
+The archive hash matches the sparse index and the source matches the
+`tyche-core-v0.5.0` tag. The merged workspace passes 58 tests. An independent
+consumer generates its lock from scratch and reproduces all four version-one
+counter words alongside the Aequitas 0.4 providers.
+
 ## Registry provider release 0.5.0
 
 - Public sampling and statistics bounds use Eunomia 0.12. Direct consumers upgrade Eunomia together with Tyche. The core crate ships independently of the integration wrappers.

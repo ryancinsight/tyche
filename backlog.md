@@ -11,8 +11,8 @@
   records the provider hold; a midpoint-index test passes; Criterion baselines
   cover `report` for multiple outputs and a test beside `layout_allocation.rs`
   counts its allocations; the 0.5.0 record cites the repair.
-- Blocker: release authority and the owner-led provider/consumer sequence.
-  Re-open when the owner starts that sequence; the repair landed in PR 126.
+- The 0.5.0 provider release is complete. The correlation-specific ADR,
+  benchmark, and allocation evidence remain open for the repair in PR 126.
 - Scope: `docs/adr/`, `crates/tyche-core/benches/`, workspace version.
 - Basis: `ddde0f81`; priority: verification; needs: none
 
@@ -30,7 +30,9 @@
   section of `README.md`, and this PM record.
 - Acceptance: standalone locked package validation and focused tests pass; the
   crate is indexed; the exact-source GitHub Release exists; crates.io accepts
-  only trusted-publisher updates.
+  only trusted-publisher updates. Version 0.5.0 is indexed and the exact
+  [trusted publishing run](https://github.com/ryancinsight/tyche/actions/runs/44782145848)
+  records the distribution. The independent stream replay passes.
 - Evidence for this slice: package manifests set `publish = false` on all
   three integration packages, `publish = true` remains explicit on
   `tyche-core`, and README/CHANGELOG/checklist now state the same boundary.
