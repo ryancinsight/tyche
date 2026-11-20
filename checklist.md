@@ -1,5 +1,10 @@
 # Tyche checklist
 
+## Current release target tyche-core 0.5.0
+
+- [ ] [major] Verify the API and normalized package for [ADR 0008](docs/adr/0008-registry-provider-release.md).
+- [ ] [major] Publish and verify an independent registry consumer.
+
 - [x] ATLAS-TYCHE-TYPE-SURFACE-001 [patch]: consolidate the checked index
       conversions shared by Latin-hypercube and Sobol designs, rename the
       bounded counter helper to its domain contract, and remove all five
