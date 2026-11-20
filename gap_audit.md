@@ -1,5 +1,10 @@
 # Tyche ownership gap audit
 
+## Registry provider release 0.5.0
+
+- Public sampling and statistics bounds use Eunomia 0.12. Direct consumers upgrade Eunomia together with Tyche. The core crate ships independently of the integration wrappers.
+- The release gate verifies the typed API, archived dependency baseline, and fresh consumer graph.
+
 ## TYCHE-008 publication boundary
 
 The release backlog requires `tyche-core` to be the publishable registry

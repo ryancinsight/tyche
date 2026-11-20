@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+### Breaking
+
+- [major] Public sampling and statistics bounds use Eunomia 0.12. Direct consumers upgrade Eunomia together with Tyche. The core crate ships independently of the integration wrappers.
+
 ## Unreleased
 
 ### Fixed
