@@ -1,5 +1,14 @@
 # Tyche checklist
 
+## Stable release checklist
+
+Basis `47820cd1ef43`, representative manifest `tyche-core 0.5.0`. Target 1.0.0. [Backlog item](backlog.md#tyche-stable-qualification).
+
+- [ ] [patch] Reconcile the released Core receipt with TYCHE-CORRELATION-RANGE-002. Check the status of the proposed correlation repair independently and replay the deterministic stream and UQ value oracles.
+- [ ] [minor] Exercise the versioned metadata and payload schema through the real Consus adapter. Recover a complete study by manifest and reject missing, reordered or corrupted payloads as its contract requires.
+- [ ] [major] Verify the Core registry endpoint and private adapter boundaries, owned RNG reference cases and the clean study consumer before the stable API freeze.
+- [ ] [patch] Run the [release scope](docs/adr/0006-release-scope-1-0.md) exits and attach reviewed, exact-revision evidence for this member’s [Atlas qualification criteria](https://github.com/ryancinsight/atlas/blob/17b0124a7548ad81e817284afc5cb115c1d1bc78/docs/parity/repositories.json).
+
 ## Current release target tyche-core 0.5.0
 
 - [x] [major] Verify the API and normalized package for [ADR 0008](docs/adr/0008-registry-provider-release.md).

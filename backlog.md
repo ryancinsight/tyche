@@ -1,5 +1,11 @@
 # Tyche implementation backlog
 
+<a id="tyche-stable-qualification"></a>
+## TYCHE-STABLE-QUALIFICATION — tyche stable-release qualification [patch] — todo
+- priority: verification; milestone: M-study-schema; basis: `47820cd1ef43`.
+- Outcome: Close the durable study contract after the 0.5.0 Core release. Follow the [release scope](docs/adr/0006-release-scope-1-0.md) and [milestone exits](backlog/milestones.md).
+- Acceptance and sequence: [stable-release checklist](checklist.md#stable-release-checklist).
+
 <a id="tyche-correlation-range-002"></a>
 
 ## TYCHE-CORRELATION-RANGE-002 — Correlation range release evidence [major] — blocked
