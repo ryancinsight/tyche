@@ -2,8 +2,8 @@
 
 <a id="tyche-stable-qualification"></a>
 ## TYCHE-STABLE-QUALIFICATION — tyche stable-release qualification [patch] — todo
-- priority: verification; milestone: M-study-schema; basis: `47820cd1ef43`.
-- Outcome: Close the durable study contract after the 0.5.0 Core release. Follow the [release scope](docs/adr/0006-release-scope-1-0.md) and [milestone exits](backlog/milestones.md).
+- priority: verification; milestone: M-study-schema; basis: `f490b7bb3bae`.
+- Outcome: Close the durable study contract after the 0.5.0 Core release. Follow the [release scope](docs/adr/0006-release-scope-1-0.md) and [milestone exits](backlog/milestones.md). Planning targets for `tyche-core` are 0.5.1 only for compatible repairs, then 0.6.0, then 1.0.0. Verification alone can advance the current version.
 - Acceptance and sequence: [stable-release checklist](checklist.md#stable-release-checklist).
 
 <a id="tyche-correlation-range-002"></a>

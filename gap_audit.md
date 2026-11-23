@@ -1,5 +1,11 @@
 # Tyche ownership gap audit
 
+## Incremental release baseline
+
+Reviewed [tyche-core 0.5.0](crates/tyche-core/Cargo.toml) at [f490b7bb3bae](https://github.com/ryancinsight/tyche/tree/f490b7bb3bae0aa1fe81a349a5d4738aab90eb6a). The exact version appears in the [registry](https://crates.io/crates/tyche-core/0.5.0).
+
+The next [patch] checkpoint uses [correlation range](crates/tyche-core/tests/main/correlation_range.rs). [Target version and acceptance criteria](checklist.md#stable-release-checklist).
+
 ## Tyche Core 0.5.0 release verification
 
 Crates.io serves the archive from `c49c984f5fbe8238eeaf8ebd5838997ae38bc1e7`.
