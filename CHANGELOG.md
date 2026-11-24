@@ -48,7 +48,9 @@
   `Bootstrap` replicate, and `BaggedModel::predict` averages the retained
   members without refitting. Resamples come from the provider's bootstrap
   schedule, so `SplitMix64::VERSION` governs replay; no new random stream is
-  added.
+  added. `Bagging::fit` reserves its resample buffer and member storage before
+  any member fits and returns `BaggingError::ResampleAllocation` or
+  `BaggingError::MemberAllocation` where an allocation is refused.
 - Morris elementary-effect screening: `ElementaryEffects::from_steps` reduces
   a validated trajectory (one perturbation per parameter, strictly positive
   step) to per-parameter effects, and `MorrisScreening` accumulates them into
