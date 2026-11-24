@@ -17,6 +17,7 @@ use std::alloc::System;
 #[global_allocator]
 static ALLOCATOR: CountingAllocator<System> = CountingAllocator::new(System);
 
+mod bagging;
 mod bootstrap;
 mod conformal_laws;
 mod correlation_range;

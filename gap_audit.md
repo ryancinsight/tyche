@@ -1,33 +1,23 @@
 # Tyche ownership gap audit
 
-## TYCHE-SOBOL-CENTERED-003
+## Incremental release baseline
 
-At `a14ab1ea`, `E[A²] - E[A]²` rounds to zero for balanced unit-variance
-responses with a large constant offset, silently returning zero Sobol indices.
-The isolated native regression fails before the repair. The candidate reuses
-centered `Moments`, retains population normalization and constant-output zero
-indices, and adds exact native-precision and allocation controls. The ordinary
-two-pass comparison uses a derived rounding envelope instead of requiring
-bit equality from differently ordered floating-point algorithms. Independent
-review also identified a candidate-only double-rounding error at the least
-subnormal. Native tests reproduced both precisions; finalization now divides
-once by finite `2*M2`, or halves the numerator before dividing when `2*M2`
-overflows. Exact public regressions cover both paths. Complete
-delivery qualification remains pending; no release hold is removed.
+Reviewed [tyche-core 0.5.0](crates/tyche-core/Cargo.toml) at [f490b7bb3bae](https://github.com/ryancinsight/tyche/tree/f490b7bb3bae0aa1fe81a349a5d4738aab90eb6a). The exact version appears in the [registry](https://crates.io/crates/tyche-core/0.5.0).
 
-## TYCHE-008 publication boundary
+The next [patch] checkpoint uses [correlation range](crates/tyche-core/tests/main/correlation_range.rs). [Target version and acceptance criteria](backlog.md#tyche-stable-qualification).
 
-The release backlog requires `tyche-core` to be the publishable registry
-artifact while the Consus adapter, Moirai adapter, and facade remain private.
-The prior manifests inherited the workspace-level `publish = true` for all
-four packages, while the README described those private packages as merely
-unreleased. The three integration manifests now set `publish = false`, and
-the README, CHANGELOG, checklist, and backlog agree with the Cargo metadata.
-The remaining TYCHE-008 work is external registry configuration and exact
-release evidence; this slice does not claim publication. Formatting and
-locked no-dependency metadata pass. The locked Nextest gate is blocked before
-compilation by the Atlas overlay's unused local patches requiring a lockfile
-rewrite, so this change carries no focused-test claim.
+## Tyche Core 0.5.0 release verification
+
+Crates.io serves the archive from `c49c984f5fbe8238eeaf8ebd5838997ae38bc1e7`.
+The archive hash matches the sparse index and the source matches the
+`tyche-core-v0.5.0` tag. The merged workspace passes 58 tests. An independent
+consumer generates its lock from scratch and reproduces all four version-one
+counter words alongside the Aequitas 0.4 providers.
+
+## Registry provider release 0.5.0
+
+- Public sampling and statistics bounds use Eunomia 0.12. Direct consumers upgrade Eunomia together with Tyche. The core crate ships independently of the integration wrappers.
+- The release gate verifies the typed API, archived dependency baseline, and fresh consumer graph.
 
 ## TYCHE-004 multi-output sensitivity closure (2026-08-13)
 
@@ -41,16 +31,10 @@ allocation. A two-output test verifies independent correlation vectors, Morris
 oracles. Local evidence: fmt, warning-denied Clippy, `cargo nextest run -p
 tyche-core` 48/48, and 17/17 doctests pass.
 
-The only remaining TYCHE-004 scope is a genuine trainable-model seam for
-ensemble bagging; the current score-only model remains excluded from the
-provider migration.
-
 The multi-output estimator delivery is closed at source
 `dc96f5ecd6af643e34f2146b9f3dbb49ba85dbae`, merged as provider default
 `4a6f8cd495c78beaaa6e4081705b33ed0da8be9e`. Hosted verification and
 supply-chain run `31675476210` passed; the book build run `31675476477` passed.
-The trainable-model seam remains a separate correctness item because the
-current ensemble model retains no trained model state.
 
 ## Phase 0 closure
 
@@ -80,9 +64,10 @@ allocator, or physics ownership.
   local fixed collocation LHS and pseudo-Sobol generators and consumes Tyche's
   const-generic random-access designs. Kwavers retains measure-correct
   rectangle, disk, ball, boundary, and interface mapping. Local evidence is
-  46/46 grid and 21/21 PINN geometry/config tests; 23 hosted checks, including
-  code coverage, have succeeded while four full benchmark pairs continue on
-  the exact source head.
+  46/46 grid and 21/21 PINN geometry/config tests. On the exact source head the
+  hosted checks, including code coverage and the four full benchmark pairs,
+  succeed, while the `benchmark regression check` job of hosted run
+  `29875283986` fails.
 
 ## Provider residuals
 
@@ -159,7 +144,8 @@ The remaining hosted evidence limits are explicit.
 - The remaining consumer bootstrap work is therefore limited to any other
   consumer-specific confidence policies; Tyche's provider index-generation
   contract is consumed at this audited Kwavers boundary. Ensemble entropy and
-  `rand` ownership remain separate until a real trainable-model seam exists.
+  `rand` ownership remain open: this repository records no consumer migration
+  to the delivered seam, whose `Bagging::fit` takes an explicit `Seed`.
 
 ## Commit message rules are unenforced
 

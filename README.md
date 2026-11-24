@@ -3,7 +3,8 @@
 Tyche is the Atlas owner for reproducible uncertainty studies. Phase 0
 provides validated parameter spaces, deterministic random-access Latin
 hypercube and Sobol designs, fixed and runtime dimension selection,
-deterministic bootstrap resampling with caller-owned output, and
+deterministic bootstrap resampling with caller-owned output, retained-state
+bagging over those resamples, and
 uniform and weighted finite-distribution sampling, support-checked discrete
 importance ratios, index-addressed ensemble execution, online moments,
 correlation screening, finite-sample split-conformal calibration, and provider
@@ -80,7 +81,7 @@ crates/
 │       ├── design/       # Cow metadata and const-width spaces
 │       ├── sampling/     # typed streams and fixed/runtime designs
 │       ├── study/        # named specifications and fixed arrays
-│       ├── ensemble/     # GAT model seam and borrowed views
+│       ├── ensemble/     # GAT model seam, trainable bagging, borrowed views
 │       ├── statistics/   # Welford/Chan and screening
 │       └── uncertainty/  # conformal calibration
 ├── tyche-moirai/         # borrowed scoped execution
@@ -100,6 +101,10 @@ monomorphize without algorithm-path vtables.
 `Bootstrap` stores only validated population/resample sizes and a zero-sized
 algorithm policy; its random-access indices use the shared exact
 multiply-high reducer and its fill path allocates nothing after construction.
+`Bagging` fits one `TrainableModel` per replicate of its `Bootstrap` and
+replays under the stream algorithm's `VERSION` (`SplitMix64::VERSION`);
+`BaggedModel::predict` returns the mean of the retained members' predictions
+and never refits ([ADR 0009](docs/adr/0009-retained-state-trainable-models.md)).
 `SplitMix64`, typed `Counter` domains, `StandardNormal`,
 `PopulationVariance`, and `SampleVariance` are zero-sized. Stream algorithm
 selection has no default: the type and nonzero version identify the bitwise
@@ -194,11 +199,10 @@ single-iteration bench smoke; drop `-- --test` for a timing run. The separate
    and Sobol generation. Geometry mappings remain Kwavers-owned.
 2. Migrate Kwavers percentile-mean index generation to Tyche's deterministic
    bootstrap contract. Percentile interpolation remains Kwavers-owned. Ensemble
-   bagging adopts provider resampling only with a real trainable-model seam; the
-   current score-only placeholder is not a valid consumer contract.
-3. Multi-output Morris and Saltelli reports are delivered in `tyche-core`;
-   ensemble bagging still requires a real trainable-model seam before it can
-   adopt provider resampling.
+   bagging can adopt provider resampling through `TrainableModel` and `Bagging`;
+   this repository records no consumer migration to them.
+3. Multi-output Morris and Saltelli reports and the trainable-model seam for
+   ensemble bagging are delivered in `tyche-core`.
 4. Add a versioned Consus study schema with manifest-last logical completeness.
    Crash durability waits for a Consus transaction capability.
 

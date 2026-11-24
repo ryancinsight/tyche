@@ -1,17 +1,16 @@
 # Changelog
 
+## 0.5.0
+
+### Breaking
+
+- [major] Public sampling and statistics bounds use Eunomia 0.12. Direct consumers upgrade Eunomia together with Tyche. The core crate ships independently of the integration wrappers.
+
 ## Unreleased
 
 ### Fixed
 
-- [patch] Accumulate the Sobol denominator with the canonical centered moments
-  rather than subtracting raw squared means. Balanced responses offset by
-  10,000 in binary32 or 100,000,000 in binary64 retain first- and total-order
-  influence instead of silently reporting zero. Population normalization,
-  constant-response behavior and allocation-free updates remain; first-cross
-  accumulation semantics and finite-range limits are unchanged. Total-order
-  finalization avoids both double-rounding at the least subnormal and overflow
-  from doubling a finite centered sum.
+- [patch] Use centered population moments for the Sobol denominator. Small response differences now survive a large common offset in both supported precisions.
 
 - [patch] Preserve squared Pearson correlation when the accumulated centered
   sums are finite and nonzero but their products overflow, underflow to zero,
@@ -46,6 +45,14 @@
 
 ### Added
 
+- [minor] Trainable-model seam for ensemble bagging: `TrainableModel` fits on
+  a resample and returns retained trained state, `Bagging` fits one model per
+  `Bootstrap` replicate, and `BaggedModel::predict` averages the retained
+  members without refitting. Resamples come from the provider's bootstrap
+  schedule, so `SplitMix64::VERSION` governs replay; no new random stream is
+  added. `Bagging::fit` reserves its resample buffer and member storage before
+  any member fits and returns `BaggingError::ResampleAllocation` or
+  `BaggingError::MemberAllocation` where an allocation is refused.
 - Morris elementary-effect screening: `ElementaryEffects::from_steps` reduces
   a validated trajectory (one perturbation per parameter, strictly positive
   step) to per-parameter effects, and `MorrisScreening` accumulates them into

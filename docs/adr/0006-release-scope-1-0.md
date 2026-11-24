@@ -3,6 +3,9 @@
 - Status: Accepted
 - Change class: minor
 - Date: 2026-11-12
+- Revised: 2026-11-24, ensemble-bagging seam delivered (ADR 0009); planned versions 0.6.0 and 0.7.0 because `tyche-core` 0.5.0 is published (tag `tyche-core-v0.5.0`, crates.io)
+- Revised: 2026-11-24, M-uq-closure exit narrowed to the named bagging test and the whole-package `cargo test -p tyche-core --locked --all-features` moved from `exit:` to `standing:` (nextest and `test --doc` there), because an exit check names one feature and a whole-package run is a regression gate; the standing line preserves the old check, so nothing is weakened; evidence: `backlog/milestones.md:3-4` in PR #144
+- Revised: 2026-11-24, installed-state condition added to M-uq-closure `standing:`, because the roadmap rules put the installed-state assertion on the first milestone and the ladder had none once TYCHE-BAGGING-001 removed the last open correctness item; the conformance scan has no row reading git configuration (`scripts/atlas-conformance.py` at Atlas 3272746: `member_gate_versions` compares hook file contents, `cache_retention_policy_missing` reads the root `.cargo/config.toml`), so the line names the direct commands; evidence: `backlog/milestones.md:4`
 
 ## Context
 
@@ -11,19 +14,19 @@ workspace 0.4.0) is the Atlas stack's reproducible uncertainty-study
 provider: counter-addressed streams, random-access LHS and Sobol designs,
 discrete/importance sampling, bootstrap indices, Morris/Saltelli
 estimators, and versioned study execution. Sampling breadth (TYCHE-003)
-and the multi-output sensitivity closure (TYCHE-004) are delivered; three
-open scopes remain: the ensemble-bagging trainable-model seam, the
-versioned study schema, and the crates.io release automation. No
-milestone ladder exists to 1.0.
+and the multi-output sensitivity closure (TYCHE-004) are delivered, as is the
+ensemble-bagging trainable-model seam ([ADR 0009](0009-retained-state-trainable-models.md));
+two open scopes remain: the versioned study schema and the crates.io
+release automation.
 
 ## Decision
 
 Adopt a three-milestone ladder to 1.0 recorded in `backlog/milestones.md`:
 
-- **M-uq-closure** (0.5.0): the UQ surface is honest — a real
+- **M-uq-closure** (0.6.0): the UQ surface is honest — a real
   trainable-model seam for ensemble bagging, replacing the score-only
   model that retains no trained state.
-- **M-study-schema** (0.6.0): studies persist against a versioned
+- **M-study-schema** (0.7.0): studies persist against a versioned
   metadata/payload schema with manifest-last completeness; durability
   itself waits on Consus transaction support (dependency, not ladder
   content).
