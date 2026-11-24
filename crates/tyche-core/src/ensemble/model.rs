@@ -35,3 +35,66 @@ where
         M: 'a,
         T: 'a;
 }
+
+/// A model fitted on a resample that retains its trained state.
+///
+/// The implementor holds hyperparameters; [`Self::fit`] returns the trained
+/// state, which the caller keeps and passes to every [`Self::predict`], so
+/// predicting never refits. [`crate::Bagging`] fits one state per bootstrap
+/// resample.
+///
+/// # Examples
+///
+/// ```
+/// use tyche_core::TrainableModel;
+///
+/// /// Fitted state: the sum of the resampled observations.
+/// struct Total;
+///
+/// impl TrainableModel<f64> for Total {
+///     type Observation = f64;
+///     type Input = ();
+///     type Fitted = f64;
+///     type Error = core::convert::Infallible;
+///
+///     fn fit(&self, data: &[f64], resample: &[usize]) -> Result<f64, Self::Error> {
+///         Ok(resample.iter().map(|&index| data[index]).sum())
+///     }
+///
+///     fn predict(&self, fitted: &f64, _: &()) -> Result<f64, Self::Error> {
+///         Ok(*fitted)
+///     }
+/// }
+///
+/// let fitted = Total.fit(&[1.0, 3.0], &[0, 1, 1]).unwrap();
+/// assert_eq!(Total.predict(&fitted, &()).unwrap(), 7.0);
+/// ```
+pub trait TrainableModel<T> {
+    /// One training observation.
+    type Observation;
+    /// Prediction input.
+    type Input: ?Sized;
+    /// Trained state retained between predictions.
+    type Fitted;
+    /// Fitting or prediction failure.
+    type Error;
+
+    /// Fit on the observations selected by `resample`, whose indices are below
+    /// `observations.len()` and repeat under sampling with replacement.
+    ///
+    /// # Errors
+    ///
+    /// Returns the model's typed failure.
+    fn fit(
+        &self,
+        observations: &[Self::Observation],
+        resample: &[usize],
+    ) -> Result<Self::Fitted, Self::Error>;
+
+    /// Predict from retained trained state.
+    ///
+    /// # Errors
+    ///
+    /// Returns the model's typed failure.
+    fn predict(&self, fitted: &Self::Fitted, input: &Self::Input) -> Result<T, Self::Error>;
+}

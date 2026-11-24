@@ -43,6 +43,12 @@
 
 ### Added
 
+- [minor] Trainable-model seam for ensemble bagging: `TrainableModel` fits on
+  a resample and returns retained trained state, `Bagging` fits one model per
+  `Bootstrap` replicate, and `BaggedModel::predict` averages the retained
+  members without refitting. Resamples come from the provider's bootstrap
+  schedule, so `SplitMix64::VERSION` governs replay; no new random stream is
+  added.
 - Morris elementary-effect screening: `ElementaryEffects::from_steps` reduces
   a validated trajectory (one perturbation per parameter, strictly positive
   step) to per-parameter effects, and `MorrisScreening` accumulates them into
