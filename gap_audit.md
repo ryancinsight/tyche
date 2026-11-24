@@ -19,20 +19,6 @@ counter words alongside the Aequitas 0.4 providers.
 - Public sampling and statistics bounds use Eunomia 0.12. Direct consumers upgrade Eunomia together with Tyche. The core crate ships independently of the integration wrappers.
 - The release gate verifies the typed API, archived dependency baseline, and fresh consumer graph.
 
-## TYCHE-008 publication boundary
-
-The release backlog requires `tyche-core` to be the publishable registry
-artifact while the Consus adapter, Moirai adapter, and facade remain private.
-The prior manifests inherited the workspace-level `publish = true` for all
-four packages, while the README described those private packages as merely
-unreleased. The three integration manifests now set `publish = false`, and
-the README, CHANGELOG, and backlog agree with the Cargo metadata.
-This slice does not claim publication; the 0.5.0 registry release is recorded
-in the verification section above. Formatting and
-locked no-dependency metadata pass. The locked Nextest gate is blocked before
-compilation by the Atlas overlay's unused local patches requiring a lockfile
-rewrite, so this change carries no focused-test claim.
-
 ## TYCHE-004 multi-output sensitivity closure (2026-08-13)
 
 The scalar Morris and Saltelli estimators were already real and provider-owned;
