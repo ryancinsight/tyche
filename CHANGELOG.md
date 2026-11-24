@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- [patch] Use centered population moments for the Sobol denominator. Small response differences now survive a large common offset in both supported precisions.
+
 - [patch] Preserve squared Pearson correlation when the accumulated centered
   sums are finite and nonzero but their products overflow, underflow to zero,
   or lose bits as subnormals. Report finalization now normalizes exceptional

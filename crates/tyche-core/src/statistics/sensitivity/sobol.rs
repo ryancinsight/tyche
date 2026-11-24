@@ -5,7 +5,7 @@ use eunomia::RealField;
 use super::estimator::OnlineEstimator;
 use super::private::Sealed;
 use super::report::SobolReport;
-use crate::statistics::InsufficientSamples;
+use crate::statistics::{InsufficientSamples, Moments};
 
 /// Online Saltelli first- and total-order Sobol' index estimator.
 ///
@@ -13,17 +13,21 @@ use crate::statistics::InsufficientSamples;
 /// rows in an independent matrix `B`, plus, for each parameter `i`, the
 /// matrix `A_i^B` that agrees with `A` except that column `i` comes from `B`.
 /// Feeding one row triple at a time keeps the accumulation online and
-/// allocation free. With `V` the sample variance of the `A` responses, the
+/// allocation free. With `V` the population variance of the `A` responses, the
 /// first-order estimate is `S_i = sum(f(B)(f(A_i^B) - f(A))) / (N V)` and the
 /// total-order estimate is `S_Ti = sum((f(A) - f(A_i^B))^2) / (2 N V)`.
 /// Finite-sample estimates are clamped to the unit interval, matching the
 /// squared-correlation screening.
+///
+/// The denominator uses the canonical centered online moments, avoiding the
+/// cancellation in `E[A²] - E[A]²` for responses with a large constant offset.
+/// This does not make the finite-sample first-order numerator translation
+/// invariant or extend the scalar range of its accumulated products.
 #[must_use]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SobolIndices<T, const PARAMETERS: usize, const OUTPUTS: usize = 1> {
     count: u64,
-    a_sum: [T; OUTPUTS],
-    a_sum_squares: [T; OUTPUTS],
+    a_moments: [Moments<T>; OUTPUTS],
     first_cross: [[T; PARAMETERS]; OUTPUTS],
     total_squares: [[T; PARAMETERS]; OUTPUTS],
 }
@@ -48,8 +52,7 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
     pub fn new() -> Self {
         Self {
             count: 0,
-            a_sum: [T::ZERO; OUTPUTS],
-            a_sum_squares: [T::ZERO; OUTPUTS],
+            a_moments: [Moments::new(); OUTPUTS],
             first_cross: [[T::ZERO; PARAMETERS]; OUTPUTS],
             total_squares: [[T::ZERO; PARAMETERS]; OUTPUTS],
         }
@@ -95,13 +98,9 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
 
     fn accumulate(&mut self, (base, independent, recombined): Self::Observation<'_>) {
         self.count += 1;
-        for (
-            ((a_sum, a_sum_squares), (first_cross, total_squares)),
-            ((&base, &independent), recombined),
-        ) in self
-            .a_sum
+        for ((a_moments, (first_cross, total_squares)), ((&base, &independent), recombined)) in self
+            .a_moments
             .iter_mut()
-            .zip(self.a_sum_squares.iter_mut())
             .zip(
                 self.first_cross
                     .iter_mut()
@@ -109,8 +108,7 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
             )
             .zip(base.iter().zip(independent.iter()).zip(recombined.iter()))
         {
-            *a_sum += base;
-            *a_sum_squares += base * base;
+            a_moments.update(base);
             for ((first, total), &value) in first_cross
                 .iter_mut()
                 .zip(total_squares.iter_mut())
@@ -124,30 +122,39 @@ impl<T: RealField, const PARAMETERS: usize, const OUTPUTS: usize>
     }
 
     fn finish(self) -> Self::Report {
-        let count = self.count_as();
         let mut first_order = [[T::ZERO; PARAMETERS]; OUTPUTS];
         let mut total_order = [[T::ZERO; PARAMETERS]; OUTPUTS];
-        for ((((first_row, total_row), (&a_sum, &a_sum_squares)), first_cross), total_squares) in
-            first_order
-                .iter_mut()
-                .zip(total_order.iter_mut())
-                .zip(self.a_sum.iter().zip(self.a_sum_squares.iter()))
-                .zip(self.first_cross.iter())
-                .zip(self.total_squares.iter())
+        for ((((first_row, total_row), a_moments), first_cross), total_squares) in first_order
+            .iter_mut()
+            .zip(total_order.iter_mut())
+            .zip(self.a_moments.iter())
+            .zip(self.first_cross.iter())
+            .zip(self.total_squares.iter())
         {
-            let mean = a_sum / count;
-            let variance = (a_sum_squares / count - mean * mean).max_scalar(T::ZERO);
-            if variance > T::ZERO {
-                let first_scale = variance * count;
-                let total_scale = variance * count * T::from_f64(2.0);
+            // M2 = N * V for the population variance. Use it directly:
+            // dividing by N and multiplying back adds avoidable rounding.
+            let centered_sum = a_moments.centered_sum();
+            if centered_sum > T::ZERO {
+                let two = T::from_f64(2.0);
+                let total_scale = centered_sum * two;
                 for (((first, total), &cross), &squares) in first_row
                     .iter_mut()
                     .zip(total_row.iter_mut())
                     .zip(first_cross.iter())
                     .zip(total_squares.iter())
                 {
-                    *first = (cross / first_scale).clamp(T::ZERO, T::ONE);
-                    *total = (squares / total_scale).clamp(T::ZERO, T::ONE);
+                    *first = (cross / centered_sum).clamp(T::ZERO, T::ONE);
+                    // A finite 2*M2 is exact in binary floating point: divide
+                    // once, rather than round a subnormal quotient twice.
+                    let total_index = if total_scale.is_finite() {
+                        squares / total_scale
+                    } else {
+                        // If 2*M2 overflows, halve the numerator first. Any
+                        // rounding on this half occurs only near underflow,
+                        // where division by such a large M2 must yield zero.
+                        (squares / two) / centered_sum
+                    };
+                    *total = total_index.clamp(T::ZERO, T::ONE);
                 }
             }
         }
