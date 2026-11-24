@@ -3,6 +3,7 @@
 - Status: Accepted
 - Date: 2026-11-24
 - Class: [minor]
+- Revised: 2026-11-24, `predict` refit wording limited to the contract
 
 ## Context
 
@@ -20,7 +21,8 @@ M-uq-closure and records no contract for it.
 - `TrainableModel<T>` (`model.rs:72-100`): the implementor holds
   hyperparameters; `fit(&self, observations, resample)` returns the fitted
   state as an owned `Fitted` value, and `predict(&self, &Fitted, &Input)`
-  reads it. `predict` receives no training data, so it cannot refit.
+  reads it. `predict` receives no training data, so it refits only if an
+  implementor's `Fitted` stores the observations, which the contract excludes.
   Dispatch is static.
 - `Bagging<A>` (`bagging.rs:19-74`) wraps a `Bootstrap<A>` and a nonzero
   member count. Member `r` fits the resample at replicate `r`, filled by

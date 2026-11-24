@@ -37,7 +37,8 @@ Tyche's sampling and statistics seams are consumed without local copies:
 
 Adaptive estimator breadth (Morris and Saltelli Sobol' indices) now closes
 the previously deferred screening increments. The `TrainableModel` and
-`Bagging` seam for retained-state ensemble bagging is delivered; the versioned
+`Bagging` seam for retained-state ensemble bagging is delivered (ADR 0009,
+`docs/adr/0009-retained-state-trainable-models.md`); the versioned
 Consus study schema remains an explicitly open Tyche-owned follow-up, and the
 crates.io publication sequence is an external release gate: `tyche-core` is
 `publish = true` with a tag-gated Trusted Publishing workflow, while the

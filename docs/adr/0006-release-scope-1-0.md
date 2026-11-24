@@ -3,7 +3,7 @@
 - Status: Accepted
 - Change class: minor
 - Date: 2026-11-12
-- Revised: 2026-11-24, ensemble-bagging seam delivered (ADR 0009)
+- Revised: 2026-11-24, ensemble-bagging seam delivered (ADR 0009); planned versions 0.6.0 and 0.7.0 because `tyche-core` 0.5.0 is published (tag `tyche-core-v0.5.0`, crates.io)
 
 ## Context
 
@@ -21,10 +21,10 @@ release automation.
 
 Adopt a three-milestone ladder to 1.0 recorded in `backlog/milestones.md`:
 
-- **M-uq-closure** (0.5.0): the UQ surface is honest — a real
+- **M-uq-closure** (0.6.0): the UQ surface is honest — a real
   trainable-model seam for ensemble bagging, replacing the score-only
   model that retains no trained state.
-- **M-study-schema** (0.6.0): studies persist against a versioned
+- **M-study-schema** (0.7.0): studies persist against a versioned
   metadata/payload schema with manifest-last completeness; durability
   itself waits on Consus transaction support (dependency, not ladder
   content).
