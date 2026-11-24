@@ -1,6 +1,6 @@
 //! Bagging over the provider's deterministic bootstrap resamples.
 
-use alloc::{vec, vec::Vec};
+use alloc::vec::Vec;
 use core::{fmt, marker::PhantomData, num::NonZeroU32};
 
 use eunomia::RealField;
@@ -32,12 +32,14 @@ impl<A: StreamAlgorithm> Bagging<A> {
     /// # Errors
     ///
     /// Returns [`BaggingError::PopulationLength`] when `observations` does not
-    /// match the bootstrap population, else the first member's failure.
+    /// match the bootstrap population, [`BaggingError::ResampleAllocation`]
+    /// when the resample buffer cannot be allocated, else the first member's
+    /// failure.
     ///
     /// # Panics
     ///
-    /// Never in practice: the resample buffer has the length the bootstrap
-    /// requires.
+    /// Only if the `fill_into` length invariant breaks: the resample buffer is
+    /// resized to exactly [`Bootstrap::resample_size`] before every fill.
     pub fn fit<'model, M, T>(
         self,
         model: &'model M,
@@ -54,7 +56,12 @@ impl<A: StreamAlgorithm> Bagging<A> {
                 actual: observations.len(),
             });
         }
-        let mut resample = vec![0; self.bootstrap.resample_size()];
+        let resample_size = self.bootstrap.resample_size();
+        let mut resample = Vec::new();
+        resample
+            .try_reserve_exact(resample_size)
+            .map_err(|_| BaggingError::ResampleAllocation { resample_size })?;
+        resample.resize(resample_size, 0);
         let fitted = (0..self.members.get())
             .map(|replicate| {
                 self.bootstrap
@@ -120,6 +127,11 @@ pub enum BaggingError<E> {
         /// Supplied observation count.
         actual: usize,
     },
+    /// The resample buffer of `resample_size` indices cannot be allocated.
+    ResampleAllocation {
+        /// Index count of the requested resample.
+        resample_size: usize,
+    },
     /// A member's fit failed.
     Model(E),
 }
@@ -131,6 +143,10 @@ impl<E> fmt::Display for BaggingError<E> {
                 formatter,
                 "bagging received {actual} observations for a population of {expected}"
             ),
+            Self::ResampleAllocation { resample_size } => write!(
+                formatter,
+                "bagging cannot allocate a resample of {resample_size} indices"
+            ),
             Self::Model(_) => formatter.write_str("bagging member fit failed"),
         }
     }
@@ -139,7 +155,7 @@ impl<E> fmt::Display for BaggingError<E> {
 impl<E: core::error::Error + 'static> core::error::Error for BaggingError<E> {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
-            Self::PopulationLength { .. } => None,
+            Self::PopulationLength { .. } | Self::ResampleAllocation { .. } => None,
             Self::Model(source) => Some(source),
         }
     }

@@ -165,3 +165,39 @@ fn bagging_failures_carry_their_typed_variants() {
     ));
     assert_eq!(model.fits.get(), 1, "the first failing member ends the fit");
 }
+
+/// Fits one observation under a resample of `resample_size` indices and
+/// returns the failure with the number of fits the model performed.
+fn fit_one_observation<T: RealField>(
+    resample_size: usize,
+) -> (Option<BaggingError<LineError>>, usize) {
+    let model = OriginLine::default();
+    let design = Bootstrap::<SplitMix64>::new(1, resample_size).expect("positive sizes");
+    let outcome = Bagging::new(design, NonZeroU32::MIN)
+        .fit::<_, T>(&model, SEED, &[(T::ONE, T::ONE)])
+        .err();
+    (outcome, model.fits.get())
+}
+
+fn unallocatable_resamples_report_their_size<T: RealField>() {
+    // `usize::MAX` overflows the capacity computation. The second size is the
+    // largest element count whose byte length is at most `isize::MAX`: the
+    // capacity check admits it and the allocator refuses it because no host
+    // address space holds 2^63 bytes.
+    let largest_layout = isize::MAX.cast_unsigned() / size_of::<usize>();
+    for resample_size in [usize::MAX, largest_layout] {
+        assert_eq!(
+            fit_one_observation::<T>(resample_size),
+            (Some(BaggingError::ResampleAllocation { resample_size }), 0),
+            "no member fits when the resample cannot be allocated"
+        );
+    }
+}
+
+#[test]
+fn fit_rejects_an_unallocatable_resample_with_a_typed_error() {
+    unallocatable_resamples_report_their_size::<f32>();
+    unallocatable_resamples_report_their_size::<f64>();
+    unallocatable_resamples_report_their_size::<F32>();
+    unallocatable_resamples_report_their_size::<F64>();
+}

@@ -48,16 +48,6 @@
 - Question: does Consus expose a flush or transaction contract yet? ADR 0001 records none. Method: read the Consus `Store` trait at the locked revision; a contract adds a durability item and leaves this one unchanged.
 - Next step: record the schema version header and the manifest-last write order in an ADR beside ADR 0001, then add the schema with the round-trip test.
 
-<a id="tyche-bagging-001"></a>
-## TYCHE-BAGGING-001 — Bagging resample allocation panics [minor] — todo
-- priority: correctness; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.
-- Outcome: `Bagging::fit` returns a typed error where it now panics. `Bootstrap::new(1, usize::MAX)` is accepted (`crates/tyche-core/src/sampling/resampling.rs:32-46` checks only `u64` addressability), then `vec![0; self.bootstrap.resample_size()]` (`crates/tyche-core/src/ensemble/bagging.rs:57`) overflows capacity. The `# Panics` text "Never in practice" (`bagging.rs:37-40`) is false for that input, and any resample too large to allocate reaches the allocator abort.
-- Acceptance: test `bagging::fit_rejects_an_unallocatable_resample_with_a_typed_error` in `crates/tyche-core/tests/main/bagging.rs` fits one observation under two `Bootstrap::<SplitMix64>` resample sizes and asserts by value `Err(BaggingError::ResampleAllocation { resample_size })` for each: (a) `usize::MAX`; (b) `isize::MAX.cast_unsigned() / size_of::<usize>()` (isize::MAX/8 on a 64-bit host), which the capacity check admits and the allocator refuses. The variant `ResampleAllocation { resample_size: usize }` does not exist; adding it is this item's deliverable. A special case on `usize::MAX` alone fails (b). Run `cargo nextest run -p tyche-core --locked --all-features --test main -E 'test(=bagging::fit_rejects_an_unallocatable_resample_with_a_typed_error)'`.
-- Design: reserve with `Vec::try_reserve_exact`, then fill. `BaggingError` is `#[non_exhaustive]`, so the added variant is [minor]. The `# Panics` section then names only the `expect` whose invariant `fill_into` establishes.
-- Verification at the basis: read from source (the cited lines); `Bagging::fit` is not run. A standalone rustc 1.97.0 probe (judge-reported, not rerun here) showed `vec![0usize; usize::MAX]` panics with capacity overflow and `Vec::try_reserve_exact` returns `Err` for (a) and (b) without committing memory. Case (b) is refused only because the host address space is below 2^63 bytes (recalled: at most 2^57 on x86-64, 2^52 on aarch64; unverified).
-- Scope: `crates/tyche-core/src/ensemble/bagging.rs`, `crates/tyche-core/tests/main/bagging.rs`, `docs/adr/0009-retained-state-trainable-models.md` (error list).
-- Next step: add the failing test, then the reservation and variant.
-
 <a id="tyche-bagging-002"></a>
 ## TYCHE-BAGGING-002 — Bagging tests that kill surviving mutants [patch] — todo
 - priority: verification; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.

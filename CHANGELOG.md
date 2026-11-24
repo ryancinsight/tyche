@@ -10,6 +10,10 @@
 
 ### Fixed
 
+- [minor] `Bagging::fit` returns `BaggingError::ResampleAllocation` where it
+  panicked or aborted on a resample that cannot be allocated, such as
+  `Bootstrap::new(1, usize::MAX)`. The error enum is `#[non_exhaustive]`, so
+  the added variant is compatible.
 - [patch] Preserve squared Pearson correlation when the accumulated centered
   sums are finite and nonzero but their products overflow, underflow to zero,
   or lose bits as subnormals. Report finalization now normalizes exceptional
