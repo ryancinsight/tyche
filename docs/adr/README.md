@@ -16,3 +16,4 @@
 | [0005](0005-discrete-importance-sampling.md) | Borrowed discrete importance sampling | Accepted |
 | [0006](0006-release-scope-1-0.md) | Tyche release scope for 1.0 | Accepted |
 | [0008](0008-registry-provider-release.md) | Publish the Eunomia 0.12 study boundary | Accepted |
+| [0009](0009-retained-state-trainable-models.md) | Retained-state trainable models | Accepted |

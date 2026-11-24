@@ -36,9 +36,10 @@ Tyche's sampling and statistics seams are consumed without local copies:
   bootstrap index generation; percentile interpolation stays consumer-owned.
 
 Adaptive estimator breadth (Morris and Saltelli Sobol' indices) now closes
-the previously deferred screening increments; the versioned Consus study
-schema and the score-only ensemble model remain explicitly open Tyche-owned
-follow-ups, and the crates.io publication sequence is an external release
-gate: `tyche-core` is `publish = true` with a tag-gated Trusted Publishing
-workflow, while the workspace facade and adapter crates stay `publish =
-false` until dependency-ordered registry publication is authorized.
+the previously deferred screening increments. The `TrainableModel` and
+`Bagging` seam for retained-state ensemble bagging is delivered; the versioned
+Consus study schema remains an explicitly open Tyche-owned follow-up, and the
+crates.io publication sequence is an external release gate: `tyche-core` is
+`publish = true` with a tag-gated Trusted Publishing workflow, while the
+workspace facade and adapter crates stay `publish = false` until
+dependency-ordered registry publication is authorized.

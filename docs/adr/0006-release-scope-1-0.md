@@ -3,6 +3,7 @@
 - Status: Accepted
 - Change class: minor
 - Date: 2026-11-12
+- Revised: 2026-11-24, ensemble-bagging seam delivered (ADR 0009)
 
 ## Context
 
@@ -11,10 +12,10 @@ workspace 0.4.0) is the Atlas stack's reproducible uncertainty-study
 provider: counter-addressed streams, random-access LHS and Sobol designs,
 discrete/importance sampling, bootstrap indices, Morris/Saltelli
 estimators, and versioned study execution. Sampling breadth (TYCHE-003)
-and the multi-output sensitivity closure (TYCHE-004) are delivered; three
-open scopes remain: the ensemble-bagging trainable-model seam, the
-versioned study schema, and the crates.io release automation. No
-milestone ladder exists to 1.0.
+and the multi-output sensitivity closure (TYCHE-004) are delivered, as is the
+ensemble-bagging trainable-model seam ([ADR 0009](0009-retained-state-trainable-models.md));
+two open scopes remain: the versioned study schema and the crates.io
+release automation. No milestone ladder exists to 1.0.
 
 ## Decision
 

@@ -31,16 +31,14 @@ allocation. A two-output test verifies independent correlation vectors, Morris
 oracles. Local evidence: fmt, warning-denied Clippy, `cargo nextest run -p
 tyche-core` 48/48, and 17/17 doctests pass.
 
-The only remaining TYCHE-004 scope is a genuine trainable-model seam for
-ensemble bagging; the current score-only model remains excluded from the
-provider migration.
+The trainable-model seam for ensemble bagging is delivered as `TrainableModel`,
+`Bagging` and `BaggedModel`
+([ADR 0009](docs/adr/0009-retained-state-trainable-models.md)).
 
 The multi-output estimator delivery is closed at source
 `dc96f5ecd6af643e34f2146b9f3dbb49ba85dbae`, merged as provider default
 `4a6f8cd495c78beaaa6e4081705b33ed0da8be9e`. Hosted verification and
 supply-chain run `31675476210` passed; the book build run `31675476477` passed.
-The trainable-model seam remains a separate correctness item because the
-current ensemble model retains no trained model state.
 
 ## Phase 0 closure
 
@@ -150,7 +148,8 @@ The remaining hosted evidence limits are explicit.
 - The remaining consumer bootstrap work is therefore limited to any other
   consumer-specific confidence policies; Tyche's provider index-generation
   contract is consumed at this audited Kwavers boundary. Ensemble entropy and
-  `rand` ownership remain separate until a real trainable-model seam exists.
+  `rand` ownership remain open: this repository records no consumer migration
+  to the delivered seam, whose `Bagging::fit` takes an explicit `Seed`.
 
 ## Commit message rules are unenforced
 
