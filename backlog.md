@@ -1,8 +1,19 @@
 # Tyche implementation backlog
 
+<a id="tyche-correlation-range-002"></a>
+## TYCHE-CORRELATION-RANGE-002 — Correlation range release evidence [major] — blocked
+- priority: verification; milestone: M-uq-closure (planned 0.5.0, published); needs: none; basis: `0663169b4ab801812b1c6a086a06cd64b8f4ed59`.
+- Outcome: ADR, midpoint, `report` benchmark and allocation evidence for the correlation-range repair merged as `ddde0f81`, and a 0.5.0 record that cites it.
+- Acceptance: ADR 0007 (0006 is the 1.0 release scope) is Accepted, indexed and records the provider hold; a midpoint-index test passes; Criterion baselines cover `report` for multiple outputs; a test beside `layout_allocation.rs` counts `report` allocations; `CHANGELOG.md` lists the repair under 0.5.0.
+- Evidence at the basis: `docs/adr/README.md` lists no 0007; `correlation_range.rs` has no midpoint case; `benches/counter_sampling.rs` has no `report` group; `layout_allocation.rs` never calls `report`; `CHANGELOG.md` files the repair under Unreleased although release commit `c49c984f` contains `ddde0f81`.
+- Scope: `docs/adr/`, `crates/tyche-core/benches/`, `crates/tyche-core/tests/main/`, `CHANGELOG.md`.
+- Blocker: the hold recorded on the claim head `refs/pull/117/head`: ADR 0006 stays Proposed until the owner-led provider/consumer sequence is qualified. ADR 0006 is Accepted and 0.5.0 is published (`gap_audit.md`, Tyche Core 0.5.0 release verification); no tracked file records whether that sequence is qualified.
+- Question: is the owner-led provider/consumer sequence qualified? Method: the owner answers in the batched Ask-User round and the answer lands as a line in `gap_audit.md`. Re-open trigger: that line; on yes the status becomes todo.
+- Next step: draft ADR 0007 and its index row from the `correlation_range.rs` cases, then add the midpoint, `report` benchmark and allocation cases.
+
 <a id="tyche-stable-qualification"></a>
-## TYCHE-STABLE-QUALIFICATION — tyche stable-release qualification [patch] — todo
-- priority: verification; milestone: M-study-schema; basis: `f490b7bb3bae`.
+## TYCHE-STABLE-QUALIFICATION — tyche stable-release qualification [major] — todo
+- priority: verification; milestone: M-uq-closure (a non-feature item takes the current milestone; its entries run on through M-study-schema and M-1.0); basis: `f490b7bb3bae`.
 - Outcome: Close the durable study contract after the 0.5.0 Core release. Follow the [release scope](docs/adr/0006-release-scope-1-0.md) and [milestone exits](backlog/milestones.md). Planning targets for `tyche-core` are 0.5.1 only for compatible repairs, then 0.6.0, then 1.0.0. Verification alone can advance the current version.
 - Acceptance and sequence: the entries below, in order. Representative manifest `tyche-core 0.5.0`; target 1.0.0.
 - [ ] [patch] Reconcile the released Core receipt with TYCHE-CORRELATION-RANGE-002. Check the status of the proposed correlation repair independently and replay the deterministic stream and UQ value oracles.
@@ -12,24 +23,7 @@
 - [ ] [minor] **0.6.0.** Persist a complete study with the Consus adapter and recover it by manifest. Compare metadata, array shape, payload bytes and sampled values, then check missing or corrupted payload handling.
 - [ ] [major] **1.0.0-beta.1 → 1.0.0-rc.1 → 1.0.0.** Freeze the supported surface at beta. An independent study reader reproduces the recorded results and rejects an inconsistent archive. Keep private adapters on their declared channel. Repeat the applicable exits on the exact RC before stable promotion. Run the [release scope](docs/adr/0006-release-scope-1-0.md) exits and attach reviewed, exact-revision evidence for this member’s [Atlas qualification criteria](https://github.com/ryancinsight/atlas/blob/17b0124a7548ad81e817284afc5cb115c1d1bc78/docs/parity/repositories.json).
 
-<a id="tyche-correlation-range-002"></a>
-
-## TYCHE-CORRELATION-RANGE-002 — Correlation range release evidence [major] — blocked
-
-- **Milestone:** M-uq-closure (planned version 0.5.0, the release this item records).
-- Outcome: 0.5.0 bump, correlation-repair ADR, provider hold, midpoint tests and
-  `report` evidence that the repair dropped from released claim `refs/pull/117/head`.
-- Acceptance: ADR 0007 (0006 is the 1.0 release scope) is Accepted, indexed and
-  records the provider hold; a midpoint-index test passes; Criterion baselines
-  cover `report` for multiple outputs and a test beside `layout_allocation.rs`
-  counts its allocations; the 0.5.0 record cites the repair.
-- The 0.5.0 provider release is complete. The correlation-specific ADR,
-  benchmark, and allocation evidence remain open for the repair in PR 126.
-- Scope: `docs/adr/`, `crates/tyche-core/benches/`, workspace version.
-- Basis: `ddde0f81`; priority: verification; needs: none
-
 <a id="tyche-004"></a>
-
 ## TYCHE-004 — Trainable-model seam for ensemble bagging [minor] — todo
 
 - **Milestone:** M-uq-closure (the delivered bootstrap, Morris, Saltelli and multi-output reports stay closed; only the seam remains).
@@ -43,23 +37,11 @@
 - Basis: `0663169b4ab801812b1c6a086a06cd64b8f4ed59`
 
 <a id="tyche-005"></a>
-
 ## TYCHE-005 — Study schema [minor] — todo
-
 - **Milestone:** M-study-schema (durability waits on Consus transaction support as a dependency, not ladder content).
-- Basis: `30ca9dc9`; priority: feature; needs: none
-- Versioned metadata/payload schema and manifest-last completeness; durability
-  waits for Consus transaction support.
-
-<a id="tyche-008"></a>
-
-## TYCHE-008 — crates.io release automation [patch] — todo
-
-- **Milestone:** M-1.0 (the 0.5.0 registry publication is delivered).
-- Outcome: `tyche-core` publishes to crates.io only through Trusted Publishing from an exact-source GitHub Release, and the Consus, Moirai and facade adapters stay private with `publish = false`.
-- Evidence at `0663169b4ab8`: crates.io lists `tyche-core` 0.5.0 with `trustpub_only` true (`https://crates.io/api/v1/crates/tyche-core`); release `tyche-core-v0.5.0` targets `c49c984f5fbe`, an ancestor of default; `Crates.io Release` run `44782145848` concluded success on that commit; `gap_audit.md:9-15` records the archive hash match and the independent stream replay.
-- Acceptance: standalone locked package validation and focused tests pass; the crate is indexed; the exact-source GitHub Release exists; crates.io accepts only trusted-publisher updates; version 0.5.0 is indexed and the trusted publishing run records the distribution; the independent stream replay passes.
-- priority: feature; needs: none
-- Scope: `crates/tyche-core/Cargo.toml`, `.github/workflows/rust-release.yml`, `gap_audit.md`.
-- Next step: acceptance holds at the basis by the evidence above; delete this item. The delivering commits carry `Refs: TYCHE-008`, not an `Item:` trailer, so the deleting commit cites release commit `c49c984f5fbe`.
-- Basis: `0663169b4ab801812b1c6a086a06cd64b8f4ed59`
+- priority: feature; needs: none; basis: `0663169b4ab801812b1c6a086a06cd64b8f4ed59`.
+- Outcome: a study persists through `tyche-consus` under a versioned metadata and payload schema with the manifest written last, so a reader recovers a complete study or rejects an incomplete one. [ADR 0001](docs/adr/0001-reproducible-study-boundary.md) (Persistence boundary) claims logical completeness only, not crash durability.
+- Acceptance: the M-study-schema exit check. A test persists a complete study, recovers it by manifest and compares metadata, array shape, payload bytes and sampled values, and rejects missing, reordered and corrupted payloads with typed errors. At the basis `crates/tyche-consus/tests/archive_roundtrip.rs` holds one byte round-trip and key-safety test, and `git grep -n -i manifest -- crates` is empty.
+- Scope: `crates/tyche-consus/src/`, `crates/tyche-consus/tests/`, `docs/adr/`.
+- Question: does Consus expose a flush or transaction contract yet? ADR 0001 records none. Method: read the Consus `Store` trait at the locked revision; a contract adds a durability item and leaves this one unchanged.
+- Next step: record the schema version header and the manifest-last write order in an ADR beside ADR 0001, then add the schema with the round-trip test.
