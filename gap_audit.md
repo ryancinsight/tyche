@@ -4,7 +4,7 @@
 
 Reviewed [tyche-core 0.5.0](crates/tyche-core/Cargo.toml) at [f490b7bb3bae](https://github.com/ryancinsight/tyche/tree/f490b7bb3bae0aa1fe81a349a5d4738aab90eb6a). The exact version appears in the [registry](https://crates.io/crates/tyche-core/0.5.0).
 
-The next [patch] checkpoint uses [correlation range](crates/tyche-core/tests/main/correlation_range.rs). [Target version and acceptance criteria](checklist.md#stable-release-checklist).
+The next [patch] checkpoint uses [correlation range](crates/tyche-core/tests/main/correlation_range.rs). [Target version and acceptance criteria](backlog.md#tyche-stable-qualification).
 
 ## Tyche Core 0.5.0 release verification
 
@@ -26,9 +26,9 @@ artifact while the Consus adapter, Moirai adapter, and facade remain private.
 The prior manifests inherited the workspace-level `publish = true` for all
 four packages, while the README described those private packages as merely
 unreleased. The three integration manifests now set `publish = false`, and
-the README, CHANGELOG, checklist, and backlog agree with the Cargo metadata.
-The remaining TYCHE-008 work is external registry configuration and exact
-release evidence; this slice does not claim publication. Formatting and
+the README, CHANGELOG, and backlog agree with the Cargo metadata.
+This slice does not claim publication; the 0.5.0 registry release is recorded
+in the verification section above. Formatting and
 locked no-dependency metadata pass. The locked Nextest gate is blocked before
 compilation by the Atlas overlay's unused local patches requiring a lockfile
 rewrite, so this change carries no focused-test claim.
@@ -84,9 +84,10 @@ allocator, or physics ownership.
   local fixed collocation LHS and pseudo-Sobol generators and consumes Tyche's
   const-generic random-access designs. Kwavers retains measure-correct
   rectangle, disk, ball, boundary, and interface mapping. Local evidence is
-  46/46 grid and 21/21 PINN geometry/config tests; 23 hosted checks, including
-  code coverage, have succeeded while four full benchmark pairs continue on
-  the exact source head.
+  46/46 grid and 21/21 PINN geometry/config tests. On the exact source head the
+  hosted checks, including code coverage and the four full benchmark pairs,
+  succeed, while the `benchmark regression check` job of hosted run
+  `29875283986` fails.
 
 ## Provider residuals
 
