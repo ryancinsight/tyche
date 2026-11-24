@@ -38,19 +38,6 @@
 - Acceptance: ADR 0007 reads `Status: Accepted` and `docs/adr/README.md` lists it Accepted; `python scripts/adr-index.py check --directory docs/adr` passes from an Atlas checkout.
 - Scope: `docs/adr/0007-correlation-provider-release-boundary.md`, `docs/adr/README.md`.
 
-<a id="tyche-004"></a>
-## TYCHE-004 — Trainable-model seam for ensemble bagging [minor] — todo
-
-- **Milestone:** M-uq-closure (the delivered bootstrap, Morris, Saltelli and multi-output reports stay closed; only the seam remains).
-- Outcome: `tyche-core` owns a trainable-model contract that retains trained state, so consumer ensemble bagging can adopt provider resampling instead of a score-only model whose prediction perturbs an external predictor.
-- Evidence at `0663169b4ab8`: `crates/tyche-core/src/ensemble/model.rs:4-22` holds only the evaluation contract `StudyModel::evaluate`; `git grep -n -i -e trainable -e bagging -- crates` is empty; [ADR 0006](docs/adr/0006-release-scope-1-0.md) lines 15 and 24-25 and `README.md:197-200` name the seam as open.
-- Acceptance: the M-uq-closure exit check. `cargo test -p tyche-core --locked --all-features` runs an ensemble-bagging case over a retained trainable model; no such test exists today.
-- Replay boundary: consumers persisting bootstrap results record `SplitMix64::VERSION` and never compare them with a former local modulo schedule.
-- priority: feature; needs: none
-- Scope: `crates/tyche-core/src/ensemble/`, `crates/tyche-core/tests/main/`, `docs/adr/`.
-- Next step: record the retained-state training contract in an ADR beside `StudyModel`, then add it with the bagging test.
-- Basis: `0663169b4ab801812b1c6a086a06cd64b8f4ed59`
-
 <a id="tyche-005"></a>
 ## TYCHE-005 — Study schema [minor] — todo
 - **Milestone:** M-study-schema (durability waits on Consus transaction support as a dependency, not ladder content).
