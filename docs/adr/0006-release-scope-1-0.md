@@ -15,7 +15,7 @@ estimators, and versioned study execution. Sampling breadth (TYCHE-003)
 and the multi-output sensitivity closure (TYCHE-004) are delivered, as is the
 ensemble-bagging trainable-model seam ([ADR 0009](0009-retained-state-trainable-models.md));
 two open scopes remain: the versioned study schema and the crates.io
-release automation. No milestone ladder exists to 1.0.
+release automation.
 
 ## Decision
 
