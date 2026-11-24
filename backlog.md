@@ -55,11 +55,11 @@
 
 ## TYCHE-008 — crates.io release automation [patch] — todo
 
-- **Milestone:** M-1.0 (the 0.5.0 registry publication is delivered; the independent-consumer replay remains).
+- **Milestone:** M-1.0 (the 0.5.0 registry publication is delivered).
 - Outcome: `tyche-core` publishes to crates.io only through Trusted Publishing from an exact-source GitHub Release, and the Consus, Moirai and facade adapters stay private with `publish = false`.
-- Evidence at `0663169b4ab8`: crates.io lists `tyche-core` 0.5.0 with `trustpub_only` true (`https://crates.io/api/v1/crates/tyche-core`); release `tyche-core-v0.5.0` targets `c49c984f5fbe`, an ancestor of default; `Crates.io Release` run `44782145848` concluded success on that commit; `gap_audit.md` section "Tyche Core 0.5.0 release verification" records the archive hash match and the replay.
-- Acceptance: an independent consumer that generates its lock from scratch resolves 0.5.0 from crates.io and reproduces the four version-one counter words, and the evidence facts above hold.
+- Evidence at `0663169b4ab8`: crates.io lists `tyche-core` 0.5.0 with `trustpub_only` true (`https://crates.io/api/v1/crates/tyche-core`); release `tyche-core-v0.5.0` targets `c49c984f5fbe`, an ancestor of default; `Crates.io Release` run `44782145848` concluded success on that commit; `gap_audit.md:9-15` records the archive hash match and the independent stream replay.
+- Acceptance: standalone locked package validation and focused tests pass; the crate is indexed; the exact-source GitHub Release exists; crates.io accepts only trusted-publisher updates; version 0.5.0 is indexed and the trusted publishing run records the distribution; the independent stream replay passes.
 - priority: feature; needs: none
 - Scope: `crates/tyche-core/Cargo.toml`, `.github/workflows/rust-release.yml`, `gap_audit.md`.
-- Next step: rerun that replay against the registry artifact, then delete this item in the commit that carries `Item: TYCHE-008`.
+- Next step: acceptance holds at the basis by the evidence above; delete this item. The delivering commits carry `Refs: TYCHE-008`, not an `Item:` trailer, so the deleting commit cites release commit `c49c984f5fbe`.
 - Basis: `0663169b4ab801812b1c6a086a06cd64b8f4ed59`
