@@ -31,10 +31,6 @@ allocation. A two-output test verifies independent correlation vectors, Morris
 oracles. Local evidence: fmt, warning-denied Clippy, `cargo nextest run -p
 tyche-core` 48/48, and 17/17 doctests pass.
 
-The trainable-model seam for ensemble bagging is delivered as `TrainableModel`,
-`Bagging` and `BaggedModel`
-([ADR 0009](docs/adr/0009-retained-state-trainable-models.md)).
-
 The multi-output estimator delivery is closed at source
 `dc96f5ecd6af643e34f2146b9f3dbb49ba85dbae`, merged as provider default
 `4a6f8cd495c78beaaa6e4081705b33ed0da8be9e`. Hosted verification and
