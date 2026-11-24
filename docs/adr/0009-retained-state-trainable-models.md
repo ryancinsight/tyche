@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-11-24
 - Class: [minor]
-- Revised: 2026-11-24, `predict` refit wording limited to the contract
+- Revised: 2026-11-24, the refit statement narrowed to what `BaggedModel::predict` provably does (calls only `TrainableModel::predict`, never `fit`), because no trait text excludes a `Fitted` that stores observations; evidence: `bagging.rs:100-108` and the fit counter at `tests/main/bagging.rs:118-120` (PR #144)
 
 ## Context
 
@@ -21,9 +21,11 @@ M-uq-closure and records no contract for it.
 - `TrainableModel<T>` (`model.rs:72-100`): the implementor holds
   hyperparameters; `fit(&self, observations, resample)` returns the fitted
   state as an owned `Fitted` value, and `predict(&self, &Fitted, &Input)`
-  reads it. `predict` receives no training data, so it refits only if an
-  implementor's `Fitted` stores the observations, which the contract excludes.
-  Dispatch is static.
+  reads it. `BaggedModel::predict` calls only `TrainableModel::predict`,
+  never `fit` (`bagging.rs:100-108`), and the fit counter of the bagging test
+  witnesses this for its model. The contract places no restriction on
+  `Fitted`, so an instance-based model whose state is the observations stays
+  admissible and may do its own work inside `predict`. Dispatch is static.
 - `Bagging<A>` (`bagging.rs:19-74`) wraps a `Bootstrap<A>` and a nonzero
   member count. Member `r` fits the resample at replicate `r`, filled by
   `Bootstrap::fill_into`. Bagging adds no random stream: replay is governed by

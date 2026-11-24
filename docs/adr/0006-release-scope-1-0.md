@@ -4,6 +4,7 @@
 - Change class: minor
 - Date: 2026-11-12
 - Revised: 2026-11-24, ensemble-bagging seam delivered (ADR 0009); planned versions 0.6.0 and 0.7.0 because `tyche-core` 0.5.0 is published (tag `tyche-core-v0.5.0`, crates.io)
+- Revised: 2026-11-24, M-uq-closure exit narrowed to the named bagging test and the whole-package `cargo test -p tyche-core --locked --all-features` moved from `exit:` to `standing:` (nextest and `test --doc` there), because an exit check names one feature and a whole-package run is a regression gate; the standing line preserves the old check, so nothing is weakened; evidence: `backlog/milestones.md:3-4` in PR #144
 
 ## Context
 

@@ -52,21 +52,21 @@
 ## TYCHE-BAGGING-001 — Bagging resample allocation panics [minor] — todo
 - priority: correctness; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.
 - Outcome: `Bagging::fit` returns a typed error where it now panics. `Bootstrap::new(1, usize::MAX)` is accepted (`crates/tyche-core/src/sampling/resampling.rs:32-46` checks only `u64` addressability), then `vec![0; self.bootstrap.resample_size()]` (`crates/tyche-core/src/ensemble/bagging.rs:57`) overflows capacity. The `# Panics` text "Never in practice" (`bagging.rs:37-40`) is false for that input, and any resample too large to allocate reaches the allocator abort.
-- Acceptance: test `bagging::fit_rejects_an_unallocatable_resample_with_a_typed_error` in `crates/tyche-core/tests/main/bagging.rs` fits `Bootstrap::<SplitMix64>::new(1, usize::MAX)` over one observation and matches a new `BaggingError` variant carrying the resample size; run `cargo nextest run -p tyche-core --locked --all-features --test main -E 'test(=bagging::fit_rejects_an_unallocatable_resample_with_a_typed_error)'`. It fails today with a capacity-overflow panic.
+- Acceptance: test `bagging::fit_rejects_an_unallocatable_resample_with_a_typed_error` in `crates/tyche-core/tests/main/bagging.rs` fits one observation under two `Bootstrap::<SplitMix64>` resample sizes and asserts by value `Err(BaggingError::ResampleAllocation { resample_size })` for each: (a) `usize::MAX`; (b) `isize::MAX.cast_unsigned() / size_of::<usize>()` (isize::MAX/8 on a 64-bit host), which the capacity check admits and the allocator refuses. The variant `ResampleAllocation { resample_size: usize }` does not exist; adding it is this item's deliverable. A special case on `usize::MAX` alone fails (b). Run `cargo nextest run -p tyche-core --locked --all-features --test main -E 'test(=bagging::fit_rejects_an_unallocatable_resample_with_a_typed_error)'`.
 - Design: reserve with `Vec::try_reserve_exact`, then fill. `BaggingError` is `#[non_exhaustive]`, so the added variant is [minor]. The `# Panics` section then names only the `expect` whose invariant `fill_into` establishes.
-- Verification at the basis: read from source (the cited lines); the panic itself is not run.
+- Verification at the basis: read from source (the cited lines); `Bagging::fit` is not run. A standalone rustc 1.97.0 probe (judge-reported, not rerun here) showed `vec![0usize; usize::MAX]` panics with capacity overflow and `Vec::try_reserve_exact` returns `Err` for (a) and (b) without committing memory. Case (b) is refused only because the host address space is below 2^63 bytes (recalled: at most 2^57 on x86-64, 2^52 on aarch64; unverified).
 - Scope: `crates/tyche-core/src/ensemble/bagging.rs`, `crates/tyche-core/tests/main/bagging.rs`, `docs/adr/0009-retained-state-trainable-models.md` (error list).
 - Next step: add the failing test, then the reservation and variant.
 
 <a id="tyche-bagging-002"></a>
 ## TYCHE-BAGGING-002 — Bagging tests that kill surviving mutants [patch] — todo
 - priority: verification; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.
-- Outcome: three tests in `crates/tyche-core/tests/main/bagging.rs` (its only error case is an empty slice and `OriginLine::predict` never fails), each failing under one mutant of `crates/tyche-core/src/ensemble/bagging.rs`:
+- Outcome: three tests in `crates/tyche-core/tests/main/bagging.rs` (its only `PopulationLength` case is an empty slice, its other error case `Model(LineError::DegenerateDesign)` never reaches `source()`, and `OriginLine::predict` never fails), each failing under one mutant of `crates/tyche-core/src/ensemble/bagging.rs`:
   - `bagging::over_length_observations_report_population_length`: ten observations against population nine return `PopulationLength { expected: 9, actual: 10 }` and fit no member; kills `!=` to `<` at line 51.
   - `bagging::model_failure_exposes_its_source`: `BaggingError::Model(e).source()` is `Some` and is that error; `PopulationLength` yields `None`; kills `source()` returning `None`.
   - `bagging::prediction_failure_propagates_from_the_first_member`: a model whose `predict` errors makes `BaggedModel::predict` return that error; kills a swallowed error at line 103.
-- Acceptance: all three pass at the head and fail under their mutant; `cargo mutants -p tyche-core --file crates/tyche-core/src/ensemble/bagging.rs` reports no survivor on those lines.
-- Also: reword `crates/tyche-core/src/ensemble/model.rs:41-43` "so predicting never refits" to the ADR 0009 contract wording (an implementor whose `Fitted` stores the observations can refit; the contract excludes it).
+- Acceptance: all three pass at the head and fail under their mutant; `cargo mutants -p tyche-core --file crates/tyche-core/src/ensemble/bagging.rs` reports no survivor on those lines (a manual mutation substitutes where the tool does not generate the mutant); `git grep -n 'predicting never refits' -- crates/tyche-core/src` is empty.
+- Also: reword `crates/tyche-core/src/ensemble/model.rs:41-43` "so predicting never refits" to what the code proves: `BaggedModel::predict` calls only `TrainableModel::predict`, never `fit` (`bagging.rs:100-108`), and the fit counter of the existing test (`tests/main/bagging.rs:118-120`) witnesses it for its model. The trait adds no restriction on `Fitted`, so an instance-based model whose state is the observations stays admissible.
 - Verification at the basis: source read; the survivors are derived from the test file's contents, no mutation run.
 - Scope: `crates/tyche-core/tests/main/bagging.rs`, `crates/tyche-core/src/ensemble/model.rs`.
 - Next step: add the three tests, run the mutants command, then the Rustdoc wording.
@@ -75,17 +75,25 @@
 ## TYCHE-TRAINABLE-001 — Decide ADR 0009's open consumer questions [patch] — todo
 - priority: verification; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.
 - Outcome: ADR 0009 records three decisions it omits. (1) Multi-output: `TrainableModel<T>` returns one `T` per prediction, and the Kwavers consumer (`ensemble_methods/mod.rs`, `Array2<f32>` predictions, per-element variance) predicts arrays. (2) Member spread: `BaggedModel::predict` returns only the mean (`bagging.rs:100-108`), while the consumer reports variance. (3) Bound: `fitted_members` and `predict` need `T: RealField` (`bagging.rs:84`) but `Bagging::fit` has no such bound, so a non-scalar `T` fits and cannot be read.
-- Acceptance: ADR 0009 states for each of the three the chosen option, the strongest rejected one and the overturning evidence; `python scripts/adr-index.py check --strict --directory docs/adr` and `atlas-adr-canonical-form.py --check` pass; any chosen API change is filed as its own item citing the ADR.
+- Acceptance: ADR 0009 states for each of the three the chosen option, the strongest rejected one and the overturning evidence; from the tyche checkout root `python D:/atlas/scripts/adr-index.py --strict --directory docs/adr check` and `python D:/atlas/scripts/atlas-adr-canonical-form.py --check docs/adr` pass (tyche has no `scripts/adr-index.py`; both scripts live in the Atlas checkout); any chosen API change is filed as its own item citing the ADR.
 - Verification at the basis: read from `bagging.rs` and from `repos/kwavers` at `origin/main` `7e9ac5d9`; `git grep -n -i -E 'spread|multi-output|RealField' docs/adr/0009-retained-state-trainable-models.md` is empty.
 - Scope: `docs/adr/0009-retained-state-trainable-models.md`.
 - Next step: draft the three decisions as the recommended option and name them veto points.
+
+<a id="tyche-ladder-001"></a>
+## TYCHE-LADDER-001 — Rewrite the milestone ladder to the roadmap rules [patch] — todo
+- priority: verification; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.
+- Outcome: `backlog/milestones.md` has four defects against the roadmap rules. M-study-schema's exit (`milestones.md:6`) is the whole-workspace `cargo test --workspace --locked --all-features`, which a hosted run at the basis passes with no schema (60 of 60 tests; judge-cited run 45338630845, not rerun here). M-1.0 (`:8-9`) has no `exit:` line. No milestone has an example exit check that checks its own result. The first milestone lacks the standing condition for the conformance scan's installed-state assertions.
+- Acceptance: every milestone has an `exit:` of one `<action> <result> <object>` feature with a named runnable check that fails at the basis and passes at the head, one per milestone a runnable example that checks its own result; M-study-schema's exit is the named TYCHE-005 test; M-uq-closure's `standing:` adds the conformance scan's installed-state assertions; a revision note on ADR 0006 names each moved check; a judge verdict confirms every capability area and open feature item maps to an exit check, a non-goal or delivered capability, and each milestone has one check failing at that commit.
+- Scope: `backlog/milestones.md`, `docs/adr/0006-release-scope-1-0.md`.
+- Next step: draft the M-study-schema and M-1.0 exit checks from TYCHE-005's acceptance and `crates/tyche/examples/reproducible_study.rs`, then open the rewrite under `judge-required`.
 
 <a id="tyche-docs-001"></a>
 ## TYCHE-DOCS-001 — Facade registry claims disagree with the registry [patch] — todo
 - priority: verification; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.
 - Outcome: README and the facade manifest stop claiming a 0.4 registry release. `README.md:32-34` says the facade is `publish = false`; `README.md:38-43` and `crates/tyche/Cargo.toml:3-8` tell consumers to depend on `tyche-uncertainty` at `version = "0.4"` from the registry. crates.io lists `tyche-uncertainty` at 0.2.0 only (looked up 2026-11-24, `max_version` 0.2.0) while the workspace version is 0.4.0 and the facade is `publish = false`.
-- Acceptance: `git grep -n 'version = "0.4"' -- README.md crates/tyche/Cargo.toml` is empty, and README states which source a consumer of the current facade uses; a clean consumer resolves that source.
-- Open choice: a Git dependency, a facade release under release authority, or removing the facade from consumer guidance. Publishing is authority-gated.
+- Acceptance: `git grep -n 'version = "0.4"' -- README.md crates/tyche/Cargo.toml` is empty, README states the Git dependency a consumer of the current facade uses, and the README example compiles in a clean consumer crate outside the workspace that depends on that source (`cargo check --locked` there). A `version = "0.2"` edit fails the last clause.
+- Choice: the Git dependency is the recommended option (reversible, within Change authority). The alternatives are a facade release under release authority (publishing is authority-gated) or removing the facade from consumer guidance.
 - Scope: `README.md`, `crates/tyche/Cargo.toml`.
 - Next step: state the Git-dependency form in README and the manifest comment, then resolve it from a scratch consumer.
 
@@ -94,6 +102,6 @@
 - priority: verification; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.
 - Outcome: `docs/book/SUMMARY.md` lists no bootstrap or bagging page (`git grep -n -i -E 'bootstrap|bagging' -- docs/book` finds only `stack_position.md`). Add one chapter with a runnable example whose bagged mean is checked against an independent sum.
 - Outline: resampling with replacement and why the mean aggregation applies; the exact multiply-high reducer and the `(seed, replicate, draw)` address with replay under `SplitMix64::VERSION`; `Bootstrap::at` and allocation-free `fill_into`; the `TrainableModel` seam, `Fitted` ownership and the fit count; error variants; what the provider does not own (percentile policy).
-- Acceptance: `mdbook test docs/book` passes with the example included from a compiled `crates/tyche/examples/` file through `{{#rustdoc_include}}`, and `SUMMARY.md` lists the chapter.
-- Scope: `docs/book/`, `crates/tyche/examples/`.
+- Acceptance: the commands book CI runs pass: `cargo build --locked -p tyche-core`, then `mdbook test docs/book --library-path <cargo target dir>/mdbook-test-libs` (`.github/workflows/book-pages.yml:38-47` calls the pinned Atlas reusable workflow `book-pages.yml` with mdBook 0.5.4, toolchain 1.97.0). That library directory holds `tyche-core` and its dependencies, not the facade, so the example is `crates/tyche-core/examples/book_bagging.rs` importing `tyche_core`, included as `docs/book/examples/moments.md:14-16` includes `book_moments.rs`, in a fenced block that is not `ignore` (an `ignore` block passes without compiling); `SUMMARY.md` lists the chapter.
+- Scope: `docs/book/`, `crates/tyche-core/examples/`.
 - Next step: write the derivation first, then the example, then wire the include.
