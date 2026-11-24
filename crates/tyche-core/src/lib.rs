@@ -24,7 +24,9 @@ pub mod study;
 pub mod uncertainty;
 
 pub use design::{InvalidParameter, Parameter, ParameterSpace, SpaceError};
-pub use ensemble::{Ensemble, ResponseReducer, StudyModel};
+pub use ensemble::{
+    BaggedModel, Bagging, BaggingError, Ensemble, ResponseReducer, StudyModel, TrainableModel,
+};
 pub use sampling::{
     Bootstrap, BootstrapError, Categorical, CategoryCount, CategoryIndex, Counter, Design,
     DigitalShift, DiscreteImportance, DiscreteWeights, ImportanceError, ImportanceSample,
