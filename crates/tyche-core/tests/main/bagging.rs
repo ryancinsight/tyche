@@ -232,8 +232,8 @@ impl<T: RealField> TrainableModel<T> for RefusedFit {
         Err(LineError::DegenerateDesign)
     }
 
-    fn predict(&self, _: &Oversized, _: &()) -> Result<T, LineError> {
-        Err(LineError::DegenerateDesign)
+    fn predict(&self, fitted: &Oversized, (): &()) -> Result<T, LineError> {
+        Ok(T::from_integer(i64::from(fitted.0[0])))
     }
 }
 
