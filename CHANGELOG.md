@@ -10,10 +10,6 @@
 
 ### Fixed
 
-- [minor] `Bagging::fit` returns `BaggingError::ResampleAllocation` where it
-  panicked or aborted on a resample that cannot be allocated, such as
-  `Bootstrap::new(1, usize::MAX)`. The error enum is `#[non_exhaustive]`, so
-  the added variant is compatible.
 - [patch] Preserve squared Pearson correlation when the accumulated centered
   sums are finite and nonzero but their products overflow, underflow to zero,
   or lose bits as subnormals. Report finalization now normalizes exceptional
@@ -52,7 +48,9 @@
   `Bootstrap` replicate, and `BaggedModel::predict` averages the retained
   members without refitting. Resamples come from the provider's bootstrap
   schedule, so `SplitMix64::VERSION` governs replay; no new random stream is
-  added.
+  added. `Bagging::fit` reserves its resample buffer and member storage before
+  any member fits and returns `BaggingError::ResampleAllocation` or
+  `BaggingError::MemberAllocation` where an allocation is refused.
 - Morris elementary-effect screening: `ElementaryEffects::from_steps` reduces
   a validated trajectory (one perturbation per parameter, strictly positive
   step) to per-parameter effects, and `MorrisScreening` accumulates them into

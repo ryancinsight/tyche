@@ -33,8 +33,9 @@ impl<A: StreamAlgorithm> Bagging<A> {
     ///
     /// Returns [`BaggingError::PopulationLength`] when `observations` does not
     /// match the bootstrap population, [`BaggingError::ResampleAllocation`]
-    /// when the resample buffer cannot be allocated, else the first member's
-    /// failure.
+    /// or [`BaggingError::MemberAllocation`] when the resample buffer or the
+    /// member storage cannot be allocated (checked before any member fits),
+    /// else the first member's failure.
     ///
     /// # Panics
     ///
@@ -62,16 +63,23 @@ impl<A: StreamAlgorithm> Bagging<A> {
             .try_reserve_exact(resample_size)
             .map_err(|_| BaggingError::ResampleAllocation { resample_size })?;
         resample.resize(resample_size, 0);
-        let fitted = (0..self.members.get())
-            .map(|replicate| {
-                self.bootstrap
-                    .fill_into(seed, u64::from(replicate), &mut resample)
-                    .expect("invariant: the buffer length equals the resample size");
+        let members = self.members.get();
+        let mut fitted = Vec::new();
+        let reserved =
+            usize::try_from(members).is_ok_and(|count| fitted.try_reserve_exact(count).is_ok());
+        if !reserved {
+            return Err(BaggingError::MemberAllocation { members });
+        }
+        for replicate in 0..members {
+            self.bootstrap
+                .fill_into(seed, u64::from(replicate), &mut resample)
+                .expect("invariant: the buffer length equals the resample size");
+            fitted.push(
                 model
                     .fit(observations, &resample)
-                    .map_err(BaggingError::Model)
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+                    .map_err(BaggingError::Model)?,
+            );
+        }
         Ok(BaggedModel {
             model,
             fitted,
@@ -132,6 +140,11 @@ pub enum BaggingError<E> {
         /// Index count of the requested resample.
         resample_size: usize,
     },
+    /// The storage for `members` trained states cannot be allocated.
+    MemberAllocation {
+        /// Member count of the design.
+        members: u32,
+    },
     /// A member's fit failed.
     Model(E),
 }
@@ -147,6 +160,10 @@ impl<E> fmt::Display for BaggingError<E> {
                 formatter,
                 "bagging cannot allocate a resample of {resample_size} indices"
             ),
+            Self::MemberAllocation { members } => write!(
+                formatter,
+                "bagging cannot allocate storage for {members} trained states"
+            ),
             Self::Model(_) => formatter.write_str("bagging member fit failed"),
         }
     }
@@ -155,7 +172,9 @@ impl<E> fmt::Display for BaggingError<E> {
 impl<E: core::error::Error + 'static> core::error::Error for BaggingError<E> {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
-            Self::PopulationLength { .. } | Self::ResampleAllocation { .. } => None,
+            Self::PopulationLength { .. }
+            | Self::ResampleAllocation { .. }
+            | Self::MemberAllocation { .. } => None,
             Self::Model(source) => Some(source),
         }
     }

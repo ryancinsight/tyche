@@ -180,6 +180,11 @@ fn fit_one_observation<T: RealField>(
 }
 
 fn unallocatable_resamples_report_their_size<T: RealField>() {
+    assert_eq!(
+        fit_one_observation::<T>(1),
+        (None, 1),
+        "a resample that fits is fitted"
+    );
     // `usize::MAX` overflows the capacity computation. The second size is the
     // largest element count whose byte length is at most `isize::MAX`: the
     // capacity check admits it and the allocator refuses it because no host
@@ -200,4 +205,58 @@ fn fit_rejects_an_unallocatable_resample_with_a_typed_error() {
     unallocatable_resamples_report_their_size::<f64>();
     unallocatable_resamples_report_their_size::<F32>();
     unallocatable_resamples_report_their_size::<F64>();
+}
+
+/// Trained state of `2^17` bytes. `u32::MAX` of them need `2^49` bytes, 512
+/// TiB: below `isize::MAX`, so the capacity check admits the request, and
+/// above the user address space of 64-bit x86-64 (128 TiB) and aarch64 (256
+/// TiB), so the allocator refuses it. A state is returned by value, so the
+/// size is bounded by the test thread's stack, which rules out a size whose
+/// product overflows `Layout`.
+struct Oversized([u8; 1 << 17]);
+
+/// Counts fits; never produces a state, as none could be stored.
+#[derive(Default)]
+struct RefusedFit {
+    fits: Cell<usize>,
+}
+
+impl<T: RealField> TrainableModel<T> for RefusedFit {
+    type Observation = ();
+    type Input = ();
+    type Fitted = Oversized;
+    type Error = LineError;
+
+    fn fit(&self, _: &[()], _: &[usize]) -> Result<Oversized, LineError> {
+        self.fits.set(self.fits.get() + 1);
+        Err(LineError::DegenerateDesign)
+    }
+
+    fn predict(&self, _: &Oversized, _: &()) -> Result<T, LineError> {
+        Err(LineError::DegenerateDesign)
+    }
+}
+
+fn unallocatable_member_storage_reports_the_member_count<T: RealField>() {
+    let model = RefusedFit::default();
+    let design = Bootstrap::<SplitMix64>::new(1, 1).expect("positive sizes");
+    let members = NonZeroU32::MAX;
+    let outcome = Bagging::new(design, members)
+        .fit::<_, T>(&model, SEED, &[()])
+        .err();
+    assert_eq!(
+        outcome,
+        Some(BaggingError::MemberAllocation {
+            members: members.get()
+        })
+    );
+    assert_eq!(model.fits.get(), 0, "no member fits without storage");
+}
+
+#[test]
+fn fit_rejects_unallocatable_member_storage_with_a_typed_error() {
+    unallocatable_member_storage_reports_the_member_count::<f32>();
+    unallocatable_member_storage_reports_the_member_count::<f64>();
+    unallocatable_member_storage_reports_the_member_count::<F32>();
+    unallocatable_member_storage_reports_the_member_count::<F64>();
 }

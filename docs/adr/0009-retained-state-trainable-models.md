@@ -3,8 +3,8 @@
 - Status: Accepted
 - Date: 2026-11-24
 - Class: [minor]
-- Revised: 2026-11-24, the refit statement narrowed to what `BaggedModel::predict` provably does (calls only `TrainableModel::predict`, never `fit`), because no trait text excludes a `Fitted` that stores observations; evidence: `bagging.rs:107-115` and the fit counter at `tests/main/bagging.rs:118-120` (PR #144)
-- Revised: 2026-11-24, `BaggingError::ResampleAllocation` added: `Bagging::fit` reserves the resample buffer with `Vec::try_reserve_exact`, so a resample that cannot be allocated returns an error where `vec!` panicked; evidence: `fit_rejects_an_unallocatable_resample_with_a_typed_error` in `tests/main/bagging.rs`.
+- Revised: 2026-11-24, the refit statement narrowed to what `BaggedModel::predict` provably does (calls only `TrainableModel::predict`, never `fit`), because no trait text excludes a `Fitted` that stores observations; evidence: `bagging.rs:115-123` and the fit counter at `tests/main/bagging.rs:118-120` (PR #144)
+- Revised: 2026-11-24, `BaggingError::ResampleAllocation` and `MemberAllocation` added: `Bagging::fit` reserves the resample buffer and the member storage with `Vec::try_reserve_exact` before any member fits, so a refused allocation returns an error where `vec!` panicked and the growing member `Vec` aborted; evidence: `fit_rejects_an_unallocatable_resample_with_a_typed_error` and `fit_rejects_unallocatable_member_storage_with_a_typed_error` in `tests/main/bagging.rs`.
 
 ## Context
 
@@ -23,26 +23,27 @@ M-uq-closure and records no contract for it.
   hyperparameters; `fit(&self, observations, resample)` returns the fitted
   state as an owned `Fitted` value, and `predict(&self, &Fitted, &Input)`
   reads it. `BaggedModel::predict` calls only `TrainableModel::predict`,
-  never `fit` (`bagging.rs:107-115`), and the fit counter of the bagging test
+  never `fit` (`bagging.rs:115-123`), and the fit counter of the bagging test
   witnesses this for its model. The contract places no restriction on
   `Fitted`, so an instance-based model whose state is the observations stays
   admissible and may do its own work inside `predict`. Dispatch is static.
-- `Bagging<A>` (`bagging.rs:19-81`) wraps a `Bootstrap<A>` and a nonzero
+- `Bagging<A>` (`bagging.rs:19-89`) wraps a `Bootstrap<A>` and a nonzero
   member count. Member `r` fits the resample at replicate `r`, filled by
   `Bootstrap::fill_into`. Bagging adds no random stream: replay is governed by
   `A::VERSION`, which is `SplitMix64::VERSION` for the only
   `StreamAlgorithm` implementor at this revision. A consumer that persists
   bagging results records that version and never compares them with a former
   local modulo schedule.
-- `BaggedModel` (`bagging.rs:85-116`) retains one `Fitted` per member in
+- `BaggedModel` (`bagging.rs:93-124`) retains one `Fitted` per member in
   replicate order. `predict` returns the mean of the members' predictions,
   accumulated through `Moments`, and never refits.
-- `BaggingError<E>` (`bagging.rs:122-137`, `#[non_exhaustive]`) separates an
+- `BaggingError<E>` (`bagging.rs:130-150`, `#[non_exhaustive]`) separates an
   observation count that differs from the bootstrap population
-  (`PopulationLength`), a resample buffer that cannot be allocated
-  (`ResampleAllocation`, reserved with `Vec::try_reserve_exact` before any
-  member fits), and a member failure (`Model`). The first failing member ends
-  the fit.
+  (`PopulationLength`), a resample buffer or the storage for the member
+  states that cannot be allocated (`ResampleAllocation`, `MemberAllocation`:
+  one variant per buffer, so each `Display` names the failing allocation;
+  both reserved with `Vec::try_reserve_exact` before any member fits), and a
+  member failure (`Model`). The first failing member ends the fit.
 
 ## Rejected alternatives
 
