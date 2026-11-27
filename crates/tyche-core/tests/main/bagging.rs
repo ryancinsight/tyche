@@ -5,6 +5,8 @@
 //! quotient of exact integer sums and equals the oracle slope bitwise.
 
 use core::cell::Cell;
+use core::error::Error;
+use core::fmt;
 use core::num::NonZeroU32;
 
 use eunomia::{F32, F64, RealField};
@@ -27,6 +29,14 @@ enum LineError {
     /// No resampled abscissa is non-zero, so the slope is undefined.
     DegenerateDesign,
 }
+
+impl fmt::Display for LineError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("no resampled abscissa is non-zero")
+    }
+}
+
+impl Error for LineError {}
 
 impl<T: RealField> TrainableModel<T> for OriginLine {
     type Observation = (T, T);
@@ -259,4 +269,124 @@ fn fit_rejects_unallocatable_member_storage_with_a_typed_error() {
     unallocatable_member_storage_reports_the_member_count::<f64>();
     unallocatable_member_storage_reports_the_member_count::<F32>();
     unallocatable_member_storage_reports_the_member_count::<F64>();
+}
+
+fn over_length_observations_report_the_population_length<T: RealField>() {
+    let model = OriginLine::default();
+    let design =
+        Bootstrap::<SplitMix64>::new(ORDINATES.len(), ORDINATES.len()).expect("positive sizes");
+    let mut data = observations::<T>();
+    data.push((T::ONE, T::ONE));
+    let outcome = Bagging::new(design, NonZeroU32::MIN)
+        .fit::<_, T>(&model, SEED, &data)
+        .err();
+    assert_eq!(
+        outcome,
+        Some(BaggingError::PopulationLength {
+            expected: ORDINATES.len(),
+            actual: ORDINATES.len() + 1
+        })
+    );
+    assert_eq!(model.fits.get(), 0, "no member fits a mismatched set");
+}
+
+#[test]
+fn over_length_observations_report_population_length() {
+    over_length_observations_report_the_population_length::<f32>();
+    over_length_observations_report_the_population_length::<f64>();
+    over_length_observations_report_the_population_length::<F32>();
+    over_length_observations_report_the_population_length::<F64>();
+}
+
+#[test]
+fn model_failure_exposes_its_source() {
+    let failure = BaggingError::Model(LineError::DegenerateDesign);
+    let source = failure.source().expect("a member failure is the source");
+    assert_eq!(
+        source.downcast_ref::<LineError>(),
+        Some(&LineError::DegenerateDesign)
+    );
+    let own_failures = [
+        BaggingError::<LineError>::PopulationLength {
+            expected: 9,
+            actual: 10,
+        },
+        BaggingError::ResampleAllocation { resample_size: 1 },
+        BaggingError::MemberAllocation { members: 1 },
+    ];
+    for failure in own_failures {
+        assert_eq!(
+            failure.source().map(ToString::to_string),
+            None,
+            "{failure} has no source"
+        );
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct Rejected {
+    member: usize,
+}
+
+/// Numbers its members by fit order; every member from `first_rejected` on
+/// rejects its prediction, naming itself.
+struct RejectingPredict {
+    first_rejected: usize,
+    fits: Cell<usize>,
+}
+
+impl<T: RealField> TrainableModel<T> for RejectingPredict {
+    type Observation = ();
+    type Input = ();
+    type Fitted = usize;
+    type Error = Rejected;
+
+    fn fit(&self, _: &[()], _: &[usize]) -> Result<usize, Rejected> {
+        let member = self.fits.get();
+        self.fits.set(member + 1);
+        Ok(member)
+    }
+
+    fn predict(&self, fitted: &usize, (): &()) -> Result<T, Rejected> {
+        if *fitted < self.first_rejected {
+            Ok(T::ONE)
+        } else {
+            Err(Rejected { member: *fitted })
+        }
+    }
+}
+
+fn prediction_failure_is_the_first_rejecting_member<T: RealField>() {
+    let design = Bootstrap::<SplitMix64>::new(1, 1).expect("positive sizes");
+    let members = usize::try_from(MEMBERS).expect("small member count");
+    for first_rejected in 0..=members {
+        let model = RejectingPredict {
+            first_rejected,
+            fits: Cell::new(0),
+        };
+        let bagged = Bagging::new(design, NonZeroU32::new(MEMBERS).expect("positive"))
+            .fit::<_, T>(&model, SEED, &[()])
+            .expect("fitting never fails");
+        let outcome = bagged.predict(&());
+        if first_rejected == members {
+            // Every difference `1 - m` is exactly zero, so the mean is exact.
+            assert_eq!(outcome, Ok(T::ONE), "no member rejects");
+        } else {
+            assert_eq!(
+                outcome,
+                Err(Rejected {
+                    member: first_rejected
+                }),
+                "the first rejecting member's failure is returned"
+            );
+        }
+    }
+}
+
+#[test]
+fn prediction_failure_propagates_from_the_first_member() {
+    prediction_failure_is_the_first_rejecting_member::<f32>();
+    prediction_failure_is_the_first_rejecting_member::<f64>();
+    prediction_failure_is_the_first_rejecting_member::<F32>();
+    prediction_failure_is_the_first_rejecting_member::<F64>();
 }

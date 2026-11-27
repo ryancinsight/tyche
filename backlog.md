@@ -48,19 +48,6 @@
 - Question: does Consus expose a flush or transaction contract yet? ADR 0001 records none. Method: read the Consus `Store` trait at the locked revision; a contract adds a durability item and leaves this one unchanged.
 - Next step: record the schema version header and the manifest-last write order in an ADR beside ADR 0001, then add the schema with the round-trip test.
 
-<a id="tyche-bagging-002"></a>
-## TYCHE-BAGGING-002 — Bagging tests that kill surviving mutants [patch] — todo
-- priority: verification; milestone: M-uq-closure; needs: none; basis: `1f74f9677a3ba2382bc11df029ea610ee59b27ed`.
-- Outcome: three tests in `crates/tyche-core/tests/main/bagging.rs` (its only `PopulationLength` case is an empty slice, its other error case `Model(LineError::DegenerateDesign)` never reaches `source()`, and `OriginLine::predict` never fails), each failing under one mutant of `crates/tyche-core/src/ensemble/bagging.rs`:
-  - `bagging::over_length_observations_report_population_length`: ten observations against population nine return `PopulationLength { expected: 9, actual: 10 }` and fit no member; kills `!=` to `<` at line 51.
-  - `bagging::model_failure_exposes_its_source`: `BaggingError::Model(e).source()` is `Some` and is that error; `PopulationLength` yields `None`; kills `source()` returning `None`.
-  - `bagging::prediction_failure_propagates_from_the_first_member`: a model whose `predict` errors makes `BaggedModel::predict` return that error; kills a swallowed error at line 103.
-- Acceptance: all three pass at the head and fail under their mutant; `cargo mutants -p tyche-core --file crates/tyche-core/src/ensemble/bagging.rs` reports no survivor on those lines (a manual mutation substitutes where the tool does not generate the mutant); `git grep -n 'predicting never refits' -- crates/tyche-core/src` is empty.
-- Also: reword `crates/tyche-core/src/ensemble/model.rs:41-43` "so predicting never refits" to what the code proves: `BaggedModel::predict` calls only `TrainableModel::predict`, never `fit` (`bagging.rs:100-108`), and the fit counter of the existing test (`tests/main/bagging.rs:118-120`) witnesses it for its model. The trait adds no restriction on `Fitted`, so an instance-based model whose state is the observations stays admissible.
-- Verification at the basis: source read; the survivors are derived from the test file's contents, no mutation run.
-- Scope: `crates/tyche-core/tests/main/bagging.rs`, `crates/tyche-core/src/ensemble/model.rs`.
-- Next step: add the three tests, run the mutants command, then the Rustdoc wording.
-
 <a id="tyche-trainable-001"></a>
 ## TYCHE-TRAINABLE-001 — Decide ADR 0009's open consumer questions [patch] — todo
 - priority: verification; milestone: M-uq-closure; needs: none; basis: `7ca7f7276ff4dbafb59e1124cf167e0a2a2c092c`.
