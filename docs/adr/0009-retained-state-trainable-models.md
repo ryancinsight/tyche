@@ -6,6 +6,8 @@
 - Revised: 2026-11-24, the refit statement narrowed to what `BaggedModel::predict` provably does (calls only `TrainableModel::predict`, never `fit`), because no trait text excludes a `Fitted` that stores observations; evidence: `bagging.rs:115-123` and the fit counter at `tests/main/bagging.rs:127-131` (PR #144)
 - Revised: 2026-11-24, `BaggingError::ResampleAllocation` and `MemberAllocation` added: `Bagging::fit` reserves the resample buffer and the member storage with `Vec::try_reserve_exact` before any member fits, so a refused allocation returns an error where `vec!` panicked and the growing member `Vec` aborted; evidence: `fit_rejects_an_unallocatable_resample_with_a_typed_error` and `fit_rejects_unallocatable_member_storage_with_a_typed_error` in `tests/main/bagging.rs`.
 
+- Revised: 2026-11-27, three consumer questions decided (multi-output, member spread, `RealField` bound), each as the recommended option and a veto point; evidence: Kwavers `34fa3f47` `ensemble_methods/mod.rs:42-46,165-176`, `bagging.rs:44-51,99-123` and `statistics/moments.rs` (TYCHE-TRAINABLE-001)
+
 ## Context
 
 `StudyModel::evaluate` (`crates/tyche-core/src/ensemble/model.rs:4-22`) maps
@@ -16,6 +18,14 @@ and perturbs an external predictor at prediction time, so the fitted members
 are not a function of the resamples and the consumer cannot adopt provider
 resampling. [ADR 0006](0006-release-scope-1-0.md) lists the seam in
 M-uq-closure and records no contract for it.
+
+Three questions remained open. The consumer predicts an `Array2<f32>` and
+reports a per-element, weighted variance across its ensemble members
+(Kwavers `34fa3f47`, `ensemble_methods/mod.rs:42-46,165-176`), while
+`TrainableModel::predict` returns one `T` (`model.rs:101`) and
+`BaggedModel::predict` returns only the mean (`bagging.rs:115-123`). Separately,
+`fitted_members` and `predict` require `T: RealField` (`bagging.rs:99`) while
+`Bagging::fit` requires nothing of `T` (`bagging.rs:44-51`).
 
 ## Decision
 
@@ -44,6 +54,27 @@ M-uq-closure and records no contract for it.
   one variant per buffer, so each `Display` names the failing allocation;
   both reserved with `Vec::try_reserve_exact` before any member fits), and a
   member failure (`Model`). The first failing member ends the fit.
+- Multi-output (veto point 1): `TrainableModel<T>::predict` keeps one scalar
+  `T` and the provider adds no output-shape type. A consumer with an array
+  response addresses one element per call through `Input`, an unconstrained
+  `?Sized` type, so one retained `Fitted` serves every element. The mean and
+  the variance are elementwise statistics: the mean over members of element
+  `(i, j)` equals element `(i, j)` of the mean array, so the scalar seam
+  loses neither. The consumer assembles its `Array2` from those calls.
+- Member spread (veto point 2): `BaggedModel` gains
+  `predict_moments(&Input) -> Result<Moments<T>, M::Error>`, the accumulator
+  `predict` already builds, and `predict` becomes its mean. The caller picks
+  the divisor through `Moments::variance::<P>` (`PopulationVariance` or
+  `SampleVariance`), so the provider fixes no variance convention. The spread
+  is that of the member predictions about their mean, unweighted, with no
+  noise term; weights and percentiles stay the consumer's. Filed as
+  TYCHE-BAGGING-SPREAD-001.
+- Bound (veto point 3): `T: RealField` is required exactly where a mean is
+  formed, so `predict` and `predict_moments` keep it. `Bagging::fit` forms no
+  mean and stays unbounded, and `fitted_members`, which only reads the
+  retained `Vec<M::Fitted>`, moves to an impl block without the bound, so
+  every fitted bag is readable. Bounds sit at the use site, never on the
+  definition. Filed as TYCHE-BAGGING-BOUND-001.
 
 ## Rejected alternatives
 
@@ -54,13 +85,29 @@ M-uq-closure and records no contract for it.
   must be a value that `fit` returns.
 - Bagging that draws its own resample indices: a second schedule would need
   its own replay version beside the bootstrap's.
+- Multi-output through an `Output` associated type with its own accumulation
+  trait: the only aggregations with a caller are the elementwise mean and
+  variance, which commute with element addressing, so the trait would have
+  one implementor (no speculative seam). `predict` into a caller `&mut [T]`
+  adds a length contract and a typed error, and per-slot accumulators need
+  storage the provider would own or the caller supplies.
+- Member spread left to the consumer through `fitted_members` and
+  `TrainableModel::predict`: both are public, so it is possible, but every
+  consumer repeats the member loop and the Welford accumulation, and the
+  mean and the spread would come from different accumulators. Returning a
+  `Vec<T>` of member predictions allocates per call and exposes more than the
+  spread needs.
+- `T: RealField` on `Bagging::fit` or on the `BaggedModel` definition: it
+  rejects a fit-only use with a non-scalar `T`, bounds a type that reads
+  nothing scalar, and still leaves `fitted_members` gated behind it.
 
 ## Consequences
 
 - `BaggedModel` holds members times the size of `Fitted` until it drops, plus
   one resample buffer of `resample_size` indices during `fit`.
 - `BaggedModel` borrows the model (`&'model M`), so the model outlives it.
-- The mean is the only aggregation provided.
+- The mean is the only aggregation provided until TYCHE-BAGGING-SPREAD-001
+  adds the moments accumulator; the three decisions above change no code.
 - Evidence: `crates/tyche-core/tests/main/bagging.rs` fits a least-squares
   model on integer data for `f32`, `f64`, `F32` and `F64`, compares each member
   with an independently derived slope, bounds the bagged mean by a derived
@@ -74,3 +121,10 @@ M-uq-closure and records no contract for it.
   `fit` signature.
 - A measured `Fitted` footprint that makes members times its size
   untenable for a consumer reopens retention of every member.
+- Multi-output: a measured `predict` cost per element that dominates, for a
+  predictor that evaluates the whole array per call, or a statistic that
+  couples outputs (a covariance across elements) reopens a vector `Output`.
+- Member spread: a consumer that needs weighted spread or quantiles of the
+  member predictions reopens exposing the member predictions themselves.
+- `RealField` bound: an aggregation over a non-scalar `T` with a defined mean
+  reopens the bound on `predict`.

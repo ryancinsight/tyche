@@ -48,13 +48,21 @@
 - Question: does Consus expose a flush or transaction contract yet? ADR 0001 records none. Method: read the Consus `Store` trait at the locked revision; a contract adds a durability item and leaves this one unchanged.
 - Next step: record the schema version header and the manifest-last write order in an ADR beside ADR 0001, then add the schema with the round-trip test.
 
-<a id="tyche-trainable-001"></a>
-## TYCHE-TRAINABLE-001 — Decide ADR 0009's open consumer questions [patch] — todo
-- priority: verification; milestone: M-uq-closure; needs: none; basis: `d499924114bc200082316e7af2e94a4b9417c755`.
-- Outcome: ADR 0009 records three decisions it omits. (1) Multi-output: `TrainableModel<T>` returns one `T` per prediction (`model.rs:101`), while the Kwavers consumer predicts `Array2<f32>` and reports per-element variance (`crates/kwavers-analysis/src/ml/uncertainty/ensemble_methods/mod.rs:42-46,165-176` at kwavers `34fa3f47`). (2) Member spread: `BaggedModel::predict` returns only the mean (`bagging.rs:115-123`), while the consumer reports variance. (3) Bound: `fitted_members` and `predict` need `T: RealField` (`bagging.rs:99`) but `Bagging::fit` has no such bound (`bagging.rs:50-52`), so a non-scalar `T` fits and cannot be read.
-- Acceptance: from the tyche checkout root, `awk '/^## /{h=$2} {l=tolower($0)} l~/multi-output/{m[h]=1} l~/spread/{s[h]=1} /RealField/{r[h]=1} END{ok=1;n=split("Decision Rejected Overturning",H," ");for(i=1;i<=n;i++)if(!(m[H[i]]&&s[H[i]]&&r[H[i]]))ok=0;print ok}' docs/adr/0009-retained-state-trainable-models.md` prints `1` (it prints `0` at the basis): each of `multi-output`, `spread` and `RealField` occurs under Decision, Rejected alternatives and Overturning evidence. The prose there states, per question, the chosen option, the strongest rejected one and the overturning evidence (a judge reads this; the command cannot). With the scripts taken from an export of the stack repository's default branch at its fetched revision (tyche has no `scripts/adr-index.py`), `python <export>/scripts/adr-index.py --strict --directory docs/adr check` and `python <export>/scripts/atlas-adr-canonical-form.py --check docs/adr` pass. Any chosen API change is filed as its own item citing the ADR.
-- Scope: `docs/adr/0009-retained-state-trainable-models.md`.
-- Next step: draft the three decisions as the recommended option and name them veto points.
+<a id="tyche-bagging-bound-001"></a>
+## TYCHE-BAGGING-BOUND-001 — Read fitted bagging members for any target type [minor] — todo
+- priority: tightening; milestone: M-uq-closure; needs: none; basis: `5b97125517d174854a0da495e0d8422d5220ec55`.
+- Outcome: [ADR 0009](docs/adr/0009-retained-state-trainable-models.md) (Decision, Bound) moves `fitted_members` out of the `T: RealField` impl block (`crates/tyche-core/src/ensemble/bagging.rs:99-102`) into an impl block bounded only by `M: TrainableModel<T>`. `predict` keeps `RealField`, and `Bagging::fit` (`:44-51`) stays unbounded. The seam is unreleased (`CHANGELOG.md` `## Unreleased`), so the loosening is additive.
+- Acceptance: test `bagging::fitted_members_are_readable_for_a_non_scalar_target` in `crates/tyche-core/tests/main/bagging.rs` fits a model whose `T` is a tuple of two `u8` (not `RealField`), then asserts with `assert_eq!` that `fitted_members()` equals the per-replicate states computed from `Bootstrap::at` draws the way `oracle_slope` does (`tests/main/bagging.rs:75`). `cargo nextest run -p tyche-core --test main -E 'test(=bagging::fitted_members_are_readable_for_a_non_scalar_target)'` passes at the head and fails to compile at the base (`RealField` is not satisfied by the tuple).
+- Scope: `crates/tyche-core/src/ensemble/bagging.rs`, `crates/tyche-core/tests/main/bagging.rs`, `CHANGELOG.md`.
+- Next step: split the impl block, add the test, then the changelog line.
+
+<a id="tyche-bagging-spread-001"></a>
+## TYCHE-BAGGING-SPREAD-001 — Expose the bagged member spread [minor] — todo
+- priority: feature; milestone: M-uq-closure; needs: TYCHE-BAGGING-BOUND-001; basis: `5b97125517d174854a0da495e0d8422d5220ec55`.
+- Outcome: [ADR 0009](docs/adr/0009-retained-state-trainable-models.md) (Decision, Member spread) adds `BaggedModel::predict_moments(&Input) -> Result<Moments<T>, M::Error>`; `predict` returns its mean. The Kwavers consumer reports per-element variance across members (`34fa3f47`, `ensemble_methods/mod.rs:165-176`) and `predict` returns only the mean (`bagging.rs:115-123`). It serves the M-uq-closure bagging exit (member prediction); no new exit check is claimed, so the closing sweep decides whether the ladder gains one or this item is deleted as a non-goal.
+- Acceptance: test `bagging::member_spread_matches_the_independent_variance_for_every_scalar` in `crates/tyche-core/tests/main/bagging.rs`, for `f32`, `f64`, `F32` and `F64`: `predict_moments(..).variance::<PopulationVariance>()` equals the variance of the member slopes `oracle_slope` derives from integer sums (`tests/main/bagging.rs:75,101-102`), within a bound derived from the scalar epsilon and member count and named at the assertion, and `predict` equals `predict_moments(..).mean()` through `assert_eq!`. `cargo nextest run -p tyche-core --test main -E 'test(=bagging::member_spread_matches_the_independent_variance_for_every_scalar)'` passes at the head and fails to compile at the base (no such method). A doctest on `predict_moments` runs under `cargo test --doc -p tyche-core`.
+- Scope: `crates/tyche-core/src/ensemble/bagging.rs`, `crates/tyche-core/tests/main/bagging.rs`, `CHANGELOG.md`.
+- Next step: add the method after TYCHE-BAGGING-BOUND-001 lands, then the test.
 
 <a id="tyche-ladder-001"></a>
 ## TYCHE-LADDER-001 — Rewrite the milestone ladder to the roadmap rules [patch] — todo
