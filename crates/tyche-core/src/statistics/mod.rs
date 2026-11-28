@@ -26,5 +26,5 @@ pub use variance::{PopulationVariance, SampleVariance, VariancePolicy};
     reason = "the generic numeric contract represents observation counts in T"
 )]
 pub(crate) fn count_as<T: RealField>(count: u64) -> T {
-    T::from_f64(count as f64)
+    T::from_count(count as usize)
 }

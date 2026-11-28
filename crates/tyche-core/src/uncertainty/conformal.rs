@@ -88,11 +88,11 @@ impl<T: RealField> ConformalCalibrator<T> {
     )]
     fn select_sorted(self, scores: &[T]) -> T {
         let corrected_rank =
-            (T::from_f64((scores.len() + 1) as f64) * (T::ONE - self.miscoverage)).ceil();
+            (T::from_count(scores.len() + 1) * (T::ONE - self.miscoverage)).ceil();
         scores
             .iter()
             .enumerate()
-            .find(|(index, _)| T::from_f64((index + 1) as f64) >= corrected_rank)
+            .find(|(index, _)| T::from_count(index + 1) >= corrected_rank)
             .map_or_else(
                 || {
                     scores
