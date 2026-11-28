@@ -82,6 +82,14 @@
 - Scope: `docs/book/`, `crates/tyche-core/examples/`.
 - Next step: write the derivation first, then the example, then wire the include.
 
+<a id="tyche-ci-aggregate-001"></a>
+## TYCHE-CI-AGGREGATE-001 — Require the single CI aggregate context on main [patch] — todo
+- priority: verification; milestone: M-uq-closure; needs: none; basis: `cfdb27461a7a2474348a115b47d9f4e97d14447c`.
+- Outcome: the `main` branch requires the one context `CI aggregate`, the `aggregate` job of `.github/workflows/ci.yml`, which fails on a draft and on any non-success of `lockfile`, `verify` and `supply-chain`. Until then the aggregate binds nothing, and `verify` alone concludes success on a draft pull request.
+- Acceptance: `gh api repos/ryancinsight/tyche/branches/main/protection/required_status_checks --jq .contexts` prints `["CI aggregate"]`. At the basis it prints `["verify","supply-chain","Lockfile integrity / Lockfile integrity"]`.
+- Scope: the repository's branch protection (merge-mechanics setting); no file changes.
+- Next step: once `ci.yml` on the default branch holds the `aggregate` job and a green run on a ready pull request has named it, copy the context from that run's check name and run `gh api -X PATCH repos/ryancinsight/tyche/branches/main/protection/required_status_checks -f 'contexts[]=CI aggregate'`, leaving `strict` unchanged. Every other open pull request then needs a run that includes the job. Delete this block with the sweep that records the command's output.
+
 <a id="tyche-mutants-001"></a>
 ## TYCHE-MUTANTS-001 — Pin and run cargo-mutants on the bagging module [patch] — todo
 - priority: verification; milestone: M-uq-closure; needs: none; basis: `d499924114bc200082316e7af2e94a4b9417c755`.
