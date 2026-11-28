@@ -42,8 +42,8 @@ where
 /// state, which the caller keeps and passes to every [`Self::predict`].
 /// [`crate::Bagging`] fits one state per bootstrap resample, and
 /// [`crate::BaggedModel::predict`] calls only [`Self::predict`], never
-/// [`Self::fit`]. The trait adds no bound on `Fitted`, so a state may be the
-/// observations themselves.
+/// [`Self::fit`]. The trait adds no bound on `Fitted`, so a state may be a copy
+/// of the observations.
 ///
 /// # Examples
 ///

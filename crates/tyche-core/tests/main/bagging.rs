@@ -299,6 +299,34 @@ fn over_length_observations_report_population_length() {
 }
 
 #[test]
+fn bagging_failures_display_their_context() {
+    let failures = [
+        (
+            BaggingError::<LineError>::PopulationLength {
+                expected: 9,
+                actual: 10,
+            },
+            "bagging received 10 observations for a population of 9",
+        ),
+        (
+            BaggingError::ResampleAllocation { resample_size: 5 },
+            "bagging cannot allocate a resample of 5 indices",
+        ),
+        (
+            BaggingError::MemberAllocation { members: 6 },
+            "bagging cannot allocate storage for 6 trained states",
+        ),
+        (
+            BaggingError::Model(LineError::DegenerateDesign),
+            "bagging member fit failed",
+        ),
+    ];
+    for (failure, text) in failures {
+        assert_eq!(failure.to_string(), text);
+    }
+}
+
+#[test]
 fn model_failure_exposes_its_source() {
     let failure = BaggingError::Model(LineError::DegenerateDesign);
     let source = failure.source().expect("a member failure is the source");
@@ -369,7 +397,9 @@ fn prediction_failure_is_the_first_rejecting_member<T: RealField>() {
             .expect("fitting never fails");
         let outcome = bagged.predict(&());
         if first_rejected == members {
-            // Every difference `1 - m` is exactly zero, so the mean is exact.
+            // `Moments` starts its mean at zero (`moments.rs:38`), so the first
+            // update adds `(1 - 0) / 1 = 1` exactly and every later update
+            // adds `(1 - 1) / k = 0` (`moments.rs:56-57`): the mean is exactly one.
             assert_eq!(outcome, Ok(T::ONE), "no member rejects");
         } else {
             assert_eq!(

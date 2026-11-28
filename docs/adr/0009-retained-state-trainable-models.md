@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-11-24
 - Class: [minor]
-- Revised: 2026-11-24, the refit statement narrowed to what `BaggedModel::predict` provably does (calls only `TrainableModel::predict`, never `fit`), because no trait text excludes a `Fitted` that stores observations; evidence: `bagging.rs:115-123` and the fit counter at `tests/main/bagging.rs:118-120` (PR #144)
+- Revised: 2026-11-24, the refit statement narrowed to what `BaggedModel::predict` provably does (calls only `TrainableModel::predict`, never `fit`), because no trait text excludes a `Fitted` that stores observations; evidence: `bagging.rs:115-123` and the fit counter at `tests/main/bagging.rs:127-131` (PR #144)
 - Revised: 2026-11-24, `BaggingError::ResampleAllocation` and `MemberAllocation` added: `Bagging::fit` reserves the resample buffer and the member storage with `Vec::try_reserve_exact` before any member fits, so a refused allocation returns an error where `vec!` panicked and the growing member `Vec` aborted; evidence: `fit_rejects_an_unallocatable_resample_with_a_typed_error` and `fit_rejects_unallocatable_member_storage_with_a_typed_error` in `tests/main/bagging.rs`.
 
 ## Context
@@ -19,7 +19,7 @@ M-uq-closure and records no contract for it.
 
 ## Decision
 
-- `TrainableModel<T>` (`model.rs:72-100`): the implementor holds
+- `TrainableModel<T>` (`model.rs:74-102`): the implementor holds
   hyperparameters; `fit(&self, observations, resample)` returns the fitted
   state as an owned `Fitted` value, and `predict(&self, &Fitted, &Input)`
   reads it. `BaggedModel::predict` calls only `TrainableModel::predict`,
