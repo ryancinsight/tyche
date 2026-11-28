@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 permissions:
@@ -71,3 +72,37 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       - uses: dtolnay/rust-toolchain@a5f673d0ba8626c3977bb416a1612774bc82181b
       - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25
+
+  # The one required check. A draft pull request never reads as passing
+  # (`verify` alone concludes success on a draft), and a failed, cancelled
+  # or skipped job fails the aggregate. `semver` is informational on pull
+  # requests (see above): the aggregate waits for it and reports its result
+  # without gating on it.
+  aggregate:
+    name: CI aggregate
+    if: always()
+    needs: [semver, lockfile, verify, supply-chain]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every job to succeed on a ready change
+        env:
+          DRAFT: ${{ github.event.pull_request.draft }}
+          SEMVER: ${{ needs.semver.result }}
+          LOCKFILE: ${{ needs.lockfile.result }}
+          VERIFY: ${{ needs.verify.result }}
+          SUPPLY_CHAIN: ${{ needs.supply-chain.result }}
+        run: |
+          if [ "$DRAFT" = "true" ]; then
+            echo "draft pull request: mark it ready for review" >&2
+            exit 1
+          fi
+          echo "semver (informational) concluded $SEMVER"
+          status=0
+          for entry in "lockfile:$LOCKFILE" "verify:$VERIFY" "supply-chain:$SUPPLY_CHAIN"; do
+            if [ "${entry#*:}" != "success" ]; then
+              echo "${entry%%:*} concluded ${entry#*:}" >&2
+              status=1
+            fi
+          done
+          exit "$status"
