@@ -82,14 +82,6 @@
 - Scope: `docs/book/`, `crates/tyche-core/examples/`.
 - Next step: write the derivation first, then the example, then wire the include.
 
-<a id="tyche-ci-aggregate-001"></a>
-## TYCHE-CI-AGGREGATE-001 — One aggregate check that refuses drafts [patch] — todo
-- priority: verification; milestone: M-uq-closure; needs: none; basis: `d499924114bc200082316e7af2e94a4b9417c755`.
-- Outcome: `.github/workflows/ci.yml` has jobs `semver`, `lockfile`, `verify` and `supply-chain` but no aggregate, and `on.pull_request` sets no `types`. The required contexts are job names: `gh api repos/ryancinsight/tyche/branches/main/protection/required_status_checks --jq .contexts` prints `["verify","supply-chain","Lockfile integrity / Lockfile integrity"]`. The stack's workflow rule requires one named aggregate that `needs:` every job and fails on any failure, cancellation or draft, so a draft never reads as passing (`verify` concludes success on a draft pull request).
-- Acceptance: `git grep -n -E 'if: (\$\{\{ )?always\(\)' -- .github/workflows/ci.yml` prints the aggregate job's line (no match at the basis); `on.pull_request.types` in that file lists `ready_for_review`; once a green run names the job, the `gh api` command above returns that one context; on a draft pull request the aggregate job concludes `failure`.
-- Scope: `.github/workflows/ci.yml`; the repository's branch protection (merge-mechanics setting).
-- Next step: add the aggregate (`semver` is informational on pull requests, so its result is not an aggregate failure) and `types`, run it on a draft and a ready pull request, then replace the required contexts through `gh api`.
-
 <a id="tyche-mutants-001"></a>
 ## TYCHE-MUTANTS-001 — Pin and run cargo-mutants on the bagging module [patch] — todo
 - priority: verification; milestone: M-uq-closure; needs: none; basis: `d499924114bc200082316e7af2e94a4b9417c755`.
