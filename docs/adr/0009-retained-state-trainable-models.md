@@ -6,7 +6,7 @@
 - Revised: 2026-11-24, the refit statement narrowed to what `BaggedModel::predict` provably does (calls only `TrainableModel::predict`, never `fit`), because no trait text excludes a `Fitted` that stores observations; evidence: `bagging.rs:115-123` and the fit counter at `tests/main/bagging.rs:127-131` (PR #144)
 - Revised: 2026-11-24, `BaggingError::ResampleAllocation` and `MemberAllocation` added: `Bagging::fit` reserves the resample buffer and the member storage with `Vec::try_reserve_exact` before any member fits, so a refused allocation returns an error where `vec!` panicked and the growing member `Vec` aborted; evidence: `fit_rejects_an_unallocatable_resample_with_a_typed_error` and `fit_rejects_unallocatable_member_storage_with_a_typed_error` in `tests/main/bagging.rs`.
 
-- Revised: 2026-11-27, three consumer questions decided (multi-output, member spread, `RealField` bound), each as the recommended option and a veto point; evidence: Kwavers `34fa3f47` `ensemble_methods/mod.rs:42-46,165-176`, `bagging.rs:44-51,99-123` and `statistics/moments.rs` (TYCHE-TRAINABLE-001)
+- Revised: 2026-11-27, three consumer questions decided (multi-output, member spread, `RealField` bound), each as the recommended option and a veto point; evidence: Kwavers `34fa3f47` `ensemble_methods/mod.rs:42-46,165-176`, `ensemble_methods/model.rs:21`, `predictor.rs:20`, `bagging.rs:44-51,99-123` and `statistics/moments.rs` (PR #158)
 
 ## Context
 
@@ -25,7 +25,11 @@ reports a per-element, weighted variance across its ensemble members
 `TrainableModel::predict` returns one `T` (`model.rs:101`) and
 `BaggedModel::predict` returns only the mean (`bagging.rs:115-123`). Separately,
 `fitted_members` and `predict` require `T: RealField` (`bagging.rs:99`) while
-`Bagging::fit` requires nothing of `T` (`bagging.rs:44-51`).
+`Bagging::fit` requires nothing of `T` (`bagging.rs:44-51`). At that revision
+the consumer's member weights default to 1.0 (`ensemble_methods/model.rs:21`)
+and change only through its public `update_weights` (`mod.rs:243-262`), its
+predictor maps a whole input matrix to a whole output matrix per call
+(`predictor.rs:20`), and no consumer type implements `TrainableModel`.
 
 ## Decision
 
@@ -60,21 +64,32 @@ reports a per-element, weighted variance across its ensemble members
   `?Sized` type, so one retained `Fitted` serves every element. The mean and
   the variance are elementwise statistics: the mean over members of element
   `(i, j)` equals element `(i, j)` of the mean array, so the scalar seam
-  loses neither. The consumer assembles its `Array2` from those calls.
+  loses neither. The consumer assembles its `Array2` from those calls. The
+  first overturning trigger below holds in form at the cited revision (the
+  predictor evaluates the whole matrix per call) but is unmeasured, and no
+  consumer type implements the trait, so a vector `Output` has neither a
+  measurement nor a second implementor; this is the weakest of the three
+  decisions.
 - Member spread (veto point 2): `BaggedModel` gains
   `predict_moments(&Input) -> Result<Moments<T>, M::Error>`, the accumulator
   `predict` already builds, and `predict` becomes its mean. The caller picks
   the divisor through `Moments::variance::<P>` (`PopulationVariance` or
   `SampleVariance`), so the provider fixes no variance convention. The spread
   is that of the member predictions about their mean, unweighted, with no
-  noise term; weights and percentiles stay the consumer's. Filed as
+  noise term, so it reproduces the consumer's statistic at default weights
+  only. A consumer that keeps non-uniform weights computes its weighted
+  reduction from `fitted_members` and `TrainableModel::predict`, and whether
+  that policy persists under provider bagging is the consumer owner's
+  decision, not made here; percentiles stay the consumer's. Filed as
   TYCHE-BAGGING-SPREAD-001.
 - Bound (veto point 3): `T: RealField` is required exactly where a mean is
   formed, so `predict` and `predict_moments` keep it. `Bagging::fit` forms no
   mean and stays unbounded, and `fitted_members`, which only reads the
   retained `Vec<M::Fitted>`, moves to an impl block without the bound, so
-  every fitted bag is readable. Bounds sit at the use site, never on the
-  definition. Filed as TYCHE-BAGGING-BOUND-001.
+  every fitted bag is readable. The `RealField` bound sits at the use site,
+  never on the `Bagging::fit` signature or the `BaggedModel` definition, which
+  keeps `M: TrainableModel<T>` only to name `M::Fitted` (`bagging.rs:93`).
+  Filed as TYCHE-BAGGING-BOUND-001.
 
 ## Rejected alternatives
 
@@ -98,8 +113,8 @@ reports a per-element, weighted variance across its ensemble members
   `Vec<T>` of member predictions allocates per call and exposes more than the
   spread needs.
 - `T: RealField` on `Bagging::fit` or on the `BaggedModel` definition: it
-  rejects a fit-only use with a non-scalar `T`, bounds a type that reads
-  nothing scalar, and still leaves `fitted_members` gated behind it.
+  rejects a fit-only use with a non-scalar `T` and bounds a type that reads
+  nothing scalar.
 
 ## Consequences
 
@@ -125,6 +140,7 @@ reports a per-element, weighted variance across its ensemble members
   predictor that evaluates the whole array per call, or a statistic that
   couples outputs (a covariance across elements) reopens a vector `Output`.
 - Member spread: a consumer that needs weighted spread or quantiles of the
-  member predictions reopens exposing the member predictions themselves.
+  member predictions reopens exposing the member predictions themselves; the
+  cited consumer meets the weighted case once `update_weights` is called.
 - `RealField` bound: an aggregation over a non-scalar `T` with a defined mean
   reopens the bound on `predict`.
